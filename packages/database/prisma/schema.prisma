@@ -1,0 +1,84 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tutor {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  photoUrl        String?
+  tagline         String?
+  about           String?
+  methodology     String?
+  experienceYrs   Int      @default(0)
+  studentsTaught  Int      @default(0)
+  rating          Float    @default(0.0)
+  reviewsCount    Int      @default(0)
+  
+  boards          Board[]
+  subjects        Subject[]
+  schools         School[]
+  locations       Location[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Board {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  tutors      Tutor[]
+}
+
+model Subject {
+  id     String   @id @default(cuid())
+  slug   String   @unique
+  name   String
+  tutors Tutor[]
+}
+
+model School {
+  id       String   @id @default(cuid())
+  slug     String   @unique
+  name     String
+  location String?
+  tutors   Tutor[]
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  societies String[]
+  tutors    Tutor[]
+}
+
+model Lead {
+  id              String   @id @default(cuid())
+  parentName      String
+  phoneNumber     String
+  board           String?
+  grade           String?
+  subject         String?
+  location        String?
+  school          String?
+  message         String?
+  status          LeadStatus @default(PENDING)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum LeadStatus {
+  PENDING
+  CONTACTED
+  CONVERTED
+  REJECTED
+}
