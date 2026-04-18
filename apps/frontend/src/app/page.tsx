@@ -40,13 +40,17 @@ export default function HomePage() {
 
           <FadeIn delay={0.4}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="h-14 px-8 text-lg w-full sm:w-auto shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl group transition-all duration-300">
-                Get Matched with a Tutor
-                <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg w-full sm:w-auto rounded-xl border-primary/20 hover:bg-primary/5 text-primary">
-                Explore Boards
-              </Button>
+              <Link href="/contact" className="w-full sm:w-auto">
+                <Button size="lg" className="h-14 px-8 text-lg w-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl group transition-all duration-300">
+                  Get Matched with a Tutor
+                  <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/gurugram" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="h-14 px-8 text-lg w-full rounded-xl border-primary/20 hover:bg-primary/5 text-primary">
+                  Explore Boards
+                </Button>
+              </Link>
             </div>
           </FadeIn>
         </div>
@@ -288,9 +292,11 @@ export default function HomePage() {
             <p className="text-primary-foreground/80 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
               Join hundreds of parents in Gurugram who trust BoardPeFocus for targeted, premium home tutoring.
             </p>
-            <Button size="lg" className="h-16 px-12 text-lg font-bold shadow-2xl bg-white text-primary hover:bg-white/90 rounded-2xl hover:-translate-y-1 transition-all duration-300">
-              Request a Callback
-            </Button>
+            <Link href="/contact">
+              <Button size="lg" className="h-16 px-12 text-lg font-bold shadow-2xl bg-white text-primary hover:bg-white/90 rounded-2xl hover:-translate-y-1 transition-all duration-300">
+                Request a Callback
+              </Button>
+            </Link>
           </div>
         </FadeIn>
       </section>

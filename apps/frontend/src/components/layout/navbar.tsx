@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { Logo } from "@/components/common/Logo";
+
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -33,11 +35,7 @@ export function Navbar() {
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className="font-heading font-bold text-2xl tracking-tight text-primary">
-            BoardPe<span className="text-accent">Focus</span>
-          </span>
-        </Link>
+        <Logo className="scale-[0.85] md:scale-100 origin-left" />
  
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-8 items-center">

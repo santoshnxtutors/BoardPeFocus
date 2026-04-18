@@ -30,9 +30,11 @@ export default function GurugramCityPage() {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10">
               We exclusively match Class 10 and 12 students in Gurugram with highly vetted educators who understand the internal marking schemes of top city schools.
             </p>
-            <Button size="lg" className="h-14 px-8 text-lg rounded-xl shadow-lg">
-              Find a Tutor Near You
-            </Button>
+            <Link href="/contact">
+              <Button size="lg" className="h-14 px-8 text-lg rounded-xl shadow-lg">
+                Find a Tutor Near You
+              </Button>
+            </Link>
           </FadeIn>
         </div>
       </section>

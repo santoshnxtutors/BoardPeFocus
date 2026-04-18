@@ -156,7 +156,7 @@ export default function ContactPage() {
                       <div>
                         <h4 className="font-bold text-lg text-foreground mb-1">WhatsApp Us</h4>
                         <p className="text-muted-foreground text-sm mb-2">Fastest way to get matched.</p>
-                        <a href="#" className="text-primary font-medium hover:underline">+91 95827 06764</a>
+                        <a href="https://wa.me/919582706764?text=Hello%20BoardPeFocus,%20I'm%20interested%20in%20finding%20a%20home%20tutor%20for%20boards." target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline">+91 95827 06764</a>
                       </div>
                     </div>
                   </StaggerItem>

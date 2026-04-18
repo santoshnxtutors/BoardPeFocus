@@ -218,9 +218,11 @@ export default function TutorProfilePage({ params }: { params: { tutorId: string
                     <span className="font-medium text-foreground">Gurugram</span>
                   </div>
                 </div>
-                <Button className="w-full bg-primary hover:bg-primary/90 text-white shadow-xl h-14 text-lg rounded-xl mt-4 transition-transform hover:-translate-y-1">
-                  Request a Callback
-                </Button>
+                <Link href="/contact">
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-white shadow-xl h-14 text-lg rounded-xl mt-4 transition-transform hover:-translate-y-1">
+                    Request a Callback
+                  </Button>
+                </Link>
                 <p className="text-xs text-center text-muted-foreground mt-4">
                   No payment required. Our counselor will contact you within 2 hours.
                 </p>
