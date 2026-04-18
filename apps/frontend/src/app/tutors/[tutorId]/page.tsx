@@ -5,6 +5,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
 import { constructMetadata } from "@/lib/seo";
 import { CheckCircle2, MapPin, GraduationCap, Star, BookOpen, Clock, CalendarDays, Award } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { FAQ } from "@/components/faq/FAQ";
 
 export async function generateMetadata({ params }: { params: { tutorId: string } }) {
