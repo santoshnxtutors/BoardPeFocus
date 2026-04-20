@@ -5,8 +5,11 @@
   "types": "./src/index.ts",
   "scripts": {
     "generate": "prisma generate",
+    "migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "seed": "prisma db seed",
+    "validate": "prisma validate"
   },
   "dependencies": {
     "@prisma/client": "^5.19.0",
