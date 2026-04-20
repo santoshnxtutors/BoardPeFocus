@@ -30,8 +30,8 @@ export function Navbar() {
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
         scrolled 
-          ? "bg-white/95 backdrop-blur-md shadow-lg py-3" 
-          : "bg-white/60 backdrop-blur-sm py-5 border-b border-black/[0.03]"
+          ? "bg-white/95 backdrop-blur-md shadow-lg py-2 md:py-3" 
+          : "bg-white/60 backdrop-blur-sm py-3 md:py-5 border-b border-black/[0.03]"
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
@@ -43,9 +43,10 @@ export function Navbar() {
             <Link 
               key={link.name} 
               href={link.href} 
-              className="text-sm font-bold text-primary/80 transition-colors hover:text-accent"
+              className="group relative text-sm font-bold text-primary/80 transition-colors hover:text-accent"
             >
               {link.name}
+              <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </Link>
           ))}
         </nav>

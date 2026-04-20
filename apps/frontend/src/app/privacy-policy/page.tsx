@@ -3,6 +3,7 @@ import { constructMetadata } from "@/lib/seo";
 export const metadata = constructMetadata({
   title: "Privacy Policy | BoardPeFocus",
   description: "Our privacy policy explains how we collect, use, and protect your data.",
+  pathname: "/privacy-policy",
 });
 
 export default function PrivacyPolicyPage() {

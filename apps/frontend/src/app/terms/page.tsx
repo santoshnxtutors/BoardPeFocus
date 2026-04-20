@@ -2,6 +2,7 @@ import { constructMetadata } from "@/lib/seo";
 
 export const metadata = constructMetadata({
   title: "Terms of Service | BoardPeFocus",
+  pathname: "/terms",
 });
 
 export default function TermsPage() {

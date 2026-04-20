@@ -1,74 +1,125 @@
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
+import { Badge } from "@/components/ui/badge";
+import { ShieldCheck, Target, Users, BookOpen, ChevronRight, MapPin } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { constructMetadata } from "@/lib/seo";
-import { Target, CheckCircle2, ShieldCheck, MapPin } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "About Us | Premium Gurugram Tutors | BoardPeFocus",
-  description: "Learn why BoardPeFocus is Gurugram's most trusted name for specialized Class 10 and 12 board preparation.",
+  title: "About Us | BoardPeFocus",
+  description: "Learn more about BoardPeFocus - Gurugram's premium board-focused home tutoring platform.",
+  pathname: "/about",
 });
 
 export default function AboutPage() {
   return (
     <div className="bg-background min-h-screen">
-      {/* Hero */}
-      <section className="relative pt-32 pb-24 text-primary overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-24 bg-muted/30 overflow-hidden">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 w-[40rem] h-[40rem] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="container mx-auto px-4 max-w-4xl text-center relative z-10">
-          <FadeIn direction="up">
-            <h1 className="text-4xl md:text-6xl font-heading font-extrabold mb-6">Why We Only Do <span className="text-accent">Boards.</span></h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              We aren't a generic marketplace. We are a specialized academic advisory firm focused strictly on helping Class 10 and 12 students in Gurugram achieve top percentiles.
+          <FadeIn>
+            <Badge variant="outline" className="mb-6 border-primary/20 bg-primary/5 text-primary text-sm px-4 py-1.5 rounded-full">
+              Our Story
+            </Badge>
+            <h1 className="text-4xl md:text-6xl font-heading font-extrabold text-primary mb-6">
+              Not just another marketplace. <br /> A bridge to excellence.
+            </h1>
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              BoardPeFocus was born out of a simple observation: generic tutoring doesn't work for board exams. High-stakes exams like CBSE, IB, and IGCSE require a level of specialization that marketplaces simply can't provide.
             </p>
           </FadeIn>
         </div>
       </section>
 
-      {/* Philosophy Section */}
-      <section className="py-24 bg-muted/30">
-        <div className="container mx-auto px-4 max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <FadeIn direction="right">
-            <div className="space-y-6">
-              <h2 className="text-3xl font-heading font-bold text-primary">The Market Problem</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Most tutoring platforms are directories. They list thousands of tutors for every hobby, language, and subject under the sun. Finding a serious educator who understands the nuances of the IB DP grading rubric or the CBSE marking scheme is like finding a needle in a haystack.
-              </p>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Parents end up wasting crucial months with tutors who are merely "good at Math" but have no idea how a board exam is evaluated.
-              </p>
-            </div>
-          </FadeIn>
-          <FadeIn direction="left">
-            <div className="bg-white p-10 rounded-3xl shadow-xl border border-border/50 relative overflow-hidden">
-              <div className="absolute -right-10 -top-10 w-32 h-32 bg-accent/10 rounded-full blur-2xl" />
-              <h2 className="text-3xl font-heading font-bold text-primary mb-6">The BoardPeFocus Solution</h2>
-              <ul className="space-y-6">
-                <li className="flex gap-4 items-start">
-                  <div className="bg-primary/10 p-2 rounded-full shrink-0"><Target className="w-5 h-5 text-primary" /></div>
-                  <div>
-                    <h4 className="font-bold text-foreground">Hyper-Specialization</h4>
-                    <p className="text-muted-foreground text-sm mt-1">We only onboard tutors who have proven track records with specific boards (CBSE, ICSE, IB, IGCSE).</p>
+      {/* Mission Section */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <FadeIn direction="right">
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-8">
+                The BoardPeFocus Difference
+              </h2>
+              <div className="space-y-8">
+                {[
+                  { 
+                    title: "Hyper-Local Focus", 
+                    icon: <MapPin className="w-6 h-6" />,
+                    desc: "We operate exclusively in Gurugram. This allows us to understand the specific academic cultures and internal assessment patterns of the city's top schools." 
+                  },
+                  { 
+                    title: "Board Specialists Only", 
+                    icon: <BookOpen className="w-6 h-6" />,
+                    desc: "We don't do 'general' tutoring. Our educators are experts in specific board rubrics—whether it's the IB DP criteria or CBSE internal marking." 
+                  },
+                  { 
+                    title: "Rigorous Vetting", 
+                    icon: <ShieldCheck className="w-6 h-6" />,
+                    desc: "We accept fewer than 2% of the tutors who apply. Every educator passes through a 5-step screening process including technical board-specific interviews." 
+                  }
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 text-primary">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-primary mb-2">{item.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+                    </div>
                   </div>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <div className="bg-accent/10 p-2 rounded-full shrink-0"><MapPin className="w-5 h-5 text-accent" /></div>
-                  <div>
-                    <h4 className="font-bold text-foreground">Gurugram Exclusive</h4>
-                    <p className="text-muted-foreground text-sm mt-1">We know the local schools. Our tutors understand the internal grading patterns of major Gurugram schools.</p>
-                  </div>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <div className="bg-secondary/10 p-2 rounded-full shrink-0"><ShieldCheck className="w-5 h-5 text-secondary" /></div>
-                  <div>
-                    <h4 className="font-bold text-foreground">Top 2% Selection</h4>
-                    <p className="text-muted-foreground text-sm mt-1">Our interview and vetting process rejects 98% of applicants. We only provide educators we would trust with our own children.</p>
-                  </div>
-                </li>
-              </ul>
+                ))}
+              </div>
+            </FadeIn>
+            <FadeIn direction="left" className="relative">
+              <div className="aspect-square bg-muted/30 rounded-[3rem] overflow-hidden border border-border flex items-center justify-center p-12">
+                <div className="text-center">
+                  <p className="text-7xl font-heading font-extrabold text-primary mb-4">95%+</p>
+                  <p className="text-xl font-bold text-muted-foreground uppercase tracking-widest">Target Achievement</p>
+                  <div className="mt-12 h-0.5 w-24 bg-accent mx-auto"></div>
+                </div>
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* Team/Values Section */}
+      <section className="py-24 bg-muted/20">
+        <div className="container mx-auto px-4 text-center max-w-4xl">
+          <FadeIn>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-12">Our Commitment to Parents</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="p-10 rounded-3xl bg-white border border-border shadow-sm">
+                <Users className="w-12 h-12 text-accent mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-primary mb-4">Personal Matching</h3>
+                <p className="text-muted-foreground">Every student is matched manually by our academic advisors, not by an algorithm. We listen to your child's needs first.</p>
+              </div>
+              <div className="p-10 rounded-3xl bg-white border border-border shadow-sm">
+                <Target className="w-12 h-12 text-secondary mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-primary mb-4">Result Oriented</h3>
+                <p className="text-muted-foreground">Our methodology is designed for high performance. We focus on past paper practice, rubric mastery, and time management.</p>
+              </div>
             </div>
           </FadeIn>
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="py-24 bg-primary text-white">
+        <div className="container mx-auto px-4 text-center">
+          <FadeIn>
+            <h2 className="text-4xl md:text-5xl font-heading font-bold mb-8">Ready to start your journey?</h2>
+            <p className="text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
+              Join hundreds of Gurugram families who have elevated their child's board preparation with BoardPeFocus.
+            </p>
+            <Link href="/contact">
+              <Button size="lg" className="h-16 px-12 text-lg font-bold bg-white text-primary hover:bg-white/90 rounded-2xl">
+                Get Started Today
+              </Button>
+            </Link>
+          </FadeIn>
+        </div>
+      </section>
     </div>
   );
 }

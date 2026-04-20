@@ -8,77 +8,553 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ==========================================
+// 1. IDENTITY & ACCESS (RBAC)
+// ==========================================
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  passwordHash  String
+  name          String
+  isActive      Boolean    @default(true)
+  lastLogin     DateTime?
+  roles         UserRole[]
+  auditLogs     AuditLog[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?  // Soft delete
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique // e.g., 'SUPERADMIN', 'EDITOR'
+  description String?
+  permissions RolePermission[]
+  users       UserRole[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  action      String           @unique // e.g., 'tutor:create', 'page:publish'
+  description String?
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@id([userId, roleId])
+}
+
+// ==========================================
+// 2. TUTORS MODULE
+// ==========================================
+
 model Tutor {
   id              String   @id @default(cuid())
   slug            String   @unique
   name            String
+  displayName     String?
+  email           String?  @unique
+  phone           String?
   photoUrl        String?
+  videoUrl        String?
   tagline         String?
-  about           String?
-  methodology     String?
+  bio             String?  @db.Text
+  about           String?  @db.Text
+  methodology     String?  @db.Text
   experienceYrs   Int      @default(0)
   studentsTaught  Int      @default(0)
+  hourlyRateMin   Int?
+  hourlyRateMax   Int?
+  
+  // Stats & Ranking
   rating          Float    @default(0.0)
   reviewsCount    Int      @default(0)
+  priority        Int      @default(0) // For sorting
   
-  boards          Board[]
-  subjects        Subject[]
-  schools         School[]
-  locations       Location[]
+  // Status
+  isFeatured      Boolean  @default(false)
+  isVerified      Boolean  @default(false)
+  status          TutorStatus @default(DRAFT)
+  
+  // Relations
+  qualifications  TutorQualification[]
+  achievements    TutorAchievement[]
+  boards          TutorBoard[]
+  subjects        TutorSubject[]
+  schools         TutorSchool[]
+  locations       TutorLocationCoverage[]
+  media           TutorMedia[]
+  faqs            TutorFaq[]
+  reviews         TutorReview[]
+  claimProofs     ClaimProof[]
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
 }
+
+enum TutorStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+model TutorQualification {
+  id          String @id @default(cuid())
+  tutorId     String
+  degree      String
+  institution String
+  year        Int?
+  tutor       Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+}
+
+model TutorAchievement {
+  id          String @id @default(cuid())
+  tutorId     String
+  title       String
+  description String?
+  year        Int?
+  tutor       Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+}
+
+model TutorBoard {
+  tutorId String
+  boardId String
+  tutor   Tutor @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  board   Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  @@id([tutorId, boardId])
+}
+
+model TutorSubject {
+  tutorId   String
+  subjectId String
+  tutor     Tutor   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  @@id([tutorId, subjectId])
+}
+
+model TutorSchool {
+  tutorId  String
+  schoolId String
+  tutor    Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  @@id([tutorId, schoolId])
+}
+
+model TutorLocationCoverage {
+  id          String @id @default(cuid())
+  tutorId     String
+  sectorId    String?
+  societyId   String?
+  tutor       Tutor   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  sector      Sector? @relation(fields: [sectorId], references: [id])
+  society     Society? @relation(fields: [societyId], references: [id])
+}
+
+model TutorMedia {
+  id        String @id @default(cuid())
+  tutorId   String
+  mediaId   String
+  type      String // e.g., 'CERTIFICATE', 'PROFILE_VIDEO', 'ACTION_SHOT'
+  tutor     Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  media     MediaAsset @relation(fields: [mediaId], references: [id])
+}
+
+model TutorFaq {
+  id        String @id @default(cuid())
+  tutorId   String
+  question  String
+  answer    String
+  order     Int    @default(0)
+  tutor     Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+}
+
+model TutorReview {
+  id          String   @id @default(cuid())
+  tutorId     String
+  parentName  String
+  studentName String?
+  rating      Int      @default(5)
+  comment     String   @db.Text
+  isVerified  Boolean  @default(true)
+  status      ReviewStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  tutor       Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ==========================================
+// 3. EDUCATIONAL ENTITIES
+// ==========================================
 
 model Board {
   id          String   @id @default(cuid())
   slug        String   @unique
   name        String
-  description String?
-  tutors      Tutor[]
+  shortName   String?
+  description String?  @db.Text
+  tutors      TutorBoard[]
+  subjects    BoardSubject[]
+  schools     SchoolBoard[]
+  pageRecords PageRecord[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Subject {
-  id     String   @id @default(cuid())
-  slug   String   @unique
-  name   String
-  tutors Tutor[]
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?  @db.Text
+  tutors      TutorSubject[]
+  boards      BoardSubject[]
+  pageRecords PageRecord[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BoardSubject {
+  id        String @id @default(cuid())
+  boardId   String
+  subjectId String
+  board     Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  @@unique([boardId, subjectId])
 }
 
 model School {
-  id       String   @id @default(cuid())
-  slug     String   @unique
-  name     String
-  location String?
-  tutors   Tutor[]
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?  @db.Text
+  address     String?
+  website     String?
+  boards      SchoolBoard[]
+  tutors      TutorSchool[]
+  pageRecords PageRecord[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model Location {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-  societies String[]
-  tutors    Tutor[]
+model SchoolBoard {
+  schoolId String
+  boardId  String
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  board    Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  @@id([schoolId, boardId])
 }
+
+model Sector {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  societies   Society[]
+  tutors      TutorLocationCoverage[]
+  pageRecords PageRecord[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Society {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  sectorId    String
+  sector      Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  tutors      TutorLocationCoverage[]
+  pageRecords PageRecord[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ==========================================
+// 4. CMS & PAGE GENERATION
+// ==========================================
+
+model PageTemplate {
+  id          String       @id @default(cuid())
+  name        String       @unique // e.g., 'TUTOR_BY_BOARD_SUBJECT'
+  layout      String       // JSON structure for components
+  pages       PageRecord[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model PageRecord {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  status         PageStatus @default(DRAFT)
+  templateId     String?
+  template       PageTemplate? @relation(fields: [templateId], references: [id])
+  
+  // Relations to dynamic entities
+  boardId        String?
+  board          Board?    @relation(fields: [boardId], references: [id])
+  subjectId      String?
+  subject        Subject?  @relation(fields: [subjectId], references: [id])
+  schoolId       String?
+  school         School?   @relation(fields: [schoolId], references: [id])
+  sectorId       String?
+  sector         Sector?   @relation(fields: [sectorId], references: [id])
+  societyId      String?
+  society        Society?  @relation(fields: [societyId], references: [id])
+  
+  // Content
+  blocks         ContentBlock[]
+  seo            SeoMeta?
+  versions       PageVersion[]
+  entityRelations PageEntityRelation[]
+  internalLinks  InternalLinkRecord[]
+  
+  contentHash    String?   // For duplication detection
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([slug])
+  @@index([status])
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model ContentBlock {
+  id           String     @id @default(cuid())
+  pageRecordId String
+  type         String     // e.g., 'HERO', 'TUTOR_GRID', 'TEXT_BLOCK'
+  content      Json
+  order        Int        @default(0)
+  pageRecord   PageRecord @relation(fields: [pageRecordId], references: [id], onDelete: Cascade)
+}
+
+model PageVersion {
+  id           String     @id @default(cuid())
+  pageRecordId String
+  content      Json       // Snapshot of blocks and SEO
+  authorId     String?
+  createdAt    DateTime   @default(now())
+  pageRecord   PageRecord @relation(fields: [pageRecordId], references: [id], onDelete: Cascade)
+}
+
+model PageEntityRelation {
+  id           String     @id @default(cuid())
+  pageRecordId String
+  entityType   String     // e.g., 'TUTOR', 'SCHOOL'
+  entityId     String
+  pageRecord   PageRecord @relation(fields: [pageRecordId], references: [id], onDelete: Cascade)
+  @@unique([pageRecordId, entityType, entityId])
+}
+
+model SeoMeta {
+  id           String     @id @default(cuid())
+  pageRecordId String     @unique
+  title        String?
+  description  String?
+  keywords     String?
+  ogImage      String?
+  canonical    String?
+  noIndex      Boolean    @default(false)
+  pageRecord   PageRecord @relation(fields: [pageRecordId], references: [id], onDelete: Cascade)
+}
+
+model Redirect {
+  id           String   @id @default(cuid())
+  from         String   @unique
+  to           String
+  code         Int      @default(301) // 301 or 302
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+// ==========================================
+// 5. INTERNAL LINKING
+// ==========================================
+
+model InternalLinkRule {
+  id           String   @id @default(cuid())
+  keyword      String   @unique
+  targetUrl    String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  records      InternalLinkRecord[]
+}
+
+model InternalLinkRecord {
+  id           String           @id @default(cuid())
+  ruleId       String
+  pageRecordId String
+  anchorText   String?
+  rule         InternalLinkRule @relation(fields: [ruleId], references: [id])
+  pageRecord   PageRecord       @relation(fields: [pageRecordId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// 6. ASSETS & MEDIA
+// ==========================================
+
+model MediaAsset {
+  id          String   @id @default(cuid())
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  url         String   // CDN URL or S3 URL
+  provider    String   @default("S3") // S3, Cloudinary, etc.
+  bucket      String?
+  key         String?  // S3 Key
+  altText     String?
+  metadata    Json?
+  tutorMedia  TutorMedia[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ==========================================
+// 7. LEADS & CRM
+// ==========================================
 
 model Lead {
   id              String   @id @default(cuid())
-  parentName      String
-  phoneNumber     String
-  board           String?
-  grade           String?
+  name            String
+  phone           String
+  email           String?
+  class           String?
   subject         String?
+  board           String?
   location        String?
-  school          String?
-  message         String?
-  status          LeadStatus @default(PENDING)
+  message         String?  @db.Text
+  source          String?  @default("direct")
+  pageUrl         String?
+  status          LeadStatus @default(NEW)
+  events          LeadEvent[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 
 enum LeadStatus {
-  PENDING
+  NEW
   CONTACTED
+  QUALIFIED
   CONVERTED
-  REJECTED
+  CLOSED
+  SPAM
+}
+
+model LeadEvent {
+  id        String   @id @default(cuid())
+  leadId    String
+  type      String   // e.g., 'STATUS_CHANGE', 'NOTE', 'CALL_LOG'
+  content   String?  @db.Text
+  metadata  Json?
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+// ==========================================
+// 8. NOTIFICATIONS
+// ==========================================
+
+model NotificationDelivery {
+  id        String   @id @default(cuid())
+  type      String   // e.g., 'EMAIL', 'WHATSAPP', 'SMS'
+  recipient String
+  subject   String?
+  content   String?  @db.Text
+  status    DeliveryStatus @default(PENDING)
+  error     String?
+  retryCount Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+  DELIVERED
+}
+
+// ==========================================
+// 9. SYSTEM & AUDIT
+// ==========================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String   // e.g., 'CREATE', 'UPDATE', 'DELETE'
+  entity    String   // e.g., 'TUTOR', 'PAGE'
+  entityId  String?
+  oldData   Json?
+  newData   Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+model GenerationJob {
+  id          String   @id @default(cuid())
+  type        String   // e.g., 'SITEMAP', 'BULK_PAGES'
+  status      JobStatus @default(QUEUED)
+  progress    Int      @default(0)
+  config      Json?
+  results     Json?
+  issues      GenerationIssue[]
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model GenerationIssue {
+  id        String   @id @default(cuid())
+  jobId     String
+  level     String   // 'INFO', 'WARN', 'ERROR'
+  message   String
+  details   Json?
+  job       GenerationJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model ClaimProof {
+  id          String   @id @default(cuid())
+  tutorId     String
+  claimType   String   // e.g., 'SCORE', 'EXPERIENCE', 'AWARD'
+  claimValue  String
+  mediaId     String?
+  verifiedAt  DateTime?
+  tutor       Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  @@index([tutorId])
 }

@@ -1,20 +1,29 @@
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
-import { constructMetadata } from "@/lib/seo";
+import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { mockBoards, mockSectors, mockSchools } from "@/data/mock";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Target, GraduationCap, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { FAQ } from "@/components/faq/FAQ";
+import { platformStats } from "@/data/stats";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export const metadata = constructMetadata({
   title: "Premium Home Tutors in Gurugram | BoardPeFocus",
   description: "Find the top 2% of board-specialized home tutors in Gurugram. Covering Golf Course Road, Sector 50, Phase 5, and all major localities for CBSE, ICSE, and IB DP.",
+  pathname: "/gurugram",
 });
 
 export default function GurugramCityPage() {
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Gurugram", url: absoluteUrl("/gurugram") },
+  ]);
+
   return (
     <div className="bg-background min-h-screen">
+      <JsonLd data={breadcrumbJsonLd} />
       
       {/* Hero */}
       <section className="relative pt-32 pb-24 text-primary overflow-hidden">
@@ -36,6 +45,29 @@ export default function GurugramCityPage() {
               </Button>
             </Link>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* WHY US / PROOF STRIP */}
+      <section className="border-y border-border/50 bg-white py-14 relative z-20 shadow-sm">
+        <div className="container mx-auto px-4">
+          <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-border/50">
+            {platformStats.map((stat) => (
+              <StaggerItem key={stat.id}>
+                <Link 
+                  href={`/transparency#${stat.id}`} 
+                  className="group block transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="text-4xl md:text-5xl font-heading font-bold text-primary mb-3 drop-shadow-sm group-hover:text-accent transition-colors">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm md:text-base text-muted-foreground font-medium uppercase tracking-wider group-hover:text-primary transition-colors">
+                    {stat.label}
+                  </div>
+                </Link>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
         </div>
       </section>
 

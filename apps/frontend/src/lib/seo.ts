@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { TutorProfileViewModel } from '@/types/tutor-profile';
 
 export const siteConfig = {
   name: 'BoardPeFocus',
@@ -11,25 +12,49 @@ export const siteConfig = {
   },
 };
 
+export function getSiteUrl() {
+  return process.env.NEXT_PUBLIC_APP_URL || siteConfig.url;
+}
+
+export function absoluteUrl(pathname = '/') {
+  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return new URL(path, getSiteUrl()).toString();
+}
+
 export function constructMetadata({
   title = siteConfig.name,
   description = siteConfig.description,
   image = siteConfig.ogImage,
   icons = '/favicon.ico',
   noIndex = false,
+  pathname,
 }: {
   title?: string;
   description?: string;
   image?: string;
   icons?: string;
   noIndex?: boolean;
+  pathname?: string;
 } = {}): Metadata {
+  const canonicalUrl = pathname ? absoluteUrl(pathname) : undefined;
+
   return {
     title,
     description,
+    applicationName: siteConfig.name,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: canonicalUrl
+      ? {
+          canonical: canonicalUrl,
+        }
+      : undefined,
     openGraph: {
       title,
       description,
+      url: canonicalUrl,
+      siteName: siteConfig.name,
+      locale: 'en_IN',
+      type: 'website',
       images: [
         {
           url: image,
@@ -44,13 +69,24 @@ export function constructMetadata({
       creator: '@boardpefocus',
     },
     icons,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || siteConfig.url),
-    ...(noIndex && {
-      robots: {
-        index: false,
-        follow: false,
-      },
-    }),
+    robots: noIndex
+      ? {
+          index: false,
+          follow: false,
+          googleBot: {
+            index: false,
+            follow: false,
+            noimageindex: true,
+          },
+        }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+          },
+        },
   };
 }
 
@@ -67,7 +103,61 @@ export function generateBreadcrumbJsonLd(items: { name: string; url: string }[])
   };
 }
 
-export function generateTutorJsonLd(tutor: any) {
+export function generateFaqJsonLd(items: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+}
+
+export function generateOrganizationJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: siteConfig.name,
+    url: getSiteUrl(),
+    description: siteConfig.description,
+    areaServed: 'Gurugram, Haryana, India',
+    knowsAbout: [
+      'CBSE home tutoring',
+      'ICSE home tutoring',
+      'IGCSE home tutoring',
+      'IB tutoring',
+      'Class 10 tutoring',
+      'Class 12 tutoring',
+    ],
+    sameAs: [siteConfig.links.twitter],
+  };
+}
+
+export function generateWebsiteJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteConfig.name,
+    url: getSiteUrl(),
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${absoluteUrl('/search')}?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+}
+
+export function generateTutorJsonLd(tutor: TutorProfileViewModel) {
+  const boardNames = (tutor.boards ?? [])
+    .map((board) => (typeof board === 'string' ? board : board.board?.name))
+    .filter(Boolean);
+  const knowsAbout = [...boardNames, ...(tutor.subjects ?? [])];
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
@@ -75,10 +165,25 @@ export function generateTutorJsonLd(tutor: any) {
     jobTitle: 'Home Tutor',
     description: tutor.about,
     image: tutor.photoUrl,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: tutor.rating,
-      reviewCount: tutor.studentsTaught,
+    url: absoluteUrl(`/tutors/${tutor.slug ?? ''}`),
+    homeLocation: {
+      '@type': 'Place',
+      name: 'Gurugram, Haryana, India',
     },
+    worksFor: {
+      '@type': 'EducationalOrganization',
+      name: siteConfig.name,
+      url: getSiteUrl(),
+    },
+    knowsAbout,
+    ...(tutor.rating && tutor.reviewsCount
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: tutor.rating,
+            reviewCount: tutor.reviewsCount,
+          },
+        }
+      : {}),
   };
 }

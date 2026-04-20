@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Search, Home, MessageCircle } from "lucide-react";
 import Link from "next/link";
+import { constructMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = constructMetadata({
+  title: "Page Not Found | BoardPeFocus",
+  description: "The page you requested could not be found.",
+  noIndex: true,
+});
 
 export default function NotFound() {
   return (

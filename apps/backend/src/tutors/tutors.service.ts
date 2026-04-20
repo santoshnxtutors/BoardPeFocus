@@ -7,7 +7,7 @@ export class TutorsService {
 
   async findAll(query?: any) {
     const { board, subject, location, school } = query || {};
-    
+
     return this.prisma.tutor.findMany({
       where: {
         boards: board ? { some: { slug: board } } : undefined,

@@ -7,6 +7,8 @@ import { GraduationCap, MapPin, CheckCircle2, ChevronRight, UserCircle2 } from "
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { absoluteUrl, generateBreadcrumbJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: { schoolSlug: string } }) {
   const school = mockSchools.find(s => s.slug === params.schoolSlug);
@@ -15,6 +17,7 @@ export async function generateMetadata({ params }: { params: { schoolSlug: strin
   return constructMetadata({
     title: `Tutors familiar with ${school.name} | BoardPeFocus`,
     description: `Find home tutors in Gurugram who understand the curriculum, testing patterns, and rigorous requirements of ${school.name}.`,
+    pathname: `/gurugram/schools/${school.slug}`,
   });
 }
 
@@ -24,9 +27,15 @@ export default function SchoolLandingPage({ params }: { params: { schoolSlug: st
 
   // Find tutors that have this school in their profile
   const relevantTutors = mockTutors.filter(t => t.schools.includes(school.name));
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Gurugram", url: absoluteUrl("/gurugram") },
+    { name: school.name, url: absoluteUrl(`/gurugram/schools/${school.slug}`) },
+  ]);
 
   return (
     <div className="bg-background min-h-screen">
+      <JsonLd data={breadcrumbJsonLd} />
       
       {/* Hero */}
       <section className="relative pt-32 pb-24 text-white bg-primary overflow-hidden">

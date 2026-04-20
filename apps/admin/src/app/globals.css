@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-outfit);
+  
+  /* Synchronizing with BoardPeFocus Website Theme */
+  --color-primary: hsl(220, 50%, 25%); /* Deep Academic Blue */
+  --color-secondary: hsl(150, 20%, 45%); /* Muted Green */
+  --color-accent: hsl(38, 92%, 50%); /* Restrained Amber */
+  --color-background: hsl(0, 0%, 100%);
+  --color-muted: hsl(30, 20%, 97%);
+  
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+}
+
+@layer base {
+  body {
+    @apply antialiased bg-slate-50 text-slate-900;
+  }
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+  }
+  
+  /* Website Style Glassmorphism */
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+}

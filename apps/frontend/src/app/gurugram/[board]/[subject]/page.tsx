@@ -2,21 +2,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
-import { constructMetadata } from "@/lib/seo";
+import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { mockBoards, mockSubjects, mockTutors } from "@/data/mock";
 import { CheckCircle2, ChevronRight, GraduationCap, MapPin, Target, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export async function generateMetadata({ params }: { params: { board: string, subject: string } }) {
   const board = mockBoards.find(b => b.slug === params.board);
   const subject = mockSubjects.find(s => s.slug === params.subject);
   
-  if (!board || !subject) return {};
+  if (!board || !subject) {
+    return constructMetadata({ title: "Page Not Found", noIndex: true });
+  }
   
   return constructMetadata({
     title: `${board.name} ${subject.name} Tutors in Gurugram | BoardPeFocus`,
     description: `Premium home tutors for ${board.name} ${subject.name} in Gurugram. Structured preparation designed to help students target 95%+.`,
+    pathname: `/gurugram/${board.slug}/${subject.slug}`,
   });
 }
 
@@ -30,9 +34,16 @@ export default function BoardSubjectPage({ params }: { params: { board: string, 
   const relevantTutors = mockTutors.filter(
     t => t.boards.includes(board.name) && t.subjects.includes(subject.name)
   );
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Gurugram", url: absoluteUrl("/gurugram") },
+    { name: board.name, url: absoluteUrl(`/gurugram/${board.slug}`) },
+    { name: subject.name, url: absoluteUrl(`/gurugram/${board.slug}/${subject.slug}`) },
+  ]);
 
   return (
     <div className="bg-background min-h-screen">
+      <JsonLd data={breadcrumbJsonLd} />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-primary pt-32 pb-24 text-white">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff1a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff1a_1px,transparent_1px)] bg-[size:32px_32px] opacity-20"></div>
