@@ -29,16 +29,23 @@ jobs:
 
             APP_DIR="/home/boardpefocus/htdocs/www.boardpefocus.in"
 
-            if [ ! -d "$APP_DIR/.git" ]; then
-              mkdir -p "$APP_DIR"
-              cd "$APP_DIR"
+            echo "Connected as: $(whoami)"
+            echo "Deploying in: $APP_DIR"
+
+            mkdir -p "$APP_DIR"
+            cd "$APP_DIR"
+
+            if [ ! -d ".git" ]; then
               git clone https://github.com/santoshnxtutors/BoardPeFocus.git .
-            else
-              cd "$APP_DIR"
             fi
 
             git fetch origin main
             git reset --hard origin/main
+
+            if ! command -v node >/dev/null 2>&1; then
+              echo "Node.js is not installed on the server"
+              exit 1
+            fi
 
             if ! command -v pnpm >/dev/null 2>&1; then
               corepack enable
