@@ -1,3 +1,5 @@
+import { sectorDetails } from "@/data/areas";
+
 export const mockTutors = [
   {
     id: "dr-sharma-1",
@@ -14,7 +16,7 @@ export const mockTutors = [
     about: "Dr. Sharma brings over a decade of dedicated teaching experience in Mathematics and Physics. With a deep understanding of the CBSE and ICSE curricula, he has consistently helped students achieve top percentiles. His methodology focuses on building strong fundamentals before tackling complex problem-solving techniques essential for board exams.",
     methodology: "My approach is simple: understand the 'why' before the 'how'. We start with real-world applications of mathematical concepts, then move to rigorous practice using past 10-year board papers. Every student gets a customized study plan based on their baseline assessment.",
     schools: ["DPS Sector 45", "The Heritage School", "Shiv Nadar School"],
-    locations: ["Sector 45", "Sector 50", "Golf Course Road"],
+    locations: ["Sector 45", "Sector 50", "Sector 53"],
   },
   {
     id: "ms-gupta-2",
@@ -30,8 +32,8 @@ export const mockTutors = [
     reviewsCount: 56,
     about: "Ms. Gupta specializes in international boards, guiding students through the rigorous requirements of IB and IGCSE sciences. Her focus on conceptual clarity and extensive past-paper practice ensures her students are exceptionally well-prepared for their final assessments.",
     methodology: "I believe in interactive learning. Chemistry isn't just about memorizing the periodic table; it's about understanding the fundamental laws governing matter. I use digital simulations alongside rigorous textbook problems to solidify understanding.",
-    schools: ["Pathways World School", "GD Goenka World School", "Lancers International"],
-    locations: ["DLF Phase 5", "Golf Course Ext Road", "Sector 56"],
+    schools: ["Pathways World School", "Lancers International School", "Shiv Nadar School"],
+    locations: ["DLF Phase 5", "Sector 57", "Sector 62"],
   },
   {
     id: "mr-verma-3",
@@ -47,8 +49,8 @@ export const mockTutors = [
     reviewsCount: 112,
     about: "With 15 years of experience exclusively teaching Commerce subjects to board students, Mr. Verma is a recognized expert in Accountancy and Economics. His students consistently score above 95%, thanks to his structured revision techniques.",
     methodology: "Commerce requires both logical understanding and meticulous practice. We focus heavily on structuring answers according to the official marking schemes, ensuring no marks are lost due to poor presentation.",
-    schools: ["Amity International", "Shikshantar", "DPS Sushant Lok"],
-    locations: ["Sushant Lok", "Sector 43", "South City"],
+    schools: ["Amity International School", "DPS Sushant Lok", "DPS Sector 45"],
+    locations: ["DLF Phase 4", "Sector 45", "Sector 50"],
   }
 ];
 
@@ -73,11 +75,15 @@ export const mockSchools = [
   { slug: "dps-sector-45", name: "DPS Sector 45", boards: ["CBSE"], location: "Sector 45" },
   { slug: "the-heritage-school", name: "The Heritage School", boards: ["CBSE", "IBDP", "IGCSE"], location: "Sector 62" },
   { slug: "shiv-nadar-school", name: "Shiv Nadar School", boards: ["CBSE", "IBDP", "IGCSE"], location: "DLF Phase 1" },
-  { slug: "pathways-world-school", name: "Pathways World School", boards: ["IBDP", "IGCSE"], location: "Aravali Retreat" }
+  { slug: "pathways-world-school", name: "Pathways World School", boards: ["IBDP", "IGCSE"], location: "Aravali Retreat" },
+  { slug: "dps-sushant-lok", name: "DPS Sushant Lok", boards: ["CBSE"], location: "Sushant Lok" },
+  { slug: "lancers-international", name: "Lancers International School", boards: ["IBDP", "IGCSE"], location: "DLF Phase 5" },
+  { slug: "scottish-high-international-school", name: "Scottish High International School", boards: ["IBDP", "IGCSE", "CBSE"], location: "DLF Phase 5" },
+  { slug: "amity-international-sector-46", name: "Amity International School", boards: ["CBSE"], location: "Sector 46" }
 ];
 
-export const mockSectors = [
-  { slug: "sector-45", name: "Sector 45", societies: ["Greenwood City", "Unitech Cyber Park"] },
-  { slug: "sector-50", name: "Sector 50", societies: ["Nirvana Country", "South City 2"] },
-  { slug: "golf-course-road", name: "Golf Course Road", societies: ["DLF Phase 5", "The Magnolias", "The Aralias"] }
-];
+export const mockSectors = sectorDetails.map((sector) => ({
+  slug: sector.slug,
+  name: sector.name,
+  societies: sector.societies.map((society) => society.name),
+}));

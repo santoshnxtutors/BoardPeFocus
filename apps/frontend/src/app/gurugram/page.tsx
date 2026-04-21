@@ -112,6 +112,13 @@ export default function GurugramCityPage() {
               <h2 className="text-3xl font-heading font-bold text-primary mb-8 flex items-center gap-3">
                 <MapPin className="w-8 h-8 text-accent" /> Major Localities
               </h2>
+              <div className="mb-6">
+                <Link href="/gurgaon-area">
+                  <Button variant="outline" className="rounded-xl px-5">
+                    Explore Gurgaon Areas Hub
+                  </Button>
+                </Link>
+              </div>
               <div className="space-y-4">
                 {mockSectors.map(sector => (
                   <Link key={sector.slug} href={`/gurugram/sectors/${sector.slug}`}>

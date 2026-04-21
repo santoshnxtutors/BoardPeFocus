@@ -1,14 +1,18 @@
-import { mockSectors, mockTutors } from "@/data/mock";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChevronRight, GraduationCap, MapPin } from "lucide-react";
+import { LeadForm } from "@/components/forms/LeadForm";
 import { TutorCard } from "@/components/cards/TutorCard";
+import { AreaBreadcrumbs } from "@/components/areas/AreaBreadcrumbs";
+import { AreaRelatedLinks } from "@/components/areas/AreaRelatedLinks";
+import { AreaSection } from "@/components/areas/AreaSection";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Target, GraduationCap, ChevronRight, School as SchoolIcon } from "lucide-react";
-import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
-import { LeadForm } from "@/components/forms/LeadForm";
-import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getAreaCluster, getSectorDetail } from "@/data/areas";
+import { mockSchools, mockTutors } from "@/data/mock";
+import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{ sector: string }>;
@@ -16,119 +20,208 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps) {
   const { sector: sectorSlug } = await params;
-  const sector = mockSectors.find(s => s.slug === sectorSlug);
-  
+  const sector = getSectorDetail(sectorSlug);
+
   if (!sector) return constructMetadata({ title: "Sector Not Found", noIndex: true });
 
   return constructMetadata({
     title: `Premium Home Tutors in ${sector.name}, Gurugram | BoardPeFocus`,
-    description: `Find board-specialized home tutors in ${sector.name}, Gurugram. Serving ${sector.societies.join(", ")}. Expert preparation for CBSE, ICSE, and IB.`,
+    description: `${sector.positioning} Explore nearby societies, school relevance, and board-specialized home tutors in ${sector.name}, Gurugram.`,
     pathname: `/gurugram/sectors/${sector.slug}`,
   });
 }
 
 export default async function SectorPage({ params }: PageProps) {
   const { sector: sectorSlug } = await params;
-  const sector = mockSectors.find(s => s.slug === sectorSlug);
+  const sector = getSectorDetail(sectorSlug);
 
   if (!sector) notFound();
 
-  // Find tutors serving this sector (based on mock locations)
-  const relatedTutors = mockTutors.filter(t => 
-    t.locations.some(loc => loc.toLowerCase() === sector.name.toLowerCase())
+  const cluster = getAreaCluster(sector.clusterSlug);
+  const relatedTutors = mockTutors.filter((tutor) =>
+    tutor.locations.some((location) => location.toLowerCase() === sector.name.toLowerCase()),
   );
+  const nearbySchools = sector.nearbySchoolSlugs
+    .map((slug) => mockSchools.find((school) => school.slug === slug))
+    .filter((school): school is (typeof mockSchools)[number] => Boolean(school));
+
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
-    { name: "Gurugram", url: absoluteUrl("/gurugram") },
+    { name: "Gurgaon Areas", url: absoluteUrl("/gurgaon-area") },
+    ...(cluster ? [{ name: cluster.name, url: absoluteUrl(`/gurgaon-area/${cluster.slug}`) }] : []),
     { name: sector.name, url: absoluteUrl(`/gurugram/sectors/${sector.slug}`) },
   ]);
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen bg-background">
       <JsonLd data={breadcrumbJsonLd} />
-      {/* Hero */}
-      <section className="relative pt-32 pb-20 bg-muted/30 overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-[40rem] h-[40rem] bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="container mx-auto px-4 relative z-10">
-          <FadeIn direction="up">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm text-primary px-4 py-2 rounded-full text-sm font-bold mb-6 shadow-sm border border-border">
-              <MapPin className="w-4 h-4 text-accent" /> Gurugram Localities
-            </div>
-            <h1 className="text-4xl md:text-6xl font-heading font-extrabold text-primary mb-6 leading-tight">
-              Home Tutors in <span className="text-accent">{sector.name}</span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed mb-10">
-              Personalized board preparation for students living in {sector.societies.join(", ")}.
-            </p>
-          </FadeIn>
-        </div>
-      </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-            {/* Tutors List */}
-            <div className="lg:col-span-2">
-              <div className="flex justify-between items-center mb-10">
-                <h2 className="text-3xl font-heading font-bold text-primary">Tutors in this Area</h2>
-                <Link href="/search">
-                  <Button variant="link" className="text-primary font-bold">
-                    View all tutors <ChevronRight className="ml-1 w-4 h-4" />
-                  </Button>
-                </Link>
+      <section className="relative overflow-hidden pt-32 pb-24">
+        <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
+        <div className="container mx-auto max-w-7xl px-4">
+          <AreaBreadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Gurgaon Areas", href: "/gurgaon-area" },
+              ...(cluster ? [{ label: cluster.name, href: `/gurgaon-area/${cluster.slug}` }] : []),
+              { label: sector.name },
+            ]}
+          />
+
+          <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+            <FadeIn direction="up">
+              <Badge variant="outline" className="rounded-full border-primary/10 bg-primary/5 px-4 py-2 text-primary">
+                <MapPin className="mr-2 h-4 w-4 text-accent" />
+                Sector Page
+              </Badge>
+              <h1 className="mt-6 text-4xl font-extrabold text-primary md:text-6xl">{`Home Tutors in ${sector.name}`}</h1>
+              <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">{sector.positioning}</p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                {sector.boardFocus.map((board) => (
+                  <Badge key={board} variant="outline" className="rounded-full border-border/80 bg-white px-4 py-2 text-foreground">
+                    {board}
+                  </Badge>
+                ))}
               </div>
+            </FadeIn>
 
-              {relatedTutors.length > 0 ? (
-                <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {relatedTutors.map((tutor) => (
-                    <StaggerItem key={tutor.id}>
-                      <TutorCard tutor={{
-                        ...tutor,
-                        experienceYears: tutor.experienceYrs,
-                        studentsTaught: tutor.studentsTaught,
-                        areas: tutor.locations,
-                        about: tutor.about || "",
-                      }} />
-                    </StaggerItem>
-                  ))}
-                </StaggerContainer>
-              ) : (
-                <div className="p-12 text-center bg-muted/20 rounded-3xl border border-dashed border-border">
-                  <p className="text-muted-foreground mb-4">We are currently expanding our network in {sector.name}.</p>
-                  <Link href="/search">
-                    <Button>Explore All Tutors</Button>
-                  </Link>
-                </div>
-              )}
+            <div className="rounded-[2rem] border border-border/60 bg-white p-6 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">Why this sector matters</p>
+              <p className="mt-4 text-sm leading-7 text-muted-foreground">{sector.microcopy}</p>
+              <div className="mt-5 space-y-3 text-sm text-foreground">
+                <p>Adjacent sectors: {sector.adjacentSectors.join(" • ")}</p>
+                <p>High-demand subjects: {sector.subjectDemand.join(" • ")}</p>
+              </div>
+            </div>
+          </div>
 
-              {/* Societies Grid */}
-              <div className="mt-20">
-                <h2 className="text-2xl font-heading font-bold text-primary mb-8 flex items-center gap-3">
-                  <MapPin className="w-6 h-6 text-accent" /> Societies We Cover in {sector.name}
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {sector.societies.map(society => (
-                    <Link 
-                      key={society} 
-                      href={`/gurugram/sectors/${sectorSlug}/${society.toLowerCase().replace(/\s+/g, '-')}`}
+          <div className="mt-16 grid gap-14 lg:grid-cols-[1.25fr_0.75fr]">
+            <div className="space-y-16">
+              <AreaSection
+                eyebrow="Tutor Matches"
+                title={`Tutors currently aligned with ${sector.name}`}
+                description="We keep this section grounded in real availability rather than making inflated locality claims."
+              >
+                {relatedTutors.length > 0 ? (
+                  <StaggerContainer className="grid gap-8 md:grid-cols-2">
+                    {relatedTutors.map((tutor) => (
+                      <StaggerItem key={tutor.id}>
+                        <TutorCard
+                          tutor={{
+                            ...tutor,
+                            experienceYears: tutor.experienceYrs,
+                            studentsTaught: tutor.studentsTaught,
+                            areas: tutor.locations,
+                            about: tutor.about || "",
+                          }}
+                        />
+                      </StaggerItem>
+                    ))}
+                  </StaggerContainer>
+                ) : (
+                  <div className="rounded-[2rem] border border-dashed border-border bg-muted/20 p-8 text-muted-foreground">
+                    We are expanding our tutor roster in {sector.name}. Tell us your preferred subjects and timings and we will shortlist from our active Gurgaon network.
+                  </div>
+                )}
+              </AreaSection>
+
+              <AreaSection
+                eyebrow="Society Pages"
+                title={`Premium societies in ${sector.name}`}
+                description="Move from sector discovery into the society page that best matches your home's access and schedule preferences."
+              >
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {sector.societies.map((society) => (
+                    <Link
+                      key={society.slug}
+                      href={`/gurugram/sectors/${sector.slug}/${society.slug}`}
+                      className="group rounded-[1.75rem] border border-border/60 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                     >
-                      <div className="p-6 rounded-2xl bg-white border border-border hover:border-primary/30 hover:shadow-md transition-all group">
-                        <p className="font-bold text-foreground group-hover:text-primary transition-colors">{society}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Tutors available</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">{sector.name}</p>
+                      <h3 className="mt-3 text-xl font-bold text-primary">{society.name}</h3>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground">{society.summary}</p>
+                      <div className="mt-5 text-sm font-semibold text-primary">
+                        Explore Society <ChevronRight className="ml-1 inline h-4 w-4" />
                       </div>
                     </Link>
                   ))}
                 </div>
-              </div>
+              </AreaSection>
+
+              <AreaSection
+                eyebrow="Nearby Schools"
+                title={`School relevance around ${sector.name}`}
+                description="These school pages are included only because families in this sector often care about locality-school alignment when choosing a tutor."
+              >
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {nearbySchools.map((school) => (
+                    <Link
+                      key={school.slug}
+                      href={`/gurugram/schools/${school.slug}`}
+                      className="rounded-[1.75rem] border border-border/60 bg-muted/20 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+                    >
+                      <div className="flex items-center gap-3 text-primary">
+                        <GraduationCap className="h-5 w-5 text-accent" />
+                        <h3 className="text-xl font-bold">{school.name}</h3>
+                      </div>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                        Relevant for parents who want school-aware tutoring without implying any official tie-up.
+                      </p>
+                      <p className="mt-4 text-sm font-medium text-foreground">{school.location}</p>
+                    </Link>
+                  ))}
+                </div>
+              </AreaSection>
+
+              <AreaRelatedLinks
+                links={[
+                  {
+                    title: cluster ? `${cluster.name} corridor page` : "Back to Gurgaon Areas Hub",
+                    description: cluster
+                      ? `Move up one level to compare sectors within ${cluster.name}.`
+                      : "Return to the main Gurgaon areas page.",
+                    href: cluster ? `/gurgaon-area/${cluster.slug}` : "/gurgaon-area",
+                  },
+                  {
+                    title: "Browse tutors",
+                    description: "Switch from locality discovery to full tutor profile discovery.",
+                    href: "/search",
+                  },
+                  {
+                    title: "CBSE tutors in Gurugram",
+                    description: "Useful for families narrowing by board after choosing the right sector.",
+                    href: "/gurugram/cbse",
+                  },
+                  {
+                    title: `${sector.subjectDemand[0]} support`,
+                    description: "Jump from the sector flow into a subject-specific tutoring page.",
+                    href: `/gurugram/cbse/${sector.subjectDemand[0].toLowerCase().replace(/\s+/g, "-")}`,
+                  },
+                ]}
+              />
             </div>
 
-            {/* Sidebar Form */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24">
-                <LeadForm 
-                  title="Request a Tutor" 
-                  subtitle={`Get matched with the best tutors in ${sector.name} for your child's board exams.`}
+            <div className="space-y-6">
+              <div className="sticky top-24 space-y-6">
+                <LeadForm
+                  title={`Request a Tutor in ${sector.name}`}
+                  subtitle={`Tell us your child's board, subjects, and timing preferences for ${sector.name}.`}
+                  defaultValues={{ location: sector.name }}
                 />
+
+                <div className="rounded-[2rem] border border-border/60 bg-white p-6 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">Subject demand</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {sector.subjectDemand.map((subject) => (
+                      <Badge key={subject} variant="outline" className="rounded-full border-primary/10 bg-primary/5 px-3 py-1 text-primary">
+                        {subject}
+                      </Badge>
+                    ))}
+                  </div>
+                  <Link href="/contact" className="mt-6 inline-block">
+                    <Button className="rounded-xl">Request Callback</Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

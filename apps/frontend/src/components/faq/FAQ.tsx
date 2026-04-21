@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -47,11 +47,9 @@ export function FAQ({
         
         {showViewMore && (
           <Link href={viewMoreHref}>
-            <Button 
-              variant="secondary" 
-              className="bg-[#f8f9fa] hover:bg-muted text-primary font-semibold rounded-lg px-6 h-12 gap-2 flex items-center"
-            >
-              View More FAQs <ArrowRight className="w-4 h-4" />
+            <Button variant="link" className="text-primary hover:text-primary/80 px-0 mt-4 md:mt-0 text-lg group font-bold">
+              View more FAQs
+              <ChevronRight className="ml-1 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
         )}

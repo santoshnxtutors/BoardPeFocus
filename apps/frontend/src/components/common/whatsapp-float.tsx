@@ -40,10 +40,11 @@ export function WhatsAppFloat() {
   const boards = ["IB DP", "IB MYP", "IGCSE", "CBSE", "ISC", "ICSE", "Cambridge Lower Secondary"];
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[100] flex flex-col items-end gap-4">
+    <div className="pointer-events-none fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[100] flex flex-col items-end gap-4">
       {/* Inquiry Popup */}
       <div 
         className={cn(
+          "pointer-events-auto",
           "bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-border/40 p-5 sm:p-7 w-[calc(100vw-2rem)] sm:w-[24rem] transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) transform origin-bottom-right max-h-[85vh] overflow-y-auto custom-scrollbar",
           isOpen ? "scale-100 opacity-100 translate-y-0" : "scale-90 opacity-0 translate-y-10 pointer-events-none"
         )}
@@ -150,6 +151,7 @@ export function WhatsAppFloat() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
+          "pointer-events-auto",
           "w-14 h-14 sm:w-18 sm:h-18 rounded-full shadow-[0_15px_40px_rgba(37,211,102,0.4)] flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group relative border-4 border-white",
           isOpen ? "bg-primary text-white" : "bg-[#25D366] text-white"
         )}

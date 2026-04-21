@@ -7,12 +7,14 @@ import {
   generateOrganizationJsonLd,
   generateWebsiteJsonLd,
 } from "@/lib/seo";
-import { GraduationCap, MapPin, Star, BookOpen, Clock, ChevronRight, Target, ShieldCheck } from "lucide-react";
+import { ChevronRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { FAQ } from "@/components/faq/FAQ";
 import { platformStats } from "@/data/stats";
 import { mockTutors, mockBoards } from "@/data/mock";
 import { TutorCard } from "@/components/cards/TutorCard";
+import { LeadForm } from "@/components/forms/LeadForm";
+import { BlogSection } from "@/components/blog/BlogSection";
 
 export const metadata = constructMetadata({
   title: "Premium Home Tutors in Gurugram | BoardPeFocus",
@@ -30,49 +32,86 @@ export default function HomePage() {
       <JsonLd data={websiteJsonLd} />
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-muted/30 pt-32 pb-32">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-[40rem] h-[40rem] bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-[30rem] h-[30rem] bg-accent/5 rounded-full blur-3xl" />
-        
-        <div className="container mx-auto px-4 text-center max-w-5xl relative z-10">
-          <FadeIn delay={0.1}>
-            <Badge variant="outline" className="mb-6 border-primary/20 bg-primary/5 text-primary text-sm px-4 py-1.5 rounded-full shadow-sm font-bold">
-              Gurugram's Premium Home Tutors
-            </Badge>
-          </FadeIn>
-          
-          <FadeIn delay={0.2}>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-extrabold tracking-tight mb-8 text-primary leading-[1.1]">
-              Board-focused preparation designed for <span className="text-accent relative inline-block">
-                high performance.
-                <svg className="absolute w-full h-3 -bottom-1 left-0 text-accent/30" viewBox="0 0 100 10" preserveAspectRatio="none">
-                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent" />
-                </svg>
-              </span>
-            </h1>
-          </FadeIn>
+      <section className="relative overflow-hidden bg-muted/30 pt-24 pb-24">
+        <div className="pointer-events-none absolute top-0 right-0 -mt-20 -mr-20 w-[40rem] h-[40rem] bg-primary/5 rounded-full blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-0 -mb-20 -ml-20 w-[30rem] h-[30rem] bg-accent/5 rounded-full blur-3xl" />
 
-          <FadeIn delay={0.3}>
-            <p className="text-lg md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
-              Specialized home tutoring for CBSE, ICSE, IGCSE, and IB boards in Gurugram. We match you with top 2% educators to target 95%+.
-            </p>
-          </FadeIn>
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <FadeIn delay={0.1}>
+                <Badge variant="outline" className="mb-3 border-primary/20 bg-primary/5 text-primary text-xs px-3 py-1 rounded-full shadow-sm font-bold">
+                  Gurugram's Premium Home Tutors
+                </Badge>
+              </FadeIn>
 
-          <FadeIn delay={0.4}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/contact" className="w-full sm:w-auto">
-                <Button size="lg" className="h-14 px-8 text-lg w-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl group transition-all duration-300 font-bold">
-                  Get Matched with a Tutor
-                  <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="/gurugram" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="h-14 px-8 text-lg w-full rounded-xl border-primary/20 hover:bg-primary/5 text-primary font-bold">
-                  Explore Boards
-                </Button>
-              </Link>
+              <FadeIn delay={0.2}>
+                <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-heading font-extrabold tracking-tight mb-6 text-primary leading-[1.15]">
+                  Board-exam home tutors in Gurgaon for <span className="text-accent relative inline-block">
+                    CBSE, ICSE, ISC, IGCSE, and IB students.
+                    <svg className="absolute w-full h-2 -bottom-1 left-0 text-accent/30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                      <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent" />
+                    </svg>
+                  </span>
+                </h1>
+              </FadeIn>
+
+              <FadeIn delay={0.3}>
+                <p className="text-base md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto lg:mx-0 leading-relaxed">
+                  BoardPeFocus offers specialized, premium one-to-one home tutoring for CBSE, ICSE, IGCSE, and IB students in Gurugram, matching families with top 2% educators for a focused, local, school-aware learning experience designed to achieve 95%.
+                </p>
+              </FadeIn>
+
+              <FadeIn delay={0.4}>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center mb-12">
+                  <Link href="/contact" className="w-full sm:w-auto">
+                    <Button size="lg" className="h-12 px-6 text-base w-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl group transition-all duration-300 font-bold">
+                      Get Matched with a Tutor
+                      <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link href="/gurugram" className="w-full sm:w-auto">
+                    <Button size="lg" variant="outline" className="h-12 px-6 text-base w-full rounded-xl border-primary/20 hover:bg-primary/5 text-primary font-bold">
+                      Explore Boards
+                    </Button>
+                  </Link>
+                </div>
+              </FadeIn>
+
+              <FadeIn delay={0.5}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:max-w-3xl items-stretch">
+                  {[
+                    {
+                      title: "BOARD-FOCUSED",
+                      desc: "Built around board prep, syllabus control, revision structure, and paper confidence."
+                    },
+                    {
+                      title: "SCHOOL-AWARE",
+                      desc: "Navigate by school, corridor, sector, and society instead of starting with a directory dump."
+                    },
+                    {
+                      title: "ONE-TO-ONE",
+                      desc: "Positioning stays premium and one-to-one so families can brief us around the exact academic context."
+                    }
+                  ].map((item, i) => (
+                    <div key={i} className="p-5 rounded-[1.25rem] bg-white border border-border/40 shadow-sm hover:shadow-md transition-all h-full flex flex-col">
+                      <p className="text-[10px] font-extrabold tracking-[0.12em] text-emerald-800 uppercase mb-3">{item.title}</p>
+                      <p className="text-[13px] text-slate-600 leading-relaxed font-medium">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </FadeIn>
             </div>
-          </FadeIn>
+
+            <div className="lg:pl-8 lg:mt-0 mt-12">
+              <FadeIn delay={0.6}>
+                <LeadForm
+                  title="Request for Matching"
+                  subtitle="Find the perfect board-specialized tutor for your child."
+                />
+              </FadeIn>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -82,8 +121,8 @@ export default function HomePage() {
           <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-border/50">
             {platformStats.map((stat) => (
               <StaggerItem key={stat.id}>
-                <Link 
-                  href={`/transparency#${stat.id}`} 
+                <Link
+                  href={`/transparency#${stat.id}`}
                   className="group block transition-all duration-300 hover:-translate-y-1"
                 >
                   <div className="text-4xl md:text-5xl font-heading font-bold text-primary mb-3 drop-shadow-sm group-hover:text-accent transition-colors">
@@ -135,7 +174,7 @@ export default function HomePage() {
               </div>
               <Link href="/search">
                 <Button variant="link" className="text-primary hover:text-primary/80 px-0 mt-4 md:mt-0 text-lg group font-bold">
-                  View all tutors 
+                  View all tutors
                   <ChevronRight className="ml-1 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
@@ -157,7 +196,7 @@ export default function HomePage() {
           </StaggerContainer>
         </div>
       </section>
-      
+
       {/* HOW IT WORKS */}
       <section className="py-32 bg-white">
         <div className="container mx-auto px-4">
@@ -172,22 +211,22 @@ export default function HomePage() {
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto relative">
             <div className="hidden md:block absolute top-12 left-1/4 right-1/4 h-0.5 border-t-2 border-dashed border-primary/10 -z-10" />
-            
+
             {[
-              { 
-                step: "01", 
-                title: "Share Requirements", 
-                desc: "Tell us about your child's board, class, subject, and school." 
+              {
+                step: "01",
+                title: "Share Requirements",
+                desc: "Tell us about your child's board, class, subject, and school."
               },
-              { 
-                step: "02", 
-                title: "Expert Matching", 
-                desc: "Our advisors handpick the best-fit tutor from our verified top 2% roster." 
+              {
+                step: "02",
+                title: "Expert Matching",
+                desc: "Our advisors handpick the best-fit tutor from our verified top 2% roster."
               },
-              { 
-                step: "03", 
-                title: "Free Demo Class", 
-                desc: "Schedule a demo to ensure the perfect teaching compatibility." 
+              {
+                step: "03",
+                title: "Free Demo Class",
+                desc: "Schedule a demo to ensure the perfect teaching compatibility."
               }
             ].map((item, i) => (
               <StaggerItem key={i} className="text-center group">
@@ -254,7 +293,7 @@ export default function HomePage() {
       {/* FAQ SECTION */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4 max-w-[1400px]">
-          <FAQ 
+          <FAQ
             showViewMore={true}
             columns={2}
             title="Frequently asked questions"
@@ -276,11 +315,13 @@ export default function HomePage() {
                 question: "What are the typical fees for tutors?",
                 answer: "Fees depend on the tutor's experience and the complexity of the board. As we provide premium, board-specialized educators, our rates reflect this high level of expertise."
               }
-            ]} 
+            ]}
           />
         </div>
       </section>
-      
+
+      <BlogSection />
+
       {/* CTA SECTION */}
       <section className="py-32 bg-muted/30 relative overflow-hidden">
         <div className="container mx-auto px-4 text-center relative z-10 max-w-4xl">

@@ -59,7 +59,7 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
-              <li><Link href="/gurugram" className="hover:text-accent transition-colors text-white font-medium">View All &rarr;</Link></li>
+              <li><Link href="/gurgaon-area" className="hover:text-accent transition-colors text-white font-medium">View All &rarr;</Link></li>
             </ul>
           </div>
 

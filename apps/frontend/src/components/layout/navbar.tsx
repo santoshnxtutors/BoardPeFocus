@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Logo } from "@/components/common/Logo";
@@ -20,8 +20,9 @@ export function Navbar() {
 
   const navLinks = [
     { name: "Boards", href: "/gurugram" },
-    { name: "Sectors", href: "/gurugram" },
+    { name: "Areas", href: "/gurgaon-area" },
     { name: "Schools", href: "/gurugram" },
+    { name: "Blog", href: "/blog" },
     { name: "Browse Tutors", href: "/search" },
   ];
 

@@ -447,10 +447,12 @@ model Lead {
   class           String?
   subject         String?
   board           String?
+  school          String?
   location        String?
   message         String?  @db.Text
   source          String?  @default("direct")
   pageUrl         String?
+  campaignParams  Json?
   status          LeadStatus @default(NEW)
   events          LeadEvent[]
   createdAt       DateTime @default(now())

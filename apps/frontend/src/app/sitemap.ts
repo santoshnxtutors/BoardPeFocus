@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { siteConfig } from '@/lib/seo';
+import { areaClusters } from '@/data/areas';
 import { mockBoards, mockSchools, mockSectors, mockSubjects, mockTutors } from '@/data/mock';
 
 async function getJson<T>(url: string): Promise<T | null> {
@@ -27,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     '',
     '/gurugram',
+    '/gurgaon-area',
     '/contact',
     '/about',
     '/faqs',
@@ -103,6 +105,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
   const sectorRoutes = liveSectors.map((sector) => `/gurugram/sectors/${sector.slug}`);
+  const areaClusterRoutes = areaClusters.map((cluster) => `/gurgaon-area/${cluster.slug}`);
   const societyRoutes = liveSectors.flatMap((sector) =>
     ('societies' in sector && Array.isArray(sector.societies) ? sector.societies : []).map(
       (society) => `/gurugram/sectors/${sector.slug}/${society.toLowerCase().replace(/\s+/g, '-')}`,
@@ -119,6 +122,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...schoolBoardRoutes,
       ...schoolBoardSubjectRoutes,
       ...sectorRoutes,
+      ...areaClusterRoutes,
       ...societyRoutes,
       ...tutorRoutes,
     ]),
