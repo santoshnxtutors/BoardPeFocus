@@ -19,18 +19,19 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: 13.127.64.109
-          username: boardpefocus
+          username: boardpefocusDb
           password: ${{ secrets.CLOUDPANEL_PASSWORD }}
           port: 22
           script_stop: true
           command_timeout: 40m
+          debug: true
           script: |
             set -e
 
             APP_DIR="/home/boardpefocus/htdocs/www.boardpefocus.in"
 
             echo "Connected as: $(whoami)"
-            echo "Deploying in: $APP_DIR"
+            echo "Using app dir: $APP_DIR"
 
             mkdir -p "$APP_DIR"
             cd "$APP_DIR"
