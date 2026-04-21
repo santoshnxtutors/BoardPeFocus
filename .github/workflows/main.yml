@@ -57,9 +57,22 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            # Ensure Node.js is available on the server. On fresh CloudPanel
+            # deployments the site user doesn't have Node installed by default.
+            # Use nvm to install an LTS release when `node` is missing. This avoids
+            # exiting early and allows the deployment to continue.
             if ! command -v node >/dev/null 2>&1; then
-              echo "Node.js is not installed on the server"
-              exit 1
+              echo "Node.js is not installed on the server, installing via nvm..."
+              export NVM_DIR="$HOME/.nvm"
+              # Install nvm if it's not present
+              if [ ! -d "$NVM_DIR" ]; then
+                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+              fi
+              # Load nvm into the current shell session
+              [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+              # Install and use the LTS version of Node (change the version as required)
+              nvm install --lts
+              nvm use --lts
             fi
 
             if ! command -v pnpm >/dev/null 2>&1; then
