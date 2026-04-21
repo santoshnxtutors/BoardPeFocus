@@ -27,7 +27,7 @@ jobs:
           script: |
             set -e
 
-            APP_DIR="/home/boardpefocus/htdocs/www.boardpefocus.in"
+            APP_DIR="/home/boardpefocusdb/htdocs/www.boardpefocus.in"
 
             if [ ! -d "$APP_DIR/.git" ]; then
               mkdir -p "$APP_DIR"
