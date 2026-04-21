@@ -15,16 +15,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Test SSH connection
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 13.127.64.109
+          username: boardpefocusdb
+          password: ${{ secrets.CLOUDPANEL_PASSWORD }}
+          port: 22
+          script_stop: true
+          command_timeout: 5m
+          script: |
+            whoami
+            pwd
+
       - name: Deploy to CloudPanel server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: 13.127.64.109
-          username: boardpefocusDb
+          username: boardpefocusdb
           password: ${{ secrets.CLOUDPANEL_PASSWORD }}
           port: 22
           script_stop: true
           command_timeout: 40m
-          debug: true
           script: |
             set -e
 
