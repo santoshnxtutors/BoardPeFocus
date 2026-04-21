@@ -1,0 +1,49 @@
+name: Deploy To CloudPanel
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: boardpefocus-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to CloudPanel server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 13.127.64.109
+          username: boardpefocusdb
+          password: ${{ secrets.CLOUDPANEL_PASSWORD }}
+          port: 22
+          script_stop: true
+          command_timeout: 40m
+          script: |
+            set -e
+
+            APP_DIR="/home/boardpefocus/htdocs/www.boardpefocus.in"
+
+            if [ ! -d "$APP_DIR/.git" ]; then
+              mkdir -p "$APP_DIR"
+              cd "$APP_DIR"
+              git clone https://github.com/santoshnxtutors/BoardPeFocus.git .
+            else
+              cd "$APP_DIR"
+            fi
+
+            git fetch origin main
+            git reset --hard origin/main
+
+            if ! command -v pnpm >/dev/null 2>&1; then
+              corepack enable
+              corepack prepare pnpm@9.5.0 --activate
+            fi
+
+            chmod +x scripts/cloudpanel-deploy.sh
+            APP_DIR="$APP_DIR" bash scripts/cloudpanel-deploy.sh
