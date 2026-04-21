@@ -15,11 +15,13 @@ async function bootstrap() {
 
   // Security & Validation
   const allowedOrigins = [
-    process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000',
-    process.env.ADMIN_ORIGIN ?? 'http://localhost:3002',
-  ];
+    process.env.FRONTEND_ORIGIN,
+    process.env.ADMIN_ORIGIN,
+    'http://localhost:3000',
+    'http://localhost:3002',
+  ].filter(Boolean);
   app.enableCors({
-    origin: allowedOrigins,
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
     credentials: true,
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));

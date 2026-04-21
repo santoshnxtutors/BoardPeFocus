@@ -3,11 +3,26 @@ import {
   Lead, PageRecord, SeoMeta, MediaAsset, User, AuditLog 
 } from '@boardpefocus/types';
 
-const rawApiBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-const API_BASE_URL = rawApiBaseUrl.endsWith('/v1')
-  ? rawApiBaseUrl
-  : `${rawApiBaseUrl.replace(/\/$/, '')}/v1`;
+function resolveApiBaseUrl() {
+  const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  if (configuredApiBaseUrl) {
+    return configuredApiBaseUrl;
+  }
+
+  if (typeof window !== 'undefined') {
+    const { protocol, hostname } = window.location;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+
+    if (isLocalhost) {
+      return 'http://localhost:3001/api';
+    }
+
+    return `${protocol}//${hostname}/api`;
+  }
+
+  return 'http://localhost:3001/api';
+}
 
 class ApiClient {
   private getAuthToken() {
@@ -20,7 +35,11 @@ class ApiClient {
 
   private async fetcher<T>(path: string, options?: RequestInit): Promise<T> {
     const token = this.getAuthToken();
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const rawApiBaseUrl = resolveApiBaseUrl();
+    const apiBaseUrl = rawApiBaseUrl.endsWith('/v1')
+      ? rawApiBaseUrl
+      : `${rawApiBaseUrl.replace(/\/$/, '')}/v1`;
+    const response = await fetch(`${apiBaseUrl}${path}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
