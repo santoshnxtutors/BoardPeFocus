@@ -66,5 +66,4 @@ jobs:
               npm install -g pm2
             fi
 
-            chmod +x scripts/cloudpanel-deploy.sh
             APP_DIR="$APP_DIR" bash scripts/cloudpanel-deploy.sh
