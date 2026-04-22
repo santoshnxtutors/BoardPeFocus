@@ -120,6 +120,38 @@ export default function HomePage() {
       description: "Coding logic, theory coverage, and practical-style revision in one path.",
     },
   ];
+  const schoolEntryPoints = [
+    {
+      name: "The Shri Ram School Aravali",
+      href: "/schools/the-shri-ram-school-aravali",
+      cue: "DLF Phase 4, Gurgaon • ICSE, ISC",
+    },
+    {
+      name: "The Shri Ram School Moulsari",
+      href: "/schools/the-shri-ram-school-moulsari",
+      cue: "DLF Phase 3, Gurgaon • ICSE, ISC",
+    },
+    {
+      name: "Heritage Xperiential Learning School",
+      href: "/schools/the-heritage-school",
+      cue: "Sector 62, Gurgaon • CBSE, IGCSE",
+    },
+    {
+      name: "Pathways School Gurgaon",
+      href: "/schools/pathways-school-gurgaon",
+      cue: "Golf Course Extension belt, Gurgaon • IB, IGCSE",
+    },
+    {
+      name: "Pathways World School Gurgaon",
+      href: "/schools/pathways-world-school",
+      cue: "Aravali zone, Gurgaon • IB, IGCSE",
+    },
+    {
+      name: "GD Goenka World School",
+      href: "/schools/gd-goenka-world-school",
+      cue: "Sohna Road region, Gurgaon • IB, IGCSE",
+    },
+  ];
   const topAreaCoverage = [
     {
       name: "DLF Phases and MG Road belt",
@@ -355,6 +387,44 @@ export default function HomePage() {
                       <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-primary/55 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
                     </div>
                     <p className="text-sm leading-7 text-muted-foreground">{subject.description}</p>
+                  </div>
+                </Link>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+      </section>
+
+      {/* SCHOOL-AWARE ENTRY POINTS */}
+      <section className="pb-24 bg-white">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <FadeIn>
+            <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">School-aware entry points</h2>
+                <p className="text-muted-foreground text-base md:text-lg max-w-4xl leading-relaxed">
+                  Parents often think in terms of school context first. These overview pages make it easier to move from school into the right board, subject, and Gurgaon support path.
+                </p>
+              </div>
+              <Link href="/schools" className="group inline-flex items-center text-sm md:text-base font-bold text-primary hover:text-accent transition-colors">
+                View all schools
+                <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </FadeIn>
+
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {schoolEntryPoints.map((school) => (
+              <StaggerItem key={school.name}>
+                <Link href={school.href} className="group">
+                  <div className="h-full rounded-[1.75rem] border border-border/60 bg-white px-5 py-5 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/20 group-hover:shadow-lg">
+                    <div className="mb-4 flex items-start justify-between gap-3">
+                      <p className="text-xl font-heading font-bold text-primary transition-colors group-hover:text-accent">
+                        {school.name}
+                      </p>
+                      <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-primary/55 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                    </div>
+                    <p className="text-sm leading-7 text-muted-foreground">{school.cue}</p>
                   </div>
                 </Link>
               </StaggerItem>

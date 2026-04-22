@@ -87,6 +87,7 @@ export function Footer() {
             <ul className="grid grid-cols-1 gap-2 text-sm text-primary-foreground/70">
               <li><Link href="/about" className="hover:text-accent transition-colors">About Us</Link></li>
               <li><Link href="/blog" className="hover:text-accent transition-colors">Blog</Link></li>
+              <li><Link href="/resources" className="hover:text-accent transition-colors">Resources</Link></li>
               <li><Link href="/contact" className="hover:text-accent transition-colors">Support</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-accent transition-colors">Privacy</Link></li>
               <li><Link href="/terms" className="hover:text-accent transition-colors">Terms</Link></li>

@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { getAllBoardParams, getAllClassParams, getAllSubjectParams } from '@/app/boards/_data/boards';
 import { getAllClassHubParams } from '@/app/classes/_data/classes';
+import { getAllResourceArticleParams } from '@/app/resources/_data/articles';
+import { getAllResourceCategoryParams } from '@/app/resources/_data/catalog';
 import {
   getAllSchoolAreaParams,
   getAllSchoolBoardParams,
@@ -39,6 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/boards',
     '/classes',
     '/schools',
+    '/resources',
     '/gurugram',
     '/gurgaon-area',
     '/contact',
@@ -84,6 +87,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ({ schoolSlug, areaSlug }) => `/schools/${schoolSlug}/areas/${areaSlug}`,
   );
   const schoolFaqRoutes = getAllSchoolParams().map(({ schoolSlug }) => `/schools/${schoolSlug}/faq`);
+  const resourceCategoryRoutes = getAllResourceCategoryParams().map(({ category }) => `/resources/${category}`);
+  const resourceArticleRoutes = getAllResourceArticleParams().map(
+    ({ category, slug }) => `/resources/${category}/${slug}`,
+  );
   const boardsClassRoutes = getAllClassParams().map(
     ({ board, classLevel }) => `/boards/${board}/${classLevel}`,
   );
@@ -159,6 +166,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...schoolClassHubRoutes,
       ...schoolAreaHubRoutes,
       ...schoolFaqRoutes,
+      ...resourceCategoryRoutes,
+      ...resourceArticleRoutes,
       ...boardsClassRoutes,
       ...boardsSubjectRoutes,
       ...boardSubjectRoutes,
