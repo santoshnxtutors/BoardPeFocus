@@ -5,7 +5,13 @@ import { FAQ } from "@/components/faq/FAQ";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { GeneratedManifestPage } from "@/components/generated-pages/GeneratedManifestPage";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJsonLd } from "@/lib/seo";
+import {
+  buildGeneratedMetadata,
+  getClassFallbackParams,
+  getManifestPage,
+} from "@/lib/generated-pages";
 import { ClassesBreadcrumbs } from "@/app/classes/_components/ClassesBreadcrumbs";
 import { ClassesCtaBlock } from "@/app/classes/_components/ClassesCtaBlock";
 import { ClassesRelatedLinks } from "@/app/classes/_components/ClassesRelatedLinks";
@@ -24,14 +30,16 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return getAllClassHubParams();
+  return [...getAllClassHubParams(), ...getClassFallbackParams()];
 }
 
 export async function generateMetadata({ params }: PageProps) {
   const { classLevel } = await params;
   const classHub = getClassHubConfig(classLevel);
+  const generatedPage = getManifestPage(`/classes/${classLevel}`);
 
-  if (!classHub) return constructMetadata({ title: "Class Page Not Found", noIndex: true });
+  if (!classHub && !generatedPage) return constructMetadata({ title: "Class Page Not Found", noIndex: true });
+  if (!classHub) return constructMetadata(buildGeneratedMetadata(generatedPage!));
 
   return constructMetadata({
     title: `${classHub.label} Home Tutors in Gurgaon | BoardPeFocus`,
@@ -43,7 +51,12 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function ClassHubDetailPage({ params }: PageProps) {
   const { classLevel } = await params;
   const classHub = getClassHubConfig(classLevel);
-  if (!classHub) notFound();
+  const generatedPage = getManifestPage(`/classes/${classLevel}`);
+
+  if (!classHub && !generatedPage) notFound();
+  if (!classHub) {
+    return <GeneratedManifestPage record={generatedPage!} />;
+  }
 
   const schools = getSchoolDetails(classHub.schoolReferences.map((school) => school.slug));
   const areas = getAreaDetails(classHub.areaReferences.map((area) => area.slug));

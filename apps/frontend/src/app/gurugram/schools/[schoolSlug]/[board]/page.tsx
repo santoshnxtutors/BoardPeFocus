@@ -7,19 +7,36 @@ import { School as SchoolIcon, GraduationCap, MapPin, ChevronRight, BookOpen } f
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
 import { LeadForm } from "@/components/forms/LeadForm";
+import { GeneratedManifestPage } from "@/components/generated-pages/GeneratedManifestPage";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildGeneratedMetadata,
+  getManifestPage,
+  getSchoolServiceFallbackParams,
+} from "@/lib/generated-pages";
 
 interface PageProps {
   params: Promise<{ schoolSlug: string; board: string }>;
+}
+
+export async function generateStaticParams() {
+  return getSchoolServiceFallbackParams();
 }
 
 export async function generateMetadata({ params }: PageProps) {
   const { schoolSlug, board: boardSlug } = await params;
   const school = mockSchools.find(s => s.slug === schoolSlug);
   const board = mockBoards.find(b => b.slug === boardSlug);
+  const generatedPage = getManifestPage(`/gurugram/schools/${schoolSlug}/${boardSlug}`);
   
-  if (!school || !board) return constructMetadata({ title: "Page Not Found", noIndex: true });
+  if (!school || !board) {
+    if (generatedPage) {
+      return constructMetadata(buildGeneratedMetadata(generatedPage));
+    }
+
+    return constructMetadata({ title: "Page Not Found", noIndex: true });
+  }
 
   return constructMetadata({
     title: `${board.name} Tutors for ${school.name} Students | BoardPeFocus`,
@@ -32,8 +49,15 @@ export default async function SchoolBoardPage({ params }: PageProps) {
   const { schoolSlug, board: boardSlug } = await params;
   const school = mockSchools.find(s => s.slug === schoolSlug);
   const board = mockBoards.find(b => b.slug === boardSlug);
+  const generatedPage = getManifestPage(`/gurugram/schools/${schoolSlug}/${boardSlug}`);
 
-  if (!school || !board) notFound();
+  if (!school || !board) {
+    if (generatedPage) {
+      return <GeneratedManifestPage record={generatedPage} />;
+    }
+
+    notFound();
+  }
 
   // Find tutors for this school AND board
   const filteredTutors = mockTutors.filter(t => 

@@ -15,6 +15,7 @@ import {
 import { siteConfig } from '@/lib/seo';
 import { areaClusters } from '@/data/areas';
 import { mockBoards, mockSchools, mockSectors, mockSubjects, mockTutors } from '@/data/mock';
+import { getGeneratedSitemapRoutes } from '@/lib/generated-pages';
 
 async function getJson<T>(url: string): Promise<T | null> {
   try {
@@ -161,6 +162,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
   );
   const tutorRoutes = liveTutors.map((tutor) => `/tutors/${tutor.slug}`);
+  const manifestRoutes = getGeneratedSitemapRoutes();
 
   const allRoutes = Array.from(
     new Set([
@@ -188,6 +190,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...areaClusterRoutes,
       ...societyRoutes,
       ...tutorRoutes,
+      ...manifestRoutes,
     ]),
   );
 

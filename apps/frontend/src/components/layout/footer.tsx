@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { MapPin, Mail, Phone } from "lucide-react";
-import { mockSectors } from "@/data/mock";
 
 const boardLinks = [
   { slug: "cbse", name: "CBSE" },
@@ -8,6 +7,14 @@ const boardLinks = [
   { slug: "isc", name: "ISC" },
   { slug: "igcse", name: "IGCSE" },
   { slug: "ib", name: "IB" },
+];
+
+const topLocalityLinks = [
+  { href: "/gurugram/sectors/dlf-phase-4", label: "Tutors in DLF Phase 4" },
+  { href: "/gurugram/sectors/dlf-phase-5", label: "Tutors in DLF Phase 5" },
+  { href: "/gurugram/sectors/sector-53", label: "Tutors in Sector 53" },
+  { href: "/gurugram/sectors/sector-54", label: "Tutors in Sector 54" },
+  { href: "/gurugram/sectors/sector-57", label: "Tutors in Sector 57" },
 ];
 
 export function Footer() {
@@ -70,10 +77,10 @@ export function Footer() {
           <div>
             <h4 className="font-heading font-bold text-base mb-4 text-white">Top Localities</h4>
             <ul className="grid grid-cols-1 gap-2 text-sm text-primary-foreground/70">
-              {mockSectors.slice(0, 5).map((sector) => (
-                <li key={sector.slug}>
-                  <Link href={`/gurugram/sectors/${sector.slug}`} className="hover:text-accent transition-colors">
-                    Tutors in {sector.name}
+              {topLocalityLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="hover:text-accent transition-colors">
+                    {item.label}
                   </Link>
                 </li>
               ))}

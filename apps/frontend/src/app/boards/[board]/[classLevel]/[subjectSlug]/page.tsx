@@ -6,7 +6,13 @@ import { LeadForm } from "@/components/forms/LeadForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { GeneratedManifestPage } from "@/components/generated-pages/GeneratedManifestPage";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJsonLd } from "@/lib/seo";
+import {
+  buildGeneratedMetadata,
+  getBoardSubjectFallbackParams,
+  getManifestPage,
+} from "@/lib/generated-pages";
 import { BoardsBreadcrumbs } from "@/app/boards/_components/BoardsBreadcrumbs";
 import { BoardsCtaBlock } from "@/app/boards/_components/BoardsCtaBlock";
 import { BoardsRelatedLinks } from "@/app/boards/_components/BoardsRelatedLinks";
@@ -29,7 +35,7 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return getAllSubjectParams();
+  return [...getAllSubjectParams(), ...getBoardSubjectFallbackParams()];
 }
 
 export async function generateMetadata({ params }: PageProps) {
@@ -37,9 +43,14 @@ export async function generateMetadata({ params }: PageProps) {
   const board = getBoardConfig(boardSlug);
   const classConfig = getBoardClassConfig(boardSlug, classLevel);
   const subject = getBoardSubjectConfig(boardSlug, classLevel, subjectSlug);
+  const generatedPage = getManifestPage(`/boards/${boardSlug}/${classLevel}/${subjectSlug}`);
+
+  if ((!board || !classConfig || !subject) && !generatedPage) {
+    return constructMetadata({ title: "Page Not Found", noIndex: true });
+  }
 
   if (!board || !classConfig || !subject) {
-    return constructMetadata({ title: "Page Not Found", noIndex: true });
+    return constructMetadata(buildGeneratedMetadata(generatedPage!));
   }
 
   return constructMetadata({
@@ -54,8 +65,12 @@ export default async function BoardSubjectPage({ params }: PageProps) {
   const board = getBoardConfig(boardSlug);
   const classConfig = getBoardClassConfig(boardSlug, classLevel);
   const subject = getBoardSubjectConfig(boardSlug, classLevel, subjectSlug);
+  const generatedPage = getManifestPage(`/boards/${boardSlug}/${classLevel}/${subjectSlug}`);
 
-  if (!board || !classConfig || !subject) notFound();
+  if ((!board || !classConfig || !subject) && !generatedPage) notFound();
+  if (!board || !classConfig || !subject) {
+    return <GeneratedManifestPage record={generatedPage!} />;
+  }
 
   const schools = getSchoolDetails(subject.relatedSchoolSlugs);
   const areas = getAreaDetails(subject.relatedAreaSlugs);

@@ -7,18 +7,30 @@ import { Target, BookOpen, GraduationCap, ChevronRight, Award, Zap } from "lucid
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
 import { LeadForm } from "@/components/forms/LeadForm";
+import { GeneratedManifestPage } from "@/components/generated-pages/GeneratedManifestPage";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildGeneratedMetadata,
+  getGurugramFallbackParams,
+  getManifestPage,
+} from "@/lib/generated-pages";
 
 interface PageProps {
   params: Promise<{ board: string }>;
 }
 
+export async function generateStaticParams() {
+  return [...mockBoards.map((board) => ({ board: board.slug })), ...getGurugramFallbackParams()];
+}
+
 export async function generateMetadata({ params }: PageProps) {
   const { board: boardSlug } = await params;
   const board = mockBoards.find(b => b.slug === boardSlug);
+  const generatedPage = getManifestPage(`/gurugram/${boardSlug}`);
   
-  if (!board) return constructMetadata({ title: "Board Not Found", noIndex: true });
+  if (!board && !generatedPage) return constructMetadata({ title: "Board Not Found", noIndex: true });
+  if (!board) return constructMetadata(buildGeneratedMetadata(generatedPage!));
 
   return constructMetadata({
     title: `Premium ${board.name} Home Tutors in Gurugram | BoardPeFocus`,
@@ -30,8 +42,12 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function BoardPage({ params }: PageProps) {
   const { board: boardSlug } = await params;
   const board = mockBoards.find(b => b.slug === boardSlug);
+  const generatedPage = getManifestPage(`/gurugram/${boardSlug}`);
 
-  if (!board) notFound();
+  if (!board && !generatedPage) notFound();
+  if (!board) {
+    return <GeneratedManifestPage record={generatedPage!} />;
+  }
 
   // Find tutors for this board
   const boardTutors = mockTutors.filter(t => 

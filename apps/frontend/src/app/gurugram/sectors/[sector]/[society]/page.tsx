@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GraduationCap, Home, ShieldCheck } from "lucide-react";
 import { LeadForm } from "@/components/forms/LeadForm";
+import { GeneratedManifestPage } from "@/components/generated-pages/GeneratedManifestPage";
 import { TutorCard } from "@/components/cards/TutorCard";
 import { AreaBreadcrumbs } from "@/components/areas/AreaBreadcrumbs";
 import { AreaRelatedLinks } from "@/components/areas/AreaRelatedLinks";
@@ -13,17 +14,33 @@ import { getAreaCluster, getSectorDetail, getSocietyDetail } from "@/data/areas"
 import { mockSchools, mockTutors } from "@/data/mock";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { getSchoolHubLink } from "@/app/schools/_data/linking";
+import {
+  buildGeneratedMetadata,
+  getManifestPage,
+  getSectorFallbackParams,
+} from "@/lib/generated-pages";
 
 interface PageProps {
   params: Promise<{ sector: string; society: string }>;
+}
+
+export async function generateStaticParams() {
+  return getSectorFallbackParams();
 }
 
 export async function generateMetadata({ params }: PageProps) {
   const { sector: sectorSlug, society: societySlug } = await params;
   const sector = getSectorDetail(sectorSlug);
   const society = getSocietyDetail(sectorSlug, societySlug);
+  const generatedPage = getManifestPage(`/gurugram/sectors/${sectorSlug}/${societySlug}`);
 
-  if (!sector || !society) return constructMetadata({ title: "Page Not Found", noIndex: true });
+  if (!sector || !society) {
+    if (generatedPage) {
+      return constructMetadata(buildGeneratedMetadata(generatedPage));
+    }
+
+    return constructMetadata({ title: "Page Not Found", noIndex: true });
+  }
 
   return constructMetadata({
     title: `Premium Home Tutors in ${society.name}, ${sector.name} | BoardPeFocus`,
@@ -36,8 +53,15 @@ export default async function SocietyPage({ params }: PageProps) {
   const { sector: sectorSlug, society: societySlug } = await params;
   const sector = getSectorDetail(sectorSlug);
   const society = getSocietyDetail(sectorSlug, societySlug);
+  const generatedPage = getManifestPage(`/gurugram/sectors/${sectorSlug}/${societySlug}`);
 
-  if (!sector || !society) notFound();
+  if (!sector || !society) {
+    if (generatedPage) {
+      return <GeneratedManifestPage record={generatedPage} />;
+    }
+
+    notFound();
+  }
 
   const cluster = getAreaCluster(sector.clusterSlug);
   const nearbySchools = sector.nearbySchoolSlugs
