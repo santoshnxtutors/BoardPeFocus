@@ -69,13 +69,13 @@ jobs:
               npm install -g pm2
             fi
 
-            pnpm install --frozen-lockfile
+            pnpm install --frozen-lockfile --prefer-offline
             pnpm --dir apps/frontend build
 
             if pm2 describe boardpefocus-frontend >/dev/null 2>&1; then
-              pm2 restart boardpefocus-frontend
-            else
-              pm2 start "pnpm start:frontend" --name boardpefocus-frontend
+              pm2 delete boardpefocus-frontend || true
             fi
 
+            pm2 start "pnpm start:frontend" --name boardpefocus-frontend
             pm2 save
+            pm2 status
