@@ -1,4 +1,4 @@
-name: Deploy To CloudPanel
+name: Deploy Frontend To CloudPanel
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: boardpefocus-production
+  group: boardpefocus-frontend
   cancel-in-progress: true
 
 jobs:
@@ -15,24 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test SSH connection
+      - name: Deploy frontend to CloudPanel
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: 13.127.64.109
-          username: boardpefocusdb
-          password: ${{ secrets.CLOUDPANEL_PASSWORD }}
-          port: 22
-          script_stop: true
-          command_timeout: 5m
-          script: |
-            whoami
-            pwd
-
-      - name: Deploy to CloudPanel server
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: 13.127.64.109
-          username: boardpefocusdb
+          username: boardpefocusapp
           password: ${{ secrets.CLOUDPANEL_PASSWORD }}
           port: 22
           script_stop: true
@@ -41,6 +28,8 @@ jobs:
             set -e
 
             APP_DIR="/home/boardpefocus/htdocs/www.boardpefocus.in"
+            REPO_URL="https://github.com/santoshnxtutors/BoardPeFocus.git"
+            NODE_VERSION="20"
 
             echo "Connected as: $(whoami)"
             echo "Using app dir: $APP_DIR"
@@ -51,11 +40,25 @@ jobs:
             git config --global --add safe.directory "$APP_DIR"
 
             if [ ! -d ".git" ]; then
-              git clone https://github.com/santoshnxtutors/BoardPeFocus.git .
+              git clone "$REPO_URL" .
             fi
 
             git fetch origin main
             git reset --hard origin/main
+
+            export NVM_DIR="$HOME/.nvm"
+
+            if [ ! -d "$NVM_DIR" ]; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+            fi
+
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            if ! command -v node >/dev/null 2>&1; then
+              nvm install $NODE_VERSION
+            fi
+
+            nvm use $NODE_VERSION
 
             if ! command -v pnpm >/dev/null 2>&1; then
               corepack enable
@@ -66,4 +69,13 @@ jobs:
               npm install -g pm2
             fi
 
-            APP_DIR="$APP_DIR" bash scripts/cloudpanel-deploy.sh
+            pnpm install --frozen-lockfile
+            pnpm --dir apps/frontend build
+
+            if pm2 describe boardpefocus-frontend >/dev/null 2>&1; then
+              pm2 restart boardpefocus-frontend
+            else
+              pm2 start "pnpm start:frontend" --name boardpefocus-frontend
+            fi
+
+            pm2 save
