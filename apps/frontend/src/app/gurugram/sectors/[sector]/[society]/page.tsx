@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { getAreaCluster, getSectorDetail, getSocietyDetail } from "@/data/areas";
 import { mockSchools, mockTutors } from "@/data/mock";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
+import { getSchoolHubLink } from "@/app/schools/_data/linking";
 
 interface PageProps {
   params: Promise<{ sector: string; society: string }>;
@@ -157,7 +158,7 @@ export default async function SocietyPage({ params }: PageProps) {
                   {nearbySchools.map((school) => (
                     <Link
                       key={school.slug}
-                      href={`/gurugram/schools/${school.slug}`}
+                      href={getSchoolHubLink(school.slug)}
                       className="rounded-[1.75rem] border border-border/60 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                     >
                       <div className="flex items-center gap-3 text-primary">
@@ -190,7 +191,7 @@ export default async function SocietyPage({ params }: PageProps) {
                   {
                     title: "Nearby school page",
                     description: "Continue into a school-aware page for sharper tutor discovery.",
-                    href: `/gurugram/schools/${nearbySchools[0]?.slug ?? "dps-sector-45"}`,
+                    href: getSchoolHubLink(nearbySchools[0]?.slug ?? "dps-sector-45"),
                   },
                   {
                     title: "Browse tutors",

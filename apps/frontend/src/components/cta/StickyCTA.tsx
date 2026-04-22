@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { trackEvent } from "@/lib/tracking";
 import { MessageCircle, Calendar } from "lucide-react";
 import { FadeIn } from "@/lib/animations";
+import { cn } from "@/lib/utils";
 
 export function StickyCTA() {
   const [isVisible, setIsVisible] = useState(false);
@@ -33,17 +36,32 @@ export function StickyCTA() {
             Get expert guidance
           </div>
           
-          <Button variant="outline" className="flex-1 md:flex-none h-12 md:h-10 border-primary/20 hover:bg-primary/5 text-primary rounded-xl font-medium">
+          <Link
+            href="/process/demo-class"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "flex-1 md:flex-none h-12 md:h-10 border-primary/20 hover:bg-primary/5 text-primary rounded-xl font-medium"
+            )}
+            onClick={() => trackEvent("sticky_cta_click", { cta_type: "demo", location: "sticky_bottom" })}
+          >
             <Calendar className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Book Demo</span>
             <span className="sm:hidden">Demo</span>
-          </Button>
+          </Link>
           
-          <Button className="flex-1 md:flex-none h-12 md:h-10 bg-[#25D366] hover:bg-[#25D366]/90 text-white rounded-xl font-medium shadow-md">
+          <Link
+            href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20to%20talk%20about%20board-exam%20tutoring%20support."
+            target="_blank"
+            className={cn(
+              buttonVariants(),
+              "flex-1 md:flex-none h-12 md:h-10 bg-[#25D366] hover:bg-[#25D366]/90 text-white rounded-xl font-medium shadow-md"
+            )}
+            onClick={() => trackEvent("sticky_cta_click", { cta_type: "whatsapp", location: "sticky_bottom" })}
+          >
             <MessageCircle className="w-4 h-4 mr-2 fill-current" />
             <span className="hidden sm:inline">WhatsApp Us</span>
             <span className="sm:hidden">Chat</span>
-          </Button>
+          </Link>
         </div>
       </FadeIn>
     </div>

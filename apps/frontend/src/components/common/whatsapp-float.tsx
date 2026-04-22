@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MessageSquare, Send, X, MapPin, School, BookOpen, GraduationCap, Layers, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { trackEvent } from "@/lib/tracking";
 import { cn } from "@/lib/utils";
 
 export function WhatsAppFloat() {
@@ -32,6 +33,13 @@ export function WhatsAppFloat() {
 📝 Inquiry: ${form.message || 'I would like to book a free demo.'}`;
     
     const encodedMessage = encodeURIComponent(fullMessage);
+    trackEvent("whatsapp_float_send", {
+      board: form.board,
+      grade: form.grade,
+      subject: form.subject,
+      school: form.school,
+      location: form.location,
+    });
     window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
     setIsOpen(false);
     setForm({ location: "", board: "", school: "", grade: "", subject: "", message: "" });
@@ -149,7 +157,11 @@ export function WhatsAppFloat() {
 
       {/* Floating Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          const nextOpen = !isOpen;
+          setIsOpen(nextOpen);
+          trackEvent("whatsapp_float_toggle", { open: nextOpen });
+        }}
         className={cn(
           "pointer-events-auto",
           "w-14 h-14 sm:w-18 sm:h-18 rounded-full shadow-[0_15px_40px_rgba(37,211,102,0.4)] flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group relative border-4 border-white",

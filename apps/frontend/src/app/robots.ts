@@ -10,7 +10,17 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin', '/api/'],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: [
+      `${baseUrl}/sitemap.xml`,
+      `${baseUrl}/boards/sitemap.xml`,
+      `${baseUrl}/classes/sitemap.xml`,
+      `${baseUrl}/schools/sitemap.xml`,
+      `${baseUrl}/gurgaon-area/sitemap.xml`,
+      `${baseUrl}/resources/sitemap.xml`,
+      `${baseUrl}/process/sitemap.xml`,
+      `${baseUrl}/faqs/sitemap.xml`,
+      `${baseUrl}/result/sitemap.xml`,
+    ],
     host: baseUrl,
   };
 }

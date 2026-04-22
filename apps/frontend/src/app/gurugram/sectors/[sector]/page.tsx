@@ -13,6 +13,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { getAreaCluster, getSectorDetail } from "@/data/areas";
 import { mockSchools, mockTutors } from "@/data/mock";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
+import { getSchoolHubLink } from "@/app/schools/_data/linking";
 
 interface PageProps {
   params: Promise<{ sector: string }>;
@@ -157,7 +158,7 @@ export default async function SectorPage({ params }: PageProps) {
                   {nearbySchools.map((school) => (
                     <Link
                       key={school.slug}
-                      href={`/gurugram/schools/${school.slug}`}
+                      href={getSchoolHubLink(school.slug)}
                       className="rounded-[1.75rem] border border-border/60 bg-muted/20 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
                     >
                       <div className="flex items-center gap-3 text-primary">

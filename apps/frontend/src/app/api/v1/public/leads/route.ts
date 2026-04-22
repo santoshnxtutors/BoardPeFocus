@@ -11,6 +11,8 @@ const leadSchema = z.object({
   subject: z.string().optional(),
   school: z.string().optional(),
   location: z.string().optional(),
+  preferredMode: z.string().optional(),
+  preferredTimeSlot: z.string().optional(),
   message: z.string().optional(),
 });
 

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { FAQ } from "@/components/faq/FAQ";
 import { platformStats } from "@/data/stats";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getSchoolHubLink } from "@/app/schools/_data/linking";
 
 export const metadata = constructMetadata({
   title: "Premium Home Tutors in Gurugram | BoardPeFocus",
@@ -142,7 +143,7 @@ export default function GurugramCityPage() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {mockSchools.map(school => (
-                  <Link key={school.slug} href={`/gurugram/schools/${school.slug}`}>
+                  <Link key={school.slug} href={getSchoolHubLink(school.slug)}>
                     <div className="p-5 rounded-2xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-colors h-full flex flex-col justify-center">
                       <h3 className="font-bold text-foreground mb-1">{school.name}</h3>
                       <p className="text-xs text-muted-foreground">{school.boards.join(", ")} • {school.location}</p>

@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { getAllBoardParams, getAllClassParams, getAllSubjectParams } from '@/app/boards/_data/boards';
 import { getAllClassHubParams } from '@/app/classes/_data/classes';
+import { getAllFaqTopicParams } from '@/app/faqs/_data/topics';
+import { getAllProcessParams } from '@/app/process/_data/process';
 import { getAllResourceArticleParams } from '@/app/resources/_data/articles';
 import { getAllResourceCategoryParams } from '@/app/resources/_data/catalog';
 import {
@@ -42,6 +44,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/classes',
     '/schools',
     '/resources',
+    '/result',
+    '/process',
+    '/support',
+    '/site-map',
     '/gurugram',
     '/gurgaon-area',
     '/contact',
@@ -73,6 +79,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const boardRoutes = liveBoards.map((board) => `/gurugram/${board.slug}`);
   const boardsHubRoutes = getAllBoardParams().map(({ board }) => `/boards/${board}`);
   const classHubRoutes = getAllClassHubParams().map(({ classLevel }) => `/classes/${classLevel}`);
+  const faqTopicRoutes = getAllFaqTopicParams().map(({ topic }) => `/faqs/${topic}`);
+  const processRoutes = getAllProcessParams().map(({ slug }) => `/process/${slug}`);
   const schoolHubRoutes = getAllSchoolParams().map(({ schoolSlug }) => `/schools/${schoolSlug}`);
   const schoolBoardHubRoutes = getAllSchoolBoardParams().map(
     ({ schoolSlug, boardSlug }) => `/schools/${schoolSlug}/boards/${boardSlug}`,
@@ -160,6 +168,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...boardRoutes,
       ...boardsHubRoutes,
       ...classHubRoutes,
+      ...faqTopicRoutes,
+      ...processRoutes,
       ...schoolHubRoutes,
       ...schoolBoardHubRoutes,
       ...schoolSubjectHubRoutes,

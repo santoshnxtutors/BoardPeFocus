@@ -25,7 +25,7 @@ export function Navbar() {
     { name: "Schools", href: "/schools" },
 
     { name: "Browse Tutors", href: "/search" },
-    { name: "Results", href: "/results" },
+    { name: "Results", href: "/result" },
     { name: "Resources", href: "/resources" },
   ];
 

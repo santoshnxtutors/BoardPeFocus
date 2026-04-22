@@ -1,4 +1,5 @@
 import { FAQPageClient } from "@/components/pages/FAQPageClient";
+import { FaqTopicLinks } from "@/app/faqs/_components/FaqTopicLinks";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { categorizedFaqs } from "@/data/faqs";
 import {
@@ -28,6 +29,7 @@ export default function FAQPage() {
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={faqJsonLd} />
       <FAQPageClient />
+      <FaqTopicLinks />
     </>
   );
 }

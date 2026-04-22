@@ -8,17 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
+import { trackEvent } from "@/lib/tracking";
 import { Loader2, CheckCircle2, Send, Phone, User, GraduationCap, BookOpen, School as SchoolIcon, MapPin } from "lucide-react";
 import { FadeIn } from "@/lib/animations";
 
 const leadSchema = z.object({
   name: z.string().min(2, "Name is required"),
   phone: z.string().min(10, "Please enter a valid 10-digit number"),
+  email: z.string().email("Please enter a valid email").optional().or(z.literal("")),
   board: z.string().optional(),
   class: z.string().optional(),
   subject: z.string().optional(),
   school: z.string().optional(),
   location: z.string().optional(),
+  preferredMode: z.string().optional(),
+  preferredTimeSlot: z.string().optional(),
+  message: z.string().optional(),
 });
 
 type LeadFormData = z.infer<typeof leadSchema>;
@@ -38,9 +43,13 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
   const phoneInputRef = useRef<HTMLInputElement | null>(null);
   const boardSelectRef = useRef<HTMLSelectElement | null>(null);
   const classSelectRef = useRef<HTMLSelectElement | null>(null);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
   const subjectInputRef = useRef<HTMLInputElement | null>(null);
   const schoolInputRef = useRef<HTMLInputElement | null>(null);
   const locationInputRef = useRef<HTMLInputElement | null>(null);
+  const preferredModeSelectRef = useRef<HTMLSelectElement | null>(null);
+  const preferredTimeSlotSelectRef = useRef<HTMLSelectElement | null>(null);
+  const messageInputRef = useRef<HTMLInputElement | null>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LeadFormData>({
     resolver: zodResolver(leadSchema),
@@ -49,11 +58,15 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
 
   const { ref: nameRef, ...nameField } = register("name");
   const { ref: phoneRef, ...phoneField } = register("phone");
+  const { ref: emailRef, ...emailField } = register("email");
   const { ref: boardRef, ...boardField } = register("board");
   const { ref: classRef, ...classField } = register("class");
   const { ref: subjectRef, ...subjectField } = register("subject");
   const { ref: schoolRef, ...schoolField } = register("school");
   const { ref: locationRef, ...locationField } = register("location");
+  const { ref: preferredModeRef, ...preferredModeField } = register("preferredMode");
+  const { ref: preferredTimeSlotRef, ...preferredTimeSlotField } = register("preferredTimeSlot");
+  const { ref: messageRef, ...messageField } = register("message");
 
   const focusInput = (ref: React.RefObject<HTMLInputElement | null>) => {
     ref.current?.focus();
@@ -64,6 +77,14 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
     setError(null);
     try {
       await api.leads.submit(data);
+      trackEvent("lead_submit", {
+        board: data.board,
+        class: data.class,
+        subject: data.subject,
+        school: data.school,
+        location: data.location,
+        preferred_mode: data.preferredMode,
+      });
       setIsSuccess(true);
       if (onSuccess) onSuccess();
     } catch (err) {
@@ -92,13 +113,13 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
   }
 
   return (
-    <div className="relative isolate bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-border/50">
-      {title && <h3 className="text-2xl font-heading font-bold text-primary mb-1 text-center">{title}</h3>}
-      {subtitle && <p className="text-muted-foreground text-sm mb-6 text-center">{subtitle}</p>}
+    <div className="relative isolate bg-white rounded-3xl p-5 md:p-6 shadow-xl border border-border/50 max-w-md mx-auto">
+      {title && <h3 className="text-xl font-heading font-bold text-primary mb-1 text-center">{title}</h3>}
+      {subtitle && <p className="text-muted-foreground text-[12px] mb-5 text-center">{subtitle}</p>}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative z-10 space-y-1.5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="relative z-10 space-y-1">
             <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Full Name</Label>
             <label
               htmlFor="name"
@@ -114,13 +135,13 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                   nameInputRef.current = node;
                 }}
                 placeholder="Name" 
-                className="h-11 pl-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-sm"
+                className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
               />
             </label>
             {errors.name && <p className="text-destructive text-[10px] mt-1 font-medium">{errors.name.message}</p>}
           </div>
 
-          <div className="relative z-10 space-y-1.5">
+          <div className="relative z-10 space-y-1">
             <Label htmlFor="phone" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Phone Number</Label>
             <label
               htmlFor="phone"
@@ -136,15 +157,37 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                   phoneInputRef.current = node;
                 }}
                 placeholder="Phone" 
-                className="h-11 pl-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-sm"
+                className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
               />
             </label>
             {errors.phone && <p className="text-destructive text-[10px] mt-1 font-medium">{errors.phone.message}</p>}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="relative z-10 space-y-1.5">
+        <div className="relative z-10 space-y-1">
+          <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Email (optional)</Label>
+          <label
+            htmlFor="email"
+            className="relative block cursor-text"
+            onClick={() => focusInput(emailInputRef)}
+          >
+            <Input
+              id="email"
+              type="email"
+              {...emailField}
+              ref={(node) => {
+                emailRef(node);
+                emailInputRef.current = node;
+              }}
+              placeholder="Parent email"
+              className="h-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
+            />
+          </label>
+          {errors.email && <p className="text-destructive text-[10px] mt-1 font-medium">{errors.email.message}</p>}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="relative z-10 space-y-1">
             <Label htmlFor="board" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Board</Label>
             <label
               htmlFor="board"
@@ -158,7 +201,7 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                   boardRef(node);
                   boardSelectRef.current = node;
                 }}
-                className="flex h-11 w-full rounded-lg border border-border/60 bg-transparent pl-10 pr-4 py-1 text-sm shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                className="flex h-10 w-full rounded-lg border border-border/60 bg-transparent pl-8 pr-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
               >
                 <option value="">Board</option>
                 <option value="CBSE">CBSE</option>
@@ -169,7 +212,7 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
             </label>
           </div>
 
-          <div className="relative z-10 space-y-1.5">
+          <div className="relative z-10 space-y-1">
             <Label htmlFor="class" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Class</Label>
             <label
               htmlFor="class"
@@ -183,7 +226,7 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                   classRef(node);
                   classSelectRef.current = node;
                 }}
-                className="flex h-11 w-full rounded-lg border border-border/60 bg-transparent pl-10 pr-4 py-1 text-sm shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                className="flex h-10 w-full rounded-lg border border-border/60 bg-transparent pl-8 pr-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
               >
                 <option value="">Class</option>
                 <option value="Class 10">Class 10</option>
@@ -196,7 +239,51 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
           </div>
         </div>
 
-        <div className="relative z-10 space-y-1.5">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="relative z-10 space-y-1">
+            <Label htmlFor="preferredMode" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Preferred mode</Label>
+            <label htmlFor="preferredMode" className="relative block cursor-pointer">
+              <select
+                id="preferredMode"
+                {...preferredModeField}
+                ref={(node) => {
+                  preferredModeRef(node);
+                  preferredModeSelectRef.current = node;
+                }}
+                className="flex h-10 w-full rounded-lg border border-border/60 bg-transparent px-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+              >
+                <option value="">Preferred mode</option>
+                <option value="Home tutoring">Home tutoring</option>
+                <option value="Online">Online</option>
+                <option value="Hybrid">Hybrid</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="relative z-10 space-y-1">
+            <Label htmlFor="preferredTimeSlot" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Preferred time slot</Label>
+            <label htmlFor="preferredTimeSlot" className="relative block cursor-pointer">
+              <select
+                id="preferredTimeSlot"
+                {...preferredTimeSlotField}
+                ref={(node) => {
+                  preferredTimeSlotRef(node);
+                  preferredTimeSlotSelectRef.current = node;
+                }}
+                className="flex h-10 w-full rounded-lg border border-border/60 bg-transparent px-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+              >
+                <option value="">Preferred time slot</option>
+                <option value="Weekday mornings">Weekday mornings</option>
+                <option value="Weekday afternoons">Weekday afternoons</option>
+                <option value="Weekday evenings">Weekday evenings</option>
+                <option value="Weekend mornings">Weekend mornings</option>
+                <option value="Weekend afternoons">Weekend afternoons</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div className="relative z-10 space-y-1">
           <Label htmlFor="subject" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Subject(s)</Label>
           <label
             htmlFor="subject"
@@ -212,13 +299,13 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                 subjectInputRef.current = node;
               }}
               placeholder="e.g. Maths, Physics" 
-              className="h-11 pl-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-sm"
+              className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
             />
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="relative z-10 space-y-1.5">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="relative z-10 space-y-1">
             <Label htmlFor="school" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">School</Label>
             <label
               htmlFor="school"
@@ -234,12 +321,12 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                   schoolInputRef.current = node;
                 }}
                 placeholder="School" 
-                className="h-11 pl-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-sm"
+                className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
               />
             </label>
           </div>
 
-          <div className="relative z-10 space-y-1.5">
+          <div className="relative z-10 space-y-1">
             <Label htmlFor="location" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Location</Label>
             <label
               htmlFor="location"
@@ -254,11 +341,31 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                   locationRef(node);
                   locationInputRef.current = node;
                 }}
-                placeholder="Area" 
-                className="h-11 pl-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-sm"
-              />
-            </label>
-          </div>
+              placeholder="Area" 
+              className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
+            />
+          </label>
+        </div>
+      </div>
+
+        <div className="relative z-10 space-y-1">
+          <Label htmlFor="message" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Notes</Label>
+          <label
+            htmlFor="message"
+            className="relative block cursor-text"
+            onClick={() => focusInput(messageInputRef)}
+          >
+            <Input
+              id="message"
+              {...messageField}
+              ref={(node) => {
+                messageRef(node);
+                messageInputRef.current = node;
+              }}
+              placeholder="Any school, sector, society, or timing details"
+              className="h-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
+            />
+          </label>
         </div>
 
         {error && <p className="text-destructive text-[11px] font-medium bg-destructive/5 p-2 rounded border border-destructive/10">{error}</p>}

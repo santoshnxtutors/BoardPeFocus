@@ -66,5 +66,7 @@ export interface Lead {
   subject?: string;
   school?: string;
   location?: string;
+  preferredMode?: string;
+  preferredTimeSlot?: string;
   message?: string;
 }
