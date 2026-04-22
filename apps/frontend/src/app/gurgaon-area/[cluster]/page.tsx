@@ -11,6 +11,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { areaClusters, getAreaCluster, getClusterSectors } from "@/data/areas";
 import { mockSchools } from "@/data/mock";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
+import { getSchoolHubLink } from "@/app/schools/_data/linking";
 
 interface PageProps {
   params: Promise<{ cluster: string }>;
@@ -136,7 +137,7 @@ export default async function AreaClusterPage({ params }: PageProps) {
                   return (
                     <Link
                       key={school.slug}
-                      href={`/gurugram/schools/${school.slug}`}
+                      href={getSchoolHubLink(school.slug)}
                       className="rounded-[1.75rem] border border-border/60 bg-muted/20 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
                     >
                       <div className="flex items-center gap-3 text-primary">
@@ -210,14 +211,14 @@ export default async function AreaClusterPage({ params }: PageProps) {
                   href: "/search",
                 },
                 {
-                  title: "CBSE Tutors in Gurugram",
+                  title: "CBSE Tutors in Gurgaon",
                   description: "Useful for board-specific parent journeys after locality discovery.",
-                  href: "/gurugram/cbse",
+                  href: "/boards/cbse",
                 },
                 {
                   title: "Top School Pages",
                   description: "Continue from corridor relevance into school-aware tutoring pages.",
-                  href: `/gurugram/schools/${cluster.schoolRelevance[0]?.slug ?? "dps-sector-45"}`,
+                  href: getSchoolHubLink(cluster.schoolRelevance[0]?.slug ?? "dps-sector-45"),
                 },
               ]}
             />

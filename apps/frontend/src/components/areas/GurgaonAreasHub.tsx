@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { mockSchools } from "@/data/mock";
+import { getSchoolHubLink } from "@/app/schools/_data/linking";
 
 const featuredSectors = getFeaturedSectors();
 const featuredSocieties = getFeaturedSocieties();
@@ -305,7 +306,7 @@ export function GurgaonAreasHub() {
           {schoolCards.map((school) => (
             <Link
               key={school.slug}
-              href={`/gurugram/schools/${school.slug}`}
+              href={getSchoolHubLink(school.slug)}
               className="rounded-[1.75rem] border border-border/60 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               <div className="flex items-start justify-between gap-4">
@@ -403,18 +404,18 @@ export function GurgaonAreasHub() {
               title: "Related Boards",
               icon: <Sparkles className="h-5 w-5 text-accent" />,
               links: [
-                { label: "CBSE Tutors", href: "/gurugram/cbse" },
-                { label: "ICSE Tutors", href: "/gurugram/icse" },
-                { label: "IB DP Tutors", href: "/gurugram/ibdp" },
+                { label: "CBSE Tutors", href: "/boards/cbse" },
+                { label: "ICSE Tutors", href: "/boards/icse" },
+                { label: "IB DP Tutors", href: "/boards/ib" },
               ],
             },
             {
               title: "Popular Subjects",
               icon: <Building2 className="h-5 w-5 text-accent" />,
               links: [
-                { label: "CBSE Maths", href: "/gurugram/cbse/mathematics" },
-                { label: "CBSE Physics", href: "/gurugram/cbse/physics" },
-                { label: "CBSE Accountancy", href: "/gurugram/cbse/accountancy" },
+                { label: "CBSE Maths", href: "/boards/cbse/class-10/maths-home-tutor-gurgaon" },
+                { label: "CBSE Physics", href: "/boards/cbse/class-12/physics-home-tutor-gurgaon" },
+                { label: "CBSE Accountancy", href: "/boards/cbse/class-12/accountancy-home-tutor-gurgaon" },
               ],
             },
             {
@@ -422,7 +423,7 @@ export function GurgaonAreasHub() {
               icon: <GraduationCap className="h-5 w-5 text-accent" />,
               links: schoolCards.slice(0, 3).map((school) => ({
                 label: school.name,
-                href: `/gurugram/schools/${school.slug}`,
+                href: getSchoolHubLink(school.slug),
               })),
             },
             {

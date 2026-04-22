@@ -1,11 +1,9 @@
 import { Tutor } from "@/types";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, Clock, GraduationCap, ChevronRight, MapPin, BookOpen } from "lucide-react";
 import Link from "next/link";
-import { FadeIn } from "@/lib/animations";
-
 interface TutorCardProps {
   tutor: Tutor;
 }
@@ -16,11 +14,11 @@ export function TutorCard({ tutor }: TutorCardProps) {
       {/* Background Accent */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
       
-      <div className="p-6 md:p-8 flex-grow">
-        <div className="flex flex-col md:flex-row gap-6 mb-8">
+      <div className="p-6 lg:p-8 flex-grow">
+        <div className="flex flex-col gap-6 lg:flex-row mb-8">
           {/* Avatar Area */}
           <div className="relative shrink-0">
-            <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-muted overflow-hidden border-4 border-white shadow-md group-hover:scale-105 transition-transform duration-500">
+            <div className="w-24 h-24 lg:w-28 lg:h-28 rounded-2xl bg-muted overflow-hidden border-4 border-white shadow-md group-hover:scale-105 transition-transform duration-500">
               {tutor.photoUrl ? (
                 <img src={tutor.photoUrl} alt={`${tutor.name}, board-focused home tutor in Gurugram`} className="w-full h-full object-cover" />
               ) : (
@@ -36,11 +34,11 @@ export function TutorCard({ tutor }: TutorCardProps) {
           </div>
 
           {/* Basic Info */}
-          <div className="flex-grow">
-            <h3 className="text-2xl font-heading font-bold text-primary group-hover:text-accent transition-colors mb-2">
+          <div className="min-w-0 flex-1">
+            <h3 className="mb-2 break-words text-xl font-heading font-bold text-primary transition-colors group-hover:text-accent lg:text-2xl">
               {tutor.name}
             </h3>
-            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground font-medium mb-4">
+            <div className="mb-4 flex flex-wrap gap-3 text-sm font-medium text-muted-foreground lg:gap-4">
               <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-secondary" /> {tutor.experienceYears} Yrs Exp.</span>
               <span className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4 text-secondary" /> {tutor.studentsTaught}+ Students</span>
             </div>

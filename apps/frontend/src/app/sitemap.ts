@@ -1,4 +1,13 @@
 import { MetadataRoute } from 'next';
+import { getAllBoardParams, getAllClassParams, getAllSubjectParams } from '@/app/boards/_data/boards';
+import { getAllClassHubParams } from '@/app/classes/_data/classes';
+import {
+  getAllSchoolAreaParams,
+  getAllSchoolBoardParams,
+  getAllSchoolClassParams,
+  getAllSchoolParams,
+  getAllSchoolSubjectParams,
+} from '@/app/schools/_data/schools';
 import { siteConfig } from '@/lib/seo';
 import { areaClusters } from '@/data/areas';
 import { mockBoards, mockSchools, mockSectors, mockSubjects, mockTutors } from '@/data/mock';
@@ -27,6 +36,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes = [
     '',
+    '/boards',
+    '/classes',
+    '/schools',
     '/gurugram',
     '/gurgaon-area',
     '/contact',
@@ -56,6 +68,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tutorSeoInventory = mockTutors;
 
   const boardRoutes = liveBoards.map((board) => `/gurugram/${board.slug}`);
+  const boardsHubRoutes = getAllBoardParams().map(({ board }) => `/boards/${board}`);
+  const classHubRoutes = getAllClassHubParams().map(({ classLevel }) => `/classes/${classLevel}`);
+  const schoolHubRoutes = getAllSchoolParams().map(({ schoolSlug }) => `/schools/${schoolSlug}`);
+  const schoolBoardHubRoutes = getAllSchoolBoardParams().map(
+    ({ schoolSlug, boardSlug }) => `/schools/${schoolSlug}/boards/${boardSlug}`,
+  );
+  const schoolSubjectHubRoutes = getAllSchoolSubjectParams().map(
+    ({ schoolSlug, subjectSlug }) => `/schools/${schoolSlug}/subjects/${subjectSlug}`,
+  );
+  const schoolClassHubRoutes = getAllSchoolClassParams().map(
+    ({ schoolSlug, classLevel }) => `/schools/${schoolSlug}/classes/${classLevel}`,
+  );
+  const schoolAreaHubRoutes = getAllSchoolAreaParams().map(
+    ({ schoolSlug, areaSlug }) => `/schools/${schoolSlug}/areas/${areaSlug}`,
+  );
+  const schoolFaqRoutes = getAllSchoolParams().map(({ schoolSlug }) => `/schools/${schoolSlug}/faq`);
+  const boardsClassRoutes = getAllClassParams().map(
+    ({ board, classLevel }) => `/boards/${board}/${classLevel}`,
+  );
+  const boardsSubjectRoutes = getAllSubjectParams().map(
+    ({ board, classLevel, subjectSlug }) => `/boards/${board}/${classLevel}/${subjectSlug}`,
+  );
   const boardSubjectRoutes = boardSeoInventory.flatMap((board) =>
     liveSubjects
       .filter((subject) =>
@@ -117,6 +151,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     new Set([
       ...staticRoutes,
       ...boardRoutes,
+      ...boardsHubRoutes,
+      ...classHubRoutes,
+      ...schoolHubRoutes,
+      ...schoolBoardHubRoutes,
+      ...schoolSubjectHubRoutes,
+      ...schoolClassHubRoutes,
+      ...schoolAreaHubRoutes,
+      ...schoolFaqRoutes,
+      ...boardsClassRoutes,
+      ...boardsSubjectRoutes,
       ...boardSubjectRoutes,
       ...schoolRoutes,
       ...schoolBoardRoutes,

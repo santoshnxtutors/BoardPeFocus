@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { MapPin, Mail, Phone } from "lucide-react";
-import { mockBoards, mockSectors } from "@/data/mock";
+import { mockSectors } from "@/data/mock";
+
+const boardLinks = [
+  { slug: "cbse", name: "CBSE" },
+  { slug: "icse", name: "ICSE" },
+  { slug: "isc", name: "ISC" },
+  { slug: "igcse", name: "IGCSE" },
+  { slug: "ib", name: "IB" },
+];
 
 export function Footer() {
   return (
@@ -38,13 +46,23 @@ export function Footer() {
           <div>
             <h4 className="font-heading font-bold text-base mb-4 text-white">Board Curricula</h4>
             <ul className="grid grid-cols-1 gap-2 text-sm text-primary-foreground/70">
-              {mockBoards.map((board) => (
+              {boardLinks.map((board) => (
                 <li key={board.slug}>
-                  <Link href={`/gurugram/${board.slug}`} className="hover:text-accent transition-colors">
+                  <Link href={`/boards/${board.slug}`} className="hover:text-accent transition-colors">
                     {board.name} Tutors
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/classes/class-10" className="hover:text-accent transition-colors">
+                  Class 10 Hub
+                </Link>
+              </li>
+              <li>
+                <Link href="/classes/class-12" className="hover:text-accent transition-colors">
+                  Class 12 Hub
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -68,6 +86,7 @@ export function Footer() {
             <h4 className="font-heading font-bold text-base mb-4 text-white">Company</h4>
             <ul className="grid grid-cols-1 gap-2 text-sm text-primary-foreground/70">
               <li><Link href="/about" className="hover:text-accent transition-colors">About Us</Link></li>
+              <li><Link href="/blog" className="hover:text-accent transition-colors">Blog</Link></li>
               <li><Link href="/contact" className="hover:text-accent transition-colors">Support</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-accent transition-colors">Privacy</Link></li>
               <li><Link href="/terms" className="hover:text-accent transition-colors">Terms</Link></li>

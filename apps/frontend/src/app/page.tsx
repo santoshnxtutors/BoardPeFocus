@@ -11,7 +11,7 @@ import { ChevronRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { FAQ } from "@/components/faq/FAQ";
 import { platformStats } from "@/data/stats";
-import { mockTutors, mockBoards } from "@/data/mock";
+import { mockTutors } from "@/data/mock";
 import { TutorCard } from "@/components/cards/TutorCard";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { BlogSection } from "@/components/blog/BlogSection";
@@ -25,6 +25,133 @@ export const metadata = constructMetadata({
 export default function HomePage() {
   const organizationJsonLd = generateOrganizationJsonLd();
   const websiteJsonLd = generateWebsiteJsonLd();
+  const boardDiscovery = [
+    {
+      name: "CBSE",
+      href: "/boards/cbse",
+      description: "Class 10 and 12 support with structured board revision in Gurgaon.",
+    },
+    {
+      name: "ICSE",
+      href: "/boards/icse",
+      description: "Premium Class 10 guidance for strong concepts and board writing.",
+    },
+    {
+      name: "ISC",
+      href: "/boards/isc",
+      description: "Senior-school support for Physics, Chemistry, Maths, and English.",
+    },
+    {
+      name: "IGCSE",
+      href: "/boards/igcse",
+      description: "Subject-specific tutoring for Cambridge learners in Gurugram.",
+    },
+    {
+      name: "IB",
+      href: "/boards/ib",
+      description: "Focused MYP and DP support with one-to-one planning.",
+    },
+  ];
+  const classDiscovery = [
+    {
+      name: "Class 10",
+      href: "/classes/class-10",
+      description: "Board-year tutoring across Maths, Science, English, and revision support.",
+    },
+    {
+      name: "Class 12",
+      href: "/classes/class-12",
+      description: "Premium support for PCM, PCB, commerce, and international board pathways.",
+    },
+  ];
+  const prioritySubjects = [
+    {
+      name: "Maths",
+      href: "/boards/cbse/class-10/maths-home-tutor-gurgaon",
+      cue: "CBSE / ICSE / IGCSE",
+      description: "Board-led one-to-one Maths support with structured revision and paper confidence.",
+    },
+    {
+      name: "Physics",
+      href: "/boards/cbse/class-12/physics-home-tutor-gurgaon",
+      cue: "Class 12 board prep",
+      description: "Focused Physics support for numericals, derivations, and answer-writing discipline.",
+    },
+    {
+      name: "Chemistry",
+      href: "/boards/cbse/class-12/chemistry-home-tutor-gurgaon",
+      cue: "CBSE / ISC / IB relevance",
+      description: "Clearer reaction flow, organic revision, and steadier board-paper execution.",
+    },
+    {
+      name: "Biology",
+      href: "/boards/cbse/class-12/biology-home-tutor-gurgaon",
+      cue: "PCB and senior boards",
+      description: "One-to-one Biology support for diagrams, theory recall, and exam writing.",
+    },
+    {
+      name: "Class 10 Science",
+      href: "/boards/cbse/class-10/science-home-tutor-gurgaon",
+      cue: "Board foundation year",
+      description: "Integrated Science help across Physics, Chemistry, and Biology for Class 10.",
+    },
+    {
+      name: "English",
+      href: "/boards/icse/class-10/english-home-tutor-gurgaon",
+      cue: "ICSE-led language support",
+      description: "Better answer framing, literature support, and cleaner written expression.",
+    },
+    {
+      name: "Economics",
+      href: "/boards/isc/class-12/economics-home-tutor-gurgaon",
+      cue: "ISC / senior board demand",
+      description: "Premium Economics support for concepts, structured answers, and exam readiness.",
+    },
+    {
+      name: "Accountancy",
+      href: "/boards/cbse/class-12/accountancy-home-tutor-gurgaon",
+      cue: "Commerce board support",
+      description: "Stronger ledger flow, problem accuracy, and chapter-wise exam preparation.",
+    },
+    {
+      name: "Computer Science",
+      href: "/boards/cbse/class-12/computer-science-home-tutor-gurgaon",
+      cue: "Class 12 specialist support",
+      description: "Coding logic, theory coverage, and practical-style revision in one path.",
+    },
+  ];
+  const topAreaCoverage = [
+    {
+      name: "DLF Phases and MG Road belt",
+      href: "/gurgaon-area/dlf-phases",
+      description: "A premium tutoring corridor with strong family demand for school-aware, one-to-one support in established residential pockets.",
+    },
+    {
+      name: "Golf Course Road",
+      href: "/gurgaon-area/golf-course-road",
+      description: "A high-intent premium zone where families usually want senior-board depth, polished matching, and efficient in-home scheduling.",
+    },
+    {
+      name: "Golf Course Extension Road",
+      href: "/gurgaon-area/golf-course-extension-road",
+      description: "A fast-growing premium corridor where Class 10 and 12 home tutoring demand is tied to schools, sectors, and societies.",
+    },
+    {
+      name: "Sohna Road and South City",
+      href: "/gurgaon-area/sohna-road",
+      description: "A strong Gurgaon demand cluster mixing established families, premium communities, and steady board-year tutoring needs.",
+    },
+    {
+      name: "Ambience and NH-8 belt",
+      href: "/gurgaon-area/ambience-nh8-belt",
+      description: "A premium micro-market for families who want home tutoring without turning the school week into a commute-heavy schedule.",
+    },
+    {
+      name: "Dwarka Expressway and New Gurgaon",
+      href: "/gurgaon-area/dwarka-expressway",
+      description: "A growing family corridor where parents often want structured support close to home with clear board and subject matching.",
+    },
+  ];
 
   return (
     <div className="bg-background">
@@ -70,7 +197,7 @@ export default function HomePage() {
                       <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
-                  <Link href="/gurugram" className="w-full sm:w-auto">
+                  <Link href="/boards" className="w-full sm:w-auto">
                     <Button size="lg" variant="outline" className="h-12 px-6 text-base w-full rounded-xl border-primary/20 hover:bg-primary/5 text-primary font-bold">
                       Explore Boards
                     </Button>
@@ -138,21 +265,134 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* BOARD CHOOSER */}
+      {/* BOARD + CLASS DISCOVERY */}
       <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <StaggerContainer className="grid gap-10 lg:grid-cols-[1.55fr_0.95fr] items-start">
+            <StaggerItem>
+              <div>
+                <div className="mb-7">
+                  <h3 className="text-2xl md:text-[2rem] font-heading font-bold text-primary mb-3">Start with your board</h3>
+                  <p className="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed">
+                    The fastest way to find a relevant path is to start with the board first, then move into class, subject, school, and area.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {boardDiscovery.map((board) => (
+                    <Link key={board.name} href={board.href} className="group">
+                      <div className="h-full rounded-[1.75rem] border border-border/60 bg-white px-5 py-5 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/20 group-hover:shadow-lg">
+                        <div className="mb-4 flex items-start justify-between gap-3">
+                          <p className="text-xl font-heading font-bold text-primary transition-colors group-hover:text-accent">
+                            {board.name}
+                          </p>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-primary/55 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                        </div>
+                        <p className="text-sm leading-7 text-muted-foreground">{board.description}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </StaggerItem>
+
+            <StaggerItem>
+              <div>
+                <div className="mb-7">
+                  <h3 className="text-2xl md:text-[2rem] font-heading font-bold text-primary mb-3">Or go straight to the board year</h3>
+                  <p className="text-sm md:text-base text-muted-foreground max-w-xl leading-relaxed">
+                    Class 10 and Class 12 stay central because that is where the highest-intent board demand lives.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {classDiscovery.map((item) => (
+                    <Link key={item.name} href={item.href} className="group">
+                      <div className="h-full rounded-[1.85rem] border border-border/60 bg-white px-5 py-5 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/20 group-hover:shadow-lg">
+                        <div className="mb-4 flex items-start justify-between gap-3">
+                          <p className="text-xl font-heading font-bold text-primary transition-colors group-hover:text-accent">
+                            {item.name}
+                          </p>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-primary/55 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                        </div>
+                        <p className="text-sm leading-7 text-muted-foreground">{item.description}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </StaggerItem>
+          </StaggerContainer>
+        </div>
+      </section>
+
+      {/* PRIORITY SUBJECTS */}
+      <section className="pb-24 bg-white">
+        <div className="container mx-auto px-4 max-w-7xl">
           <FadeIn>
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Choose Your Board</h2>
-              <p className="text-muted-foreground text-lg">Specialized preparation for major academic boards in Gurugram.</p>
+            <div className="mb-10">
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">High-priority subject pages</h2>
+              <p className="text-muted-foreground text-base md:text-lg max-w-4xl leading-relaxed">
+                Use these subject routes when you already know the main academic pressure point and want to move straight into the most relevant board-led support path.
+              </p>
             </div>
           </FadeIn>
-          <StaggerContainer className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
-            {mockBoards.map((board) => (
-              <StaggerItem key={board.slug}>
-                <Link href={`/gurugram/${board.slug}`}>
-                  <div className="px-8 py-4 rounded-2xl bg-muted/30 border border-border hover:border-primary/30 hover:bg-white hover:shadow-lg transition-all cursor-pointer group">
-                    <p className="text-xl font-bold text-primary group-hover:text-accent transition-colors">{board.name}</p>
+
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {prioritySubjects.map((subject) => (
+              <StaggerItem key={subject.name}>
+                <Link href={subject.href} className="group">
+                  <div className="h-full rounded-[1.75rem] border border-border/60 bg-white px-5 py-5 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/20 group-hover:shadow-lg">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xl font-heading font-bold text-primary transition-colors group-hover:text-accent">
+                          {subject.name}
+                        </p>
+                        <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.12em] text-primary/55">
+                          {subject.cue}
+                        </p>
+                      </div>
+                      <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-primary/55 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                    </div>
+                    <p className="text-sm leading-7 text-muted-foreground">{subject.description}</p>
+                  </div>
+                </Link>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+      </section>
+
+      {/* GURGAON TOP AREAS */}
+      <section className="pb-24 bg-white">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <FadeIn>
+            <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Gurgaon top areas</h2>
+                <p className="text-muted-foreground text-base md:text-lg max-w-4xl leading-relaxed">
+                  The local strategy follows corridor to sector to society so families can navigate by where support actually needs to happen.
+                </p>
+              </div>
+              <Link href="/gurgaon-area" className="group inline-flex items-center text-sm md:text-base font-bold text-primary hover:text-accent transition-colors">
+                View all areas
+                <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </FadeIn>
+
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {topAreaCoverage.map((area) => (
+              <StaggerItem key={area.name}>
+                <Link href={area.href} className="group">
+                  <div className="h-full rounded-[1.75rem] border border-border/60 bg-white px-5 py-5 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/20 group-hover:shadow-lg">
+                    <div className="mb-4 flex items-start justify-between gap-3">
+                      <p className="text-xl font-heading font-bold text-primary transition-colors group-hover:text-accent">
+                        {area.name}
+                      </p>
+                      <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-primary/55 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                    </div>
+                    <p className="text-sm leading-7 text-muted-foreground">{area.description}</p>
                   </div>
                 </Link>
               </StaggerItem>

@@ -187,18 +187,31 @@ export default async function SectorPage({ params }: PageProps) {
                     description: "Switch from locality discovery to full tutor profile discovery.",
                     href: "/search",
                   },
-                  {
-                    title: "CBSE tutors in Gurugram",
-                    description: "Useful for families narrowing by board after choosing the right sector.",
-                    href: "/gurugram/cbse",
-                  },
-                  {
-                    title: `${sector.subjectDemand[0]} support`,
-                    description: "Jump from the sector flow into a subject-specific tutoring page.",
-                    href: `/gurugram/cbse/${sector.subjectDemand[0].toLowerCase().replace(/\s+/g, "-")}`,
-                  },
-                ]}
-              />
+                {
+                  title: "CBSE tutors in Gurgaon",
+                  description: "Useful for families narrowing by board after choosing the right sector.",
+                  href: "/boards/cbse",
+                },
+                {
+                  title: `${sector.subjectDemand[0]} support`,
+                  description: "Jump from the sector flow into a subject-specific tutoring page.",
+                  href:
+                    sector.subjectDemand[0] === "Mathematics"
+                      ? "/boards/cbse/class-12/maths-home-tutor-gurgaon"
+                      : sector.subjectDemand[0] === "Physics"
+                        ? "/boards/cbse/class-12/physics-home-tutor-gurgaon"
+                        : sector.subjectDemand[0] === "Chemistry"
+                          ? "/boards/cbse/class-12/chemistry-home-tutor-gurgaon"
+                          : sector.subjectDemand[0] === "Biology"
+                            ? "/boards/cbse/class-12/biology-home-tutor-gurgaon"
+                            : sector.subjectDemand[0] === "Accountancy"
+                              ? "/boards/cbse/class-12/accountancy-home-tutor-gurgaon"
+                              : sector.subjectDemand[0] === "Economics"
+                                ? "/boards/cbse/class-12/economics-home-tutor-gurgaon"
+                                : "/boards/cbse/class-10/science-home-tutor-gurgaon",
+                },
+              ]}
+            />
             </div>
 
             <div className="space-y-6">

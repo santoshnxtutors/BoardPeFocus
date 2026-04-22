@@ -19,11 +19,14 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "Boards", href: "/gurugram" },
+    { name: "Boards", href: "/boards" },
+    { name: "Classes", href: "/classes" },
     { name: "Areas", href: "/gurgaon-area" },
-    { name: "Schools", href: "/gurugram" },
-    { name: "Blog", href: "/blog" },
+    { name: "Schools", href: "/schools" },
+
     { name: "Browse Tutors", href: "/search" },
+    { name: "Results", href: "/results" },
+    { name: "Resources", href: "/resources" },
   ];
 
   return (
