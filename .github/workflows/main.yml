@@ -23,7 +23,7 @@ jobs:
           password: ${{ secrets.CLOUDPANEL_PASSWORD }}
           port: 22
           script_stop: true
-          command_timeout: 40m
+          command_timeout: 60m
           script: |
             set -e
 
@@ -45,6 +45,7 @@ jobs:
 
             git fetch origin main
             git reset --hard origin/main
+            git clean -fd
 
             export NVM_DIR="$HOME/.nvm"
 
@@ -69,13 +70,12 @@ jobs:
               npm install -g pm2
             fi
 
+            rm -rf apps/frontend/.next
+
             pnpm install --frozen-lockfile --prefer-offline
             pnpm --dir apps/frontend build
 
-            if pm2 describe boardpefocus-frontend >/dev/null 2>&1; then
-              pm2 delete boardpefocus-frontend || true
-            fi
-
+            pm2 delete boardpefocus-frontend || true
             pm2 start "pnpm start:frontend" --name boardpefocus-frontend
             pm2 save
             pm2 status
