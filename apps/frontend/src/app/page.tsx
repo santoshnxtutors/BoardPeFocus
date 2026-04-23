@@ -624,6 +624,22 @@ export default function HomePage() {
               {
                 question: "What are the typical fees for tutors?",
                 answer: "Fees depend on the tutor's experience and the complexity of the board. As we provide premium, board-specialized educators, our rates reflect this high level of expertise."
+              },
+              {
+                question: "Can we book a trial class before committing?",
+                answer: "Yes. We can arrange an initial interaction or trial session so you can evaluate the tutor's teaching style, subject command, and fit with your student's goals."
+              },
+              {
+                question: "Do you provide home tutors across Gurugram?",
+                answer: "Yes. BoardPeFocus works with families across key Gurugram sectors and communities, including Golf Course Road, DLF phases, South City, Nirvana Country, Sohna Road, and nearby areas."
+              },
+              {
+                question: "Can tutoring focus on board exams and school tests together?",
+                answer: "Yes. Tutors align regular school support with board-specific preparation, including concepts, homework, chapter tests, past papers, and exam-writing practice."
+              },
+              {
+                question: "How quickly can a tutor start after matching?",
+                answer: "Timelines depend on subject, board, location, and schedule fit, but shortlisted tutors are usually shared promptly after the parent consultation."
               }
             ]}
           />

@@ -111,7 +111,7 @@ export default async function FaqTopicPage({ params }: PageProps) {
             <FAQ
               items={page.faqs}
               title={`${page.label} answers`}
-              subtitle="Visible answers only — useful, skimmable, and connected to the right next pages."
+              subtitle="Visible answers only - useful, skimmable, and connected to the right next pages."
               columns={2}
             />
 

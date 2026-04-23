@@ -1,14 +1,29 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { categorizedFaqs } from "@/data/faqs";
 import { FAQ } from "@/components/faq/FAQ";
 import { FadeIn } from "@/lib/animations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { MessageCircle, Phone, Search, ChevronRight, HelpCircle, ShieldCheck, BookOpen, CreditCard, Mail, type LucideIcon } from "lucide-react";
+import {
+  BookOpen,
+  ChevronRight,
+  CreditCard,
+  HelpCircle,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Search,
+  ShieldCheck,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const getCategoryId = (category: string) => category.toLowerCase().replace(/\s+/g, "-");
 
 export function FAQPageClient() {
   const [activeCategory, setActiveCategory] = useState(categorizedFaqs[0].category);
@@ -30,12 +45,72 @@ export function FAQPageClient() {
       .filter((category) => category.items.length > 0);
   }, [searchQuery]);
 
+  const displayedActiveCategory = visibleCategories.some(
+    (category) => category.category === activeCategory
+  )
+    ? activeCategory
+    : visibleCategories[0]?.category;
+
   const categoryIcons: Record<string, LucideIcon> = {
     "General Information": HelpCircle,
     "For Parents": ShieldCheck,
     "Boards & Curriculum": BookOpen,
+    "Tutors & Matching": Users,
+    "Areas & Schools": MapPin,
     "Payments & Scheduling": CreditCard,
   };
+
+  useEffect(() => {
+    if (visibleCategories.length === 0) {
+      return;
+    }
+
+    const sections = visibleCategories
+      .map((category) => document.getElementById(getCategoryId(category.category)))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    if (sections.length === 0) {
+      return;
+    }
+
+    let animationFrame = 0;
+
+    const updateActiveCategory = () => {
+      const readingLine = window.innerHeight * 0.28;
+      let currentSection = sections[0];
+
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= readingLine) {
+          currentSection = section;
+        } else {
+          break;
+        }
+      }
+
+      const nextCategory = currentSection.dataset.category;
+
+      if (nextCategory) {
+        setActiveCategory((currentCategory) =>
+          currentCategory === nextCategory ? currentCategory : nextCategory
+        );
+      }
+    };
+
+    const handleScroll = () => {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(updateActiveCategory);
+    };
+
+    updateActiveCategory();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [visibleCategories]);
 
   return (
     <div className="bg-background min-h-screen">
@@ -74,17 +149,17 @@ export function FAQPageClient() {
               <div className="sticky top-28 space-y-4">
                 <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6 ml-4">Categories</h2>
                 <nav className="space-y-2">
-                  {categorizedFaqs.map((cat) => {
+                  {visibleCategories.map((cat) => {
                     const Icon = categoryIcons[cat.category] || HelpCircle;
-                    const isActive = activeCategory === cat.category;
+                    const isActive = displayedActiveCategory === cat.category;
 
                     return (
                       <button
                         key={cat.category}
                         onClick={() => {
                           setActiveCategory(cat.category);
-                          const el = document.getElementById(cat.category.toLowerCase().replace(/\s+/g, '-'));
-                          el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          const el = document.getElementById(getCategoryId(cat.category));
+                          el?.scrollIntoView({ behavior: "smooth", block: "start" });
                         }}
                         className={cn(
                           "w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 text-left group",
@@ -118,7 +193,8 @@ export function FAQPageClient() {
               {visibleCategories.map((category) => (
                 <div
                   key={category.category}
-                  id={category.category.toLowerCase().replace(/\s+/g, '-')}
+                  id={getCategoryId(category.category)}
+                  data-category={category.category}
                   className="scroll-mt-32"
                 >
                   <FadeIn>
@@ -166,7 +242,10 @@ export function FAQPageClient() {
                 </Button>
               </Link>
               <Link href="tel:+919582706764">
-                <Button size="lg" variant="outline" className="h-16 px-10 text-lg rounded-2xl border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
+                <Button
+                  size="lg"
+                  className="h-16 px-10 text-lg rounded-2xl !bg-white !text-primary hover:!bg-white/90 shadow-xl [&_svg]:!text-primary"
+                >
                   <Phone className="w-5 h-5 mr-2" /> Call Academic Office
                 </Button>
               </Link>

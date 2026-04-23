@@ -39,6 +39,31 @@ export const faqTopics: FaqTopicConfig[] = [
         answer:
           "Start with the board page when curriculum is the main decision. Start with the class page when Class 10 or Class 12 pressure is driving the enquiry more strongly.",
       },
+      {
+        question: "Does CBSE support differ from ICSE or ISC support?",
+        answer:
+          "Yes. CBSE usually leans heavily on NCERT control and sample-paper discipline, while ICSE and ISC often need broader writing practice, deeper subject coverage, and sharper paper-specific preparation.",
+      },
+      {
+        question: "Can IB and IGCSE students get board-specific tutors?",
+        answer:
+          "Yes, when a suitable specialist is available. IB and IGCSE support is matched more carefully because assessment language, coursework awareness, and grading expectations differ from Indian boards.",
+      },
+      {
+        question: "Can tutoring cover school tests and final board preparation together?",
+        answer:
+          "Yes. A good plan keeps current school chapters, internal tests, pre-boards, and final board preparation connected so the student does not prepare in disconnected tracks.",
+      },
+      {
+        question: "Do board tutors help with past papers and sample papers?",
+        answer:
+          "Yes. Past papers, sample papers, marking schemes, and timed answer practice are usually part of board-season preparation once concepts are stable enough.",
+      },
+      {
+        question: "Can tutors adjust support when the board pattern changes?",
+        answer:
+          "Yes. Tutors can update practice around revised sample papers, school instructions, marking rubrics, and board circulars when those changes affect preparation.",
+      },
     ],
     relatedLinks: [
       {
@@ -81,6 +106,31 @@ export const faqTopics: FaqTopicConfig[] = [
         question: "Can families start with class hubs before choosing a subject page?",
         answer:
           "Yes. Class hubs are designed to help parents move from class-level pressure into the right subject, board, school, or tutor path.",
+      },
+      {
+        question: "Which subjects are most commonly requested for Class 10?",
+        answer:
+          "Families commonly ask for Mathematics, Science, English, Social Science, Hindi, and board-specific support where the student needs stronger structure before pre-boards.",
+      },
+      {
+        question: "Which subjects are most commonly requested for Class 12?",
+        answer:
+          "Class 12 demand is usually stream-specific, including Mathematics, Physics, Chemistry, Biology, Accounts, Economics, Business Studies, English, and selected humanities subjects.",
+      },
+      {
+        question: "Can Class 10 or Class 12 tutoring start mid-session?",
+        answer:
+          "Yes. Mid-session support can still help if the brief is clear, especially for backlog repair, chapter consolidation, school test preparation, or board revision planning.",
+      },
+      {
+        question: "How often should board-year students take sessions?",
+        answer:
+          "Session frequency depends on the subject, current marks, backlog, school workload, and time left before exams. Some students need weekly structure while others need more intensive revision blocks.",
+      },
+      {
+        question: "Can a student take different schedules for different subjects?",
+        answer:
+          "Yes. A difficult subject may need more frequent sessions, while a stronger subject may only need periodic revision, mock-paper review, or doubt-clearing support.",
       },
     ],
     relatedLinks: [
@@ -125,6 +175,31 @@ export const faqTopics: FaqTopicConfig[] = [
         answer:
           "Start with a school page when curriculum and school pace are central. Start with an area page when locality convenience and nearby options are driving the enquiry.",
       },
+      {
+        question: "Is BoardPeFocus officially affiliated with any school?",
+        answer:
+          "No. School pages are informational and school-aware, not official partnerships. They help families think about curriculum pace, assessment pressure, and local tutoring fit.",
+      },
+      {
+        question: "Can tutors align with a school's test calendar?",
+        answer:
+          "Yes. Tutors can factor in upcoming unit tests, pre-boards, assignments, practicals, and revision windows when those details are shared by the family.",
+      },
+      {
+        question: "Do school-aware tutors help with internal assessments?",
+        answer:
+          "Yes, where relevant. Tutors can help students prepare for school tests, internal assessment expectations, practical files, project guidance, and board-aligned answer practice.",
+      },
+      {
+        question: "Can a school page connect to board, subject, and area support?",
+        answer:
+          "Yes. School context is only one layer. Families can still move into board pages, class pages, subject routes, area pages, or tutor profiles depending on the real need.",
+      },
+      {
+        question: "Can school notes and assignments be used in tutoring?",
+        answer:
+          "Yes. Tutors can use school notes, worksheets, test feedback, and assignment deadlines while keeping the broader board-exam plan aligned.",
+      },
     ],
     relatedLinks: [
       {
@@ -167,6 +242,31 @@ export const faqTopics: FaqTopicConfig[] = [
         question: "Can area pages still connect to board and subject support?",
         answer:
           "Yes. The area layer is meant to bridge into boards, classes, subjects, schools, and tutor routes rather than stand alone.",
+      },
+      {
+        question: "Which Gurgaon areas does BoardPeFocus commonly support?",
+        answer:
+          "Common enquiries come from Golf Course Road, DLF phases, South City, Nirvana Country, Sohna Road, Sushant Lok, Palam Vihar, and nearby premium residential clusters.",
+      },
+      {
+        question: "Does locality affect tutor availability?",
+        answer:
+          "Yes. Locality can affect travel time, available session slots, tutor seniority, and how practical repeated home visits are during board season.",
+      },
+      {
+        question: "Can families use area pages even if they are unsure about the board route?",
+        answer:
+          "Yes. Area pages are useful when the first filter is locality. From there, families can still narrow into CBSE, ICSE, ISC, IGCSE, IB, Class 10, Class 12, or subject support.",
+      },
+      {
+        question: "Is online tutoring possible when a home tutor is not practical?",
+        answer:
+          "Sometimes. If home-visit logistics do not work, online support can be discussed when it still gives the student the right subject expertise and board-specific structure.",
+      },
+      {
+        question: "Can families request tutors near a specific sector or society?",
+        answer:
+          "Yes. Sharing the exact sector, society, landmark, and preferred timings helps shortlist tutors whose travel and schedule fit the family better.",
       },
     ],
     relatedLinks: [
@@ -211,6 +311,31 @@ export const faqTopics: FaqTopicConfig[] = [
         answer:
           "Look for clearer structure, better confidence, stronger explanation quality, and whether the sessions are actually targeting the right academic problem.",
       },
+      {
+        question: "Are tutors verified before being recommended?",
+        answer:
+          "Yes. Tutor recommendations are based on subject command, board familiarity, teaching style, reliability, and fit for the student's academic brief.",
+      },
+      {
+        question: "Can families take a demo or trial class first?",
+        answer:
+          "Yes. A demo or trial interaction helps the family judge explanation quality, pace, student comfort, and whether the tutor understands the board requirement.",
+      },
+      {
+        question: "Can a tutor be changed if the fit is not right?",
+        answer:
+          "Yes. If the match is not working, the issue can be reviewed and the requirement can be refined before suggesting another tutor where available.",
+      },
+      {
+        question: "Can parents share tutor preferences?",
+        answer:
+          "Yes. Parents can share preferences around board experience, seniority, teaching style, language comfort, gender, location, and schedule. Availability and academic fit still guide the final recommendation.",
+      },
+      {
+        question: "Can one tutor cover more than one subject?",
+        answer:
+          "Sometimes, but board-year support is usually strongest when high-stakes subjects are handled by tutors with clear subject depth and board-specific experience.",
+      },
     ],
     relatedLinks: [
       {
@@ -254,6 +379,31 @@ export const faqTopics: FaqTopicConfig[] = [
         answer:
           "The service should help review the issue clearly and, if needed, refine the brief and rematch rather than letting the fit drag on unproductively.",
       },
+      {
+        question: "What happens after a family contacts BoardPeFocus?",
+        answer:
+          "The usual next step is a requirement discussion covering board, class, subject, school context, current performance, location, preferred schedule, and the result the family wants.",
+      },
+      {
+        question: "How quickly can tutoring start?",
+        answer:
+          "Start timelines depend on subject, board, locality, schedule fit, and tutor availability. A clearer brief usually makes shortlisting faster and more accurate.",
+      },
+      {
+        question: "Does BoardPeFocus review progress after sessions begin?",
+        answer:
+          "Progress can be reviewed through parent feedback, student confidence, test performance, chapter completion, and whether the tutor's plan is addressing the original concern.",
+      },
+      {
+        question: "Can urgent board-revision support be arranged?",
+        answer:
+          "Sometimes. Short-term support can work for revision, sample papers, and backlog triage when the goal is realistic and a suitable tutor is available.",
+      },
+      {
+        question: "Can sessions increase close to exams?",
+        answer:
+          "Yes, if the tutor's availability allows. Extra sessions can help with sample-paper review, doubt clearing, pre-board correction, and final revision.",
+      },
     ],
     relatedLinks: [
       {
@@ -285,7 +435,7 @@ export const faqTopics: FaqTopicConfig[] = [
       {
         question: "How early should we hire a tutor before board pressure rises?",
         answer:
-          "The right timing depends on backlog, subject difficulty, and the student’s current control, but families usually benefit from acting before pressure becomes urgent.",
+          "The right timing depends on backlog, subject difficulty, and the student's current control, but families usually benefit from acting before pressure becomes urgent.",
       },
       {
         question: "How many sessions per week are ideal?",
@@ -296,6 +446,31 @@ export const faqTopics: FaqTopicConfig[] = [
         question: "When should tutoring shift from concept building to test practice?",
         answer:
           "That shift usually happens once the student has enough conceptual control to benefit from more board-style writing, sample papers, and timed review.",
+      },
+      {
+        question: "How can parents tell whether a tutor is the right fit?",
+        answer:
+          "Look for better study structure, clearer explanations, more confident practice, specific feedback, and a plan that connects school tests with board preparation.",
+      },
+      {
+        question: "Should struggling students and high-scoring students use tutoring differently?",
+        answer:
+          "Yes. Struggling students usually need concept repair and confidence building, while high-scoring students often need exam-writing polish, consistency, and targeted challenge.",
+      },
+      {
+        question: "Can tutoring be paused or rescheduled around school events?",
+        answer:
+          "Pauses and rescheduling can be discussed in advance, but board-year students should avoid frequent breaks that weaken study rhythm during revision season.",
+      },
+      {
+        question: "What should parents prepare before the first consultation?",
+        answer:
+          "Useful details include the student's board, class, school, current marks, weak chapters, upcoming tests, preferred schedule, location, and any previous tutoring experience.",
+      },
+      {
+        question: "How involved should parents be after tutoring starts?",
+        answer:
+          "Parents should stay close enough to track progress and feedback, but the student should still own practice, homework completion, and honest communication about doubts.",
       },
     ],
     relatedLinks: [

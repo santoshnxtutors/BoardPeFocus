@@ -31,29 +31,35 @@ export function FAQ({
   viewMoreHref = "/faqs",
   columns = 1
 }: FAQProps) {
+  const hasHeader = Boolean(title || subtitle || showViewMore);
+
   return (
     <div className={cn("w-full mx-auto py-16", columns === 2 ? "max-w-[1400px]" : "max-w-4xl")}>
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div className="text-left">
-          <h2 className="text-4xl md:text-6xl font-heading font-bold text-primary mb-4 tracking-tight">
-            {title}
-          </h2>
-          {subtitle && (
-            <p className="text-muted-foreground text-lg md:text-xl font-medium">
-              {subtitle}
-            </p>
+      {hasHeader && (
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="text-left">
+            {title && (
+              <h2 className="text-4xl md:text-6xl font-heading font-bold text-primary mb-4 tracking-tight">
+                {title}
+              </h2>
+            )}
+            {subtitle && (
+              <p className="text-muted-foreground text-lg md:text-xl font-medium">
+                {subtitle}
+              </p>
+            )}
+          </div>
+          
+          {showViewMore && (
+            <Link href={viewMoreHref}>
+              <Button variant="link" className="text-primary hover:text-primary/80 px-0 mt-4 md:mt-0 text-lg group font-bold">
+                View more FAQs
+                <ChevronRight className="ml-1 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
           )}
         </div>
-        
-        {showViewMore && (
-          <Link href={viewMoreHref}>
-            <Button variant="link" className="text-primary hover:text-primary/80 px-0 mt-4 md:mt-0 text-lg group font-bold">
-              View more FAQs
-              <ChevronRight className="ml-1 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
-        )}
-      </div>
+      )}
       
       <Accordion 
         className={cn(
