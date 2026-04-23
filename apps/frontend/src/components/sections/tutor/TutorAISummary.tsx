@@ -7,6 +7,14 @@ interface TutorAISummaryProps {
 }
 
 export const TutorAISummary = ({ tutor }: TutorAISummaryProps) => {
+  const boardNames = (tutor.boards ?? [])
+    .map((board) => (typeof board === "string" ? board : board.board?.name))
+    .filter(Boolean) as string[];
+  const schoolNames = (tutor.schools ?? [])
+    .map((school) => (typeof school === "string" ? school : school.school?.name))
+    .filter(Boolean) as string[];
+  const subjectNames = tutor.subjects ?? [];
+
   return (
     <div className="bg-primary/5 rounded-[2.5rem] p-8 border border-primary/10 relative overflow-hidden group">
       <div className="flex items-center gap-2 mb-6">
@@ -23,7 +31,7 @@ export const TutorAISummary = ({ tutor }: TutorAISummaryProps) => {
             <h4 className="font-bold text-lg">Key Specialization</h4>
           </div>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Highly specialized in <strong>{typeof tutor.boards?.[0] === 'string' ? tutor.boards[0] : tutor.boards?.[0]?.board?.name}</strong> and <strong>{typeof tutor.boards?.[1] === 'string' ? tutor.boards[1] : tutor.boards?.[1]?.board?.name}</strong> boards. Expert at bridging the gap between school curriculum and board requirements.
+            Strong fit for students needing <strong>{subjectNames.join(", ")}</strong> support across <strong>{boardNames.join(", ")}</strong>. The profile is designed around board-stage clarity, better written execution, and more stable revision flow.
           </p>
         </div>
 
@@ -33,7 +41,7 @@ export const TutorAISummary = ({ tutor }: TutorAISummaryProps) => {
             <h4 className="font-bold text-lg">Methodology</h4>
           </div>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Focuses on <strong>rubric-aligned answer framing</strong> and conceptual clarity. Proven track record with students from {typeof tutor.schools?.[0] === 'string' ? tutor.schools[0] : (tutor.schools?.[0]?.school?.name || 'top Gurugram schools')}.
+            Built around <strong>concept clarity, guided practice, and revision discipline</strong>. Especially relevant for families connected to {schoolNames[0] || "top Gurugram schools"} and similar school contexts.
           </p>
         </div>
 
@@ -44,13 +52,13 @@ export const TutorAISummary = ({ tutor }: TutorAISummaryProps) => {
           </div>
           <div className="space-y-2">
              <p className="text-muted-foreground text-sm leading-relaxed">
-               Verified experience of <strong>{tutor.experienceYrs} years</strong>. All academic credentials and result proofs are verified by our team.
+               Backed by <strong>{tutor.experienceYrs} years</strong> of teaching experience with a profile that matches school-aware home tutoring in Gurugram.
              </p>
              <div className="flex items-center gap-2">
                <div className="h-1.5 flex-1 bg-slate-200 rounded-full overflow-hidden">
-                 <div className="h-full bg-green-500 w-[95%]"></div>
+                 <div className="h-full bg-green-500 w-[90%]"></div>
                </div>
-               <span className="text-[10px] font-black text-green-600 uppercase">95% Match</span>
+               <span className="text-[10px] font-black text-green-600 uppercase">Strong Fit</span>
              </div>
           </div>
         </div>

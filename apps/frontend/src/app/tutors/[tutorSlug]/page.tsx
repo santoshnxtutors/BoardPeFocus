@@ -1,4 +1,4 @@
-import { mockTutors } from "@/data/mock";
+import { mockSchools, mockTutors } from "@/data/mock";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { FadeIn } from "@/lib/animations";
 import { LeadForm } from "@/components/forms/LeadForm";
-import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateTutorJsonLd } from "@/lib/seo";
+import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJsonLd, generateTutorJsonLd } from "@/lib/seo";
 import { TutorProfileViewModel } from "@/types/tutor-profile";
 import { JsonLd } from "@/components/seo/JsonLd";
 
@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: PageProps) {
   const subjectNames = tutor.subjects.join(", ");
 
   return constructMetadata({
-    title: `${tutor.name} | Expert ${subjectNames} Tutor for ${boardNames} | Gurugram`,
-    description: `Highly qualified ${boardNames} ${subjectNames} home tutor in Gurugram. Book a free demo with ${tutor.name}. ${tutor.experienceYrs} years of proven results in top schools.`,
+    title: `${tutor.name} | ${subjectNames} Tutor in Gurugram for ${boardNames}`,
+    description: `${tutor.name} is an experienced ${subjectNames} home tutor in Gurugram for ${boardNames}. ${tutor.tagline}`,
     image: tutor.photoUrl,
     pathname: `/tutors/${tutor.slug}`,
   });
@@ -45,15 +45,12 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function TutorProfilePage({ params }: PageProps) {
   const { tutorSlug } = await params;
-  
-  // Fetch from API with all relations (conceptually)
   const tutorData = mockTutors.find(t => t.slug === tutorSlug);
 
   if (!tutorData) {
     notFound();
   }
 
-  // Enhanced data mapping for long-form content
   const tutor: TutorProfileViewModel & {
     boards: string[];
     subjects: string[];
@@ -68,37 +65,16 @@ export default async function TutorProfilePage({ params }: PageProps) {
     faqs: { id: string; question: string; answer: string }[];
     teachingPhilosophy: string;
     results: { label: string; value: string }[];
-    achievements: { title: string; year: string; institution: string }[];
+    locations: string[];
     coverage: { sectors: string[]; societies: string[] };
   } = {
     ...tutorData,
-    methodology: "My approach focuses on rubric-aligned answer framing and conceptual clarity. I believe in bridging the gap between what the textbook says and what the board examiners expect. Every session includes past-paper practice and individualized feedback cycles.",
-    teachingPhilosophy: "Education is not the filling of a pail, but the lighting of a fire. I aim to make complex concepts intuitive through real-world analogies and structured learning paths.",
-    results: [
-      { label: "Highest Score", value: "98/100" },
-      { label: "Average Improvement", value: "+25%" },
-      { label: "Board Success Rate", value: "100%" }
-    ],
-    achievements: [
-      { title: "Best Subject Teacher Award", year: "2023", institution: "Educational Excellence Forum" },
-      { title: "Curriculum Design Specialist", year: "2021", institution: "Gurugram Educators Network" }
-    ],
-    faqs: [
-      { id: '1', question: "Do you provide home tutoring in Sector 54?", answer: "Yes, I provide home tutoring in Sector 54, 56, and DLF Phase 5. I also offer online sessions for students outside these areas." },
-      { id: '2', question: "What boards do you cover?", answer: "I specialize in IB (MYP & DP), IGCSE, and CBSE curricula. I am well-versed with the specific marking schemes of these boards." },
-      { id: '3', question: "How do you track student progress?", answer: "I maintain a weekly progress tracker that maps performance against board rubrics. Parents receive a monthly summary of improvement areas." }
-    ],
-    reviews: [
-      { id: '1', parentName: "Rajesh Khanna", studentName: "Arjun", rating: 5, comment: "Exceptional clarity in concepts. My son improved his Physics score from a 4 to a 7 in just 4 months. Highly recommended for IB DP prep." },
-      { id: '2', parentName: "Meera Gupta", studentName: "Isha", rating: 5, comment: "Very professional and patient. Understands the IGCSE curriculum inside out. The focus on past papers was a game changer." }
-    ],
-    coverage: {
-      sectors: ["Sector 42", "Sector 43", "Sector 54", "Sector 56"],
-      societies: ["Aralias", "Magnolias", "The Camellias", "DLF Park Place"]
-    }
+    faqs: buildTutorFaqs(tutorData),
+    reviews: buildTutorNotes(tutorData),
   };
 
   const jsonLd = generateTutorJsonLd(tutor);
+  const faqJsonLd = generateFaqJsonLd(tutor.faqs);
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Gurugram", url: absoluteUrl("/gurugram") },
@@ -110,10 +86,18 @@ export default async function TutorProfilePage({ params }: PageProps) {
   const tutorSchools = tutor.schools.map((school) =>
     typeof school === "string" ? school : (school.school?.name ?? ""),
   ).filter(Boolean);
+  const schoolLinks = tutorSchools.map((school) => {
+    const schoolMatch = mockSchools.find((item) => item.name === school);
+    return {
+      name: school,
+      href: schoolMatch ? `/gurugram/schools/${schoolMatch.slug}` : "/schools",
+    };
+  });
 
   return (
     <div className="bg-white min-h-screen">
       <JsonLd data={jsonLd} />
+      <JsonLd data={faqJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
 
       <TutorHero tutor={tutor} />
@@ -133,12 +117,14 @@ export default async function TutorProfilePage({ params }: PageProps) {
               {/* 2. About & Detailed Bio */}
               <FadeIn>
                 <div className="space-y-6">
-                   <h2 className="text-3xl font-heading font-bold text-primary flex items-center gap-3">
+                  <h2 className="text-3xl font-heading font-bold text-primary flex items-center gap-3">
                     <User className="w-8 h-8 text-accent" /> Professional Profile
                   </h2>
                   <div className="prose prose-lg prose-slate max-w-none text-muted-foreground leading-relaxed">
                     <p>{tutor.about}</p>
-                    <p>Over the past {tutor.experienceYrs} years, I have mentored {tutor.studentsTaught}+ students across Gurugram's top international schools. My journey began with a passion for simplifying complex academic concepts, which evolved into a structured pedagogical approach that consistently delivers results.</p>
+                    <p>
+                      Over the past {tutor.experienceYrs} years, this profile has stayed especially relevant for families connected to {formatList(tutorSchools.slice(0, 3))}. The teaching plan is designed for one-to-one home tutoring across {formatList(tutor.locations.slice(0, 4))}, with extra focus on clean revision structure and calmer exam execution.
+                    </p>
                   </div>
                 </div>
               </FadeIn>
@@ -196,12 +182,12 @@ export default async function TutorProfilePage({ params }: PageProps) {
               <FadeIn>
                 <div className="space-y-8">
                   <h2 className="text-3xl font-heading font-bold text-primary flex items-center gap-3">
-                    <School className="w-8 h-8 text-accent" /> Schools & Performance
+                    <School className="w-8 h-8 text-accent" /> Teaching Snapshot
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {tutor.results.map((result, i) => (
                       <div key={i} className="text-center p-8 rounded-[2rem] bg-white border border-border shadow-sm group hover:border-primary/20 transition-all">
-                        <p className="text-4xl font-heading font-bold text-primary mb-2 group-hover:scale-110 transition-transform">{result.value}</p>
+                        <p className="text-2xl md:text-3xl font-heading font-bold text-primary mb-2 group-hover:scale-105 transition-transform">{result.value}</p>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{result.label}</p>
                       </div>
                     ))}
@@ -220,9 +206,14 @@ export default async function TutorProfilePage({ params }: PageProps) {
               {/* 6. Localities Served in Gurugram */}
               <FadeIn>
                 <div className="space-y-6">
-                  <h3 className="text-xl font-black uppercase tracking-tight text-primary flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-accent" /> Areas Served in Gurugram
-                  </h3>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-black uppercase tracking-tight text-primary flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-accent" /> Available All Over Gurgaon
+                    </h3>
+                    <p className="pl-7 text-sm font-bold text-slate-500">
+                      Main areas frequently served by this tutor:
+                    </p>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {tutor.coverage.sectors.map(sector => (
                       <span key={sector} className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-colors">
@@ -326,9 +317,9 @@ export default async function TutorProfilePage({ params }: PageProps) {
               <div className="space-y-4">
                 <h4 className="font-black uppercase tracking-widest text-xs text-slate-400">School Support</h4>
                 <div className="flex flex-col gap-2">
-                  {tutorSchools.slice(0, 3).map(s => (
-                    <Link key={s} href={`/gurugram/schools/${s.toLowerCase().replace(' ', '-')}`} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 hover:border-primary group transition-all">
-                      <span className="font-bold text-slate-700">{s} Preparation</span>
+                  {schoolLinks.slice(0, 3).map((school) => (
+                    <Link key={school.name} href={school.href} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 hover:border-primary group transition-all">
+                      <span className="font-bold text-slate-700">{school.name} Preparation</span>
                       <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors" />
                     </Link>
                   ))}
@@ -342,6 +333,73 @@ export default async function TutorProfilePage({ params }: PageProps) {
       <TutorStickyCTA tutor={tutor} />
     </div>
   );
+}
+
+function formatList(items: string[]) {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
+
+function buildTutorFaqs(tutor: (typeof mockTutors)[number]) {
+  const boards = formatList(tutor.boards);
+  const subjects = formatList(tutor.subjects);
+  const schools = formatList(tutor.schools.slice(0, 3));
+  const sectors = formatList(tutor.coverage.sectors.slice(0, 4));
+
+  return [
+    {
+      id: "1",
+      question: `Which boards and subjects does ${tutor.name} cover?`,
+      answer: `${tutor.name} supports ${boards} students in ${subjects}. ${tutor.tagline}`,
+    },
+    {
+      id: "2",
+      question: `Is ${tutor.name} suitable for home tutoring across Gurugram?`,
+      answer: `Yes. This profile is positioned for home-tutoring enquiries across key Gurugram corridors and nearby sectors such as ${sectors}. Families from other nearby localities can still enquire for matching and schedule availability.`,
+    },
+    {
+      id: "3",
+      question: `What is the usual teaching approach with ${tutor.name}?`,
+      answer: tutor.methodology,
+    },
+    {
+      id: "4",
+      question: `Is ${tutor.name} familiar with top school expectations in Gurugram?`,
+      answer: `Yes. The profile is especially relevant for families connected to ${schools}. The emphasis stays on school-aware pacing, cleaner revision structure, and board-ready one-to-one support without implying any school affiliation.`,
+    },
+  ];
+}
+
+function buildTutorNotes(tutor: (typeof mockTutors)[number]) {
+  const primarySubject = tutor.subjects[0];
+  const firstBoard = tutor.boards[0];
+  const firstSchool = tutor.schools[0];
+
+  return [
+    {
+      id: "1",
+      parentName: `${firstBoard} board parent`,
+      studentName: primarySubject,
+      rating: 5,
+      comment: `Useful for families who want more dependable ${primarySubject.toLowerCase()} structure, cleaner written work, and steadier preparation instead of rushed chapter completion.`,
+    },
+    {
+      id: "2",
+      parentName: "School-aware family",
+      studentName: firstSchool,
+      rating: 5,
+      comment: `A strong fit when parents want the tutoring pace to stay aligned with demanding school schedules while still creating space for disciplined board revision at home.`,
+    },
+    {
+      id: "3",
+      parentName: "Home-tutoring enquiry",
+      studentName: "Gurugram",
+      rating: 5,
+      comment: `Often preferred by families looking for calm one-to-one support across ${formatList(tutor.boards)} with clearer communication, steady follow-through, and practical home scheduling.`,
+    },
+  ];
 }
 
 function Quote(props: React.SVGProps<SVGSVGElement>) {

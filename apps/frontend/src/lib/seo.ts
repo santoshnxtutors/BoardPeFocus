@@ -176,14 +176,5 @@ export function generateTutorJsonLd(tutor: TutorProfileViewModel) {
       url: getSiteUrl(),
     },
     knowsAbout,
-    ...(tutor.rating && tutor.reviewsCount
-      ? {
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: tutor.rating,
-            reviewCount: tutor.reviewsCount,
-          },
-        }
-      : {}),
   };
 }

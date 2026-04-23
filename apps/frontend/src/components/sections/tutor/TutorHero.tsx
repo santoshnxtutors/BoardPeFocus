@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Star, Clock, GraduationCap, CheckCircle2 } from "lucide-react";
+import { Star, Clock, School, CheckCircle2 } from "lucide-react";
 import { FadeIn } from "@/lib/animations";
 import { TutorProfileViewModel } from "@/types/tutor-profile";
 
@@ -9,6 +9,8 @@ interface TutorHeroProps {
 }
 
 export const TutorHero = ({ tutor }: TutorHeroProps) => {
+  const schoolCount = (tutor.schools ?? []).length;
+
   return (
     <section className="relative pt-32 pb-16 bg-muted/30 overflow-hidden">
       <div className="absolute top-0 right-0 -mt-20 -mr-20 w-[40rem] h-[40rem] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
@@ -72,13 +74,13 @@ export const TutorHero = ({ tutor }: TutorHeroProps) => {
                 </div>
                 <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-border/50">
                   <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1 flex items-center gap-1.5 justify-center lg:justify-start">
-                    <GraduationCap className="w-3 h-3" /> Students
+                    <School className="w-3 h-3" /> Schools
                   </p>
-                  <p className="text-xl font-heading font-bold text-primary">{tutor.studentsTaught}+</p>
+                  <p className="text-xl font-heading font-bold text-primary">{schoolCount}</p>
                 </div>
                 <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-border/50">
                   <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1 flex items-center gap-1.5 justify-center lg:justify-start">
-                    <Star className="w-3 h-3" /> Reviews
+                    <Star className="w-3 h-3" /> Highlights
                   </p>
                   <p className="text-xl font-heading font-bold text-primary">{tutor.reviewsCount}</p>
                 </div>

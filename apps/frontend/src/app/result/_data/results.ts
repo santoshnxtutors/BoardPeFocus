@@ -86,19 +86,19 @@ export const resultSubjectLinks: ResultLinkCard[] = [
 
 export const resultTutorLinks: ResultLinkCard[] = [
   {
-    title: "Dr. Arvind Sharma",
-    description: "A senior Maths and Physics tutor profile useful for families looking for board-focused science and numericals support.",
-    href: "/tutors/dr-sharma-1",
+    title: "Dharambir Prasad",
+    description: "A strong Class 10 and 12 Mathematics profile for families looking for structured board-focused support across CBSE, ICSE, and IB.",
+    href: "/tutors/dharambir-prasad-maths",
   },
   {
-    title: "Ms. Anjali Gupta",
-    description: "A premium fit for IB, IGCSE, Chemistry, and Biology journeys where international-board subject depth matters.",
-    href: "/tutors/ms-gupta-2",
+    title: "C. K. Gourav",
+    description: "Useful for senior-school families who want stronger Mathematics support across board preparation and JEE-oriented problem solving.",
+    href: "/tutors/c-k-gourav",
   },
   {
-    title: "Mr. Rajesh Verma",
-    description: "Useful for Commerce families who want structured Accountancy and Economics support with clearer execution.",
-    href: "/tutors/mr-verma-3",
+    title: "Priyanka Kumari",
+    description: "A practical fit for families looking for Mathematics and Accountancy support with cleaner written structure and calmer board preparation.",
+    href: "/tutors/priyanka-kumari",
   },
 ];
 
@@ -170,4 +170,3 @@ export const resultsFaqs: ResultFaqItem[] = [
       "No. School references are included only as relevance signals for families studying in or searching around those school contexts.",
   },
 ];
-

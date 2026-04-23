@@ -14,11 +14,11 @@ export const TutorReviews = ({ reviews }: TutorReviewsProps) => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-heading font-bold text-primary flex items-center gap-3">
-          <Quote className="w-8 h-8 text-accent rotate-180" /> Parental Feedback
+          <Quote className="w-8 h-8 text-accent rotate-180" /> Parent-Fit Notes
         </h2>
         <div className="flex items-center gap-1">
           <span className="text-2xl font-black text-primary">{reviews.length}</span>
-          <span className="text-xs font-black uppercase tracking-widest text-slate-400">Verified Reviews</span>
+          <span className="text-xs font-black uppercase tracking-widest text-slate-400">Profile Notes</span>
         </div>
       </div>
 
@@ -37,7 +37,7 @@ export const TutorReviews = ({ reviews }: TutorReviewsProps) => {
                 </div>
                 <div className="bg-slate-50 px-3 py-1 rounded-full border border-slate-100 flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Verified Student</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Common Use Case</span>
                 </div>
               </div>
               
@@ -52,7 +52,7 @@ export const TutorReviews = ({ reviews }: TutorReviewsProps) => {
                 <div>
                   <p className="font-black text-primary uppercase tracking-tight text-sm">{review.parentName}</p>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    Parent of {review.studentName || "Student"}
+                    Relevant for {review.studentName || "Board-stage families"}
                   </p>
                 </div>
               </div>
