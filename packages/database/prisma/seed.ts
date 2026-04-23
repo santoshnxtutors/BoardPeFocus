@@ -45,10 +45,13 @@ async function main() {
 
   // 2. Users
   console.log('--- Seeding Users ---');
-  const passwordHash = await bcrypt.hash('1234', 10);
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD ?? 'board@1234';
+  const shouldResetAdminPassword =
+    process.env.RESET_ADMIN_PASSWORD_ON_SEED === 'true';
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
   const admin = await prisma.user.upsert({
     where: { email: 'santosh@nxtutors.com' },
-    update: {},
+    update: shouldResetAdminPassword ? { passwordHash } : {},
     create: {
       email: 'santosh@nxtutors.com',
       name: 'Santosh',

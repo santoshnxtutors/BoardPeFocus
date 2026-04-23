@@ -98,15 +98,19 @@ EOF
 From the project root on the server:
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm db:generate
-pnpm db:migrate:deploy
-pnpm db:seed
-pnpm build:prod
-pm2 start ecosystem.config.cjs --env production
-pm2 save
-pm2 startup
+bash scripts/cloudpanel-deploy.sh
 ```
+
+The deploy script deletes the old BoardPeFocus PM2 apps first, then installs
+dependencies, runs Prisma generate/migrations/seed, builds all workspaces, and
+starts these three services:
+
+- `boardpefocus-frontend` on port `3000`
+- `boardpefocus-backend` on port `3001`
+- `boardpefocus-admin` on port `3002`
+
+Run `pm2 startup` once on the server if PM2 has not already been configured to
+restart after reboot.
 
 For future updates:
 
@@ -158,6 +162,6 @@ location / {
 The seed creates this initial admin login:
 
 - email: `santosh@nxtutors.com`
-- password: `1234`
+- password: the value of `ADMIN_SEED_PASSWORD`, defaulting to the project admin password used for deployment
 
 Change that password immediately after first login.
