@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { categorizedFaqs } from "@/data/faqs";
 import { FAQ } from "@/components/faq/FAQ";
 import { FadeIn } from "@/lib/animations";
@@ -12,6 +12,23 @@ import { cn } from "@/lib/utils";
 
 export function FAQPageClient() {
   const [activeCategory, setActiveCategory] = useState(categorizedFaqs[0].category);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const visibleCategories = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return categorizedFaqs;
+    }
+
+    return categorizedFaqs
+      .map((category) => ({
+        ...category,
+        items: category.items.filter((item) =>
+          `${item.question} ${item.answer}`.toLowerCase().includes(normalizedQuery)
+        ),
+      }))
+      .filter((category) => category.items.length > 0);
+  }, [searchQuery]);
 
   const categoryIcons: Record<string, LucideIcon> = {
     "General Information": HelpCircle,
@@ -40,6 +57,9 @@ export function FAQPageClient() {
               <Input
                 type="text"
                 placeholder="Search for questions (e.g. 'fees', 'boards', 'tutors')..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                aria-label="Search FAQs"
                 className="w-full h-16 pl-14 pr-6 rounded-2xl border-none bg-white text-primary text-lg shadow-2xl focus-visible:ring-2 focus-visible:ring-accent transition-all"
               />
             </div>
@@ -95,9 +115,9 @@ export function FAQPageClient() {
             </aside>
 
             <div className="flex-1 space-y-24">
-              {categorizedFaqs.map((category, idx) => (
+              {visibleCategories.map((category) => (
                 <div
-                  key={idx}
+                  key={category.category}
                   id={category.category.toLowerCase().replace(/\s+/g, '-')}
                   className="scroll-mt-32"
                 >
@@ -123,6 +143,12 @@ export function FAQPageClient() {
                   </div>
                 </div>
               ))}
+              {visibleCategories.length === 0 && (
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-border/40 p-10 text-center">
+                  <h2 className="text-2xl font-heading font-extrabold text-primary">No matching FAQs found</h2>
+                  <p className="text-muted-foreground mt-3">Try a different search term or contact our academic advisors.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -134,12 +160,16 @@ export function FAQPageClient() {
           <FadeIn>
             <h2 className="text-4xl md:text-5xl font-heading font-bold mb-8">Can&apos;t find what you&apos;re looking for?</h2>
             <div className="flex flex-wrap justify-center gap-6">
-              <Button size="lg" className="h-16 px-10 text-lg rounded-2xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-xl">
-                <Mail className="w-5 h-5 mr-2" /> Email Support
-              </Button>
-              <Button size="lg" variant="outline" className="h-16 px-10 text-lg rounded-2xl border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
-                <Phone className="w-5 h-5 mr-2" /> Call Academic Office
-              </Button>
+              <Link href="mailto:hello@boardpefocus.com">
+                <Button size="lg" className="h-16 px-10 text-lg rounded-2xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-xl">
+                  <Mail className="w-5 h-5 mr-2" /> Email Support
+                </Button>
+              </Link>
+              <Link href="tel:+919582706764">
+                <Button size="lg" variant="outline" className="h-16 px-10 text-lg rounded-2xl border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
+                  <Phone className="w-5 h-5 mr-2" /> Call Academic Office
+                </Button>
+              </Link>
             </div>
           </FadeIn>
         </div>

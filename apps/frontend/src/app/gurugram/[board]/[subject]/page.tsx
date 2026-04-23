@@ -1,10 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
+import { FadeIn } from "@/lib/animations";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { mockBoards, mockSubjects, mockTutors } from "@/data/mock";
-import { CheckCircle2, ChevronRight, GraduationCap, MapPin, Target, BookOpen } from "lucide-react";
+import { CheckCircle2, ChevronRight, Target } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -72,9 +72,11 @@ export default function BoardSubjectPage({ params }: { params: { board: string, 
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="h-14 px-8 text-lg shadow-2xl bg-white text-primary hover:bg-white/90 rounded-xl font-bold transition-all duration-300">
-                Get Matched with a Tutor
-              </Button>
+              <Link href="/contact">
+                <Button size="lg" className="h-14 px-8 text-lg shadow-2xl bg-white text-primary hover:bg-white/90 rounded-xl font-bold transition-all duration-300">
+                  Get Matched with a Tutor
+                </Button>
+              </Link>
             </div>
           </FadeIn>
         </div>
@@ -182,12 +184,16 @@ export default function BoardSubjectPage({ params }: { params: { board: string, 
                 <p className="text-muted-foreground text-sm mb-6">
                   Skip the search. Let our academic advisors match your child with the perfect {subject.name} tutor in Gurugram within 24 hours.
                 </p>
-                <Button className="w-full h-12 bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl font-bold mb-3 shadow-md">
-                  Book Free Consultation
-                </Button>
-                <Button variant="outline" className="w-full h-12 border-primary/20 text-primary hover:bg-primary/5 rounded-xl font-bold">
-                  Call Us
-                </Button>
+                <Link href="/contact" className="block mb-3">
+                  <Button className="w-full h-12 bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl font-bold shadow-md">
+                    Book Free Consultation
+                  </Button>
+                </Link>
+                <Link href="tel:+919582706764" className="block">
+                  <Button variant="outline" className="w-full h-12 border-primary/20 text-primary hover:bg-primary/5 rounded-xl font-bold">
+                    Call Us
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>

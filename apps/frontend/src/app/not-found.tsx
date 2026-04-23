@@ -40,7 +40,7 @@ export default function NotFound() {
         </div>
 
         <div className="mt-16 pt-10 border-t border-border/50 text-sm text-muted-foreground">
-          Need immediate assistance? <a href="#" className="text-primary hover:underline font-medium inline-flex items-center"><MessageCircle className="w-4 h-4 mr-1"/> Chat with us on WhatsApp</a>
+          Need immediate assistance? <a href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20finding%20the%20right%20page." target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium inline-flex items-center"><MessageCircle className="w-4 h-4 mr-1"/> Chat with us on WhatsApp</a>
         </div>
       </div>
     </div>

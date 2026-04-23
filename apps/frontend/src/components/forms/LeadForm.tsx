@@ -87,8 +87,7 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
       });
       setIsSuccess(true);
       if (onSuccess) onSuccess();
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Something went wrong. Please try again or contact us on WhatsApp.");
     } finally {
       setIsSubmitting(false);

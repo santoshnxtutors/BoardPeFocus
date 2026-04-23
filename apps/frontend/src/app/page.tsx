@@ -252,8 +252,8 @@ export default function HomePage() {
                       title: "ONE-TO-ONE",
                       desc: "Positioning stays premium and one-to-one so families can brief us around the exact academic context."
                     }
-                  ].map((item, i) => (
-                    <div key={i} className="p-5 rounded-[1.25rem] bg-white border border-border/40 shadow-sm hover:shadow-md transition-all h-full flex flex-col">
+                  ].map((item) => (
+                    <div key={item.title} className="p-5 rounded-[1.25rem] bg-white border border-border/40 shadow-sm hover:shadow-md transition-all h-full flex flex-col">
                       <p className="text-[10px] font-extrabold tracking-[0.12em] text-emerald-800 uppercase mb-3">{item.title}</p>
                       <p className="text-[13px] text-slate-600 leading-relaxed font-medium">{item.desc}</p>
                     </div>
@@ -538,8 +538,8 @@ export default function HomePage() {
                 title: "Free Demo Class",
                 desc: "Schedule a demo to ensure the perfect teaching compatibility."
               }
-            ].map((item, i) => (
-              <StaggerItem key={i} className="text-center group">
+            ].map((item) => (
+              <StaggerItem key={item.step} className="text-center group">
                 <div className="w-20 h-20 rounded-3xl bg-primary/5 flex items-center justify-center text-primary text-2xl font-bold mb-6 mx-auto group-hover:bg-primary group-hover:text-white transition-all duration-500 border border-primary/10">
                   {item.step}
                 </div>
@@ -565,8 +565,8 @@ export default function HomePage() {
                   { title: "School-Aware Mapping", desc: "Tutors who understand the internal assessment patterns of top Gurugram schools." },
                   { title: "Board-Specific Rubrics", desc: "Preparation focused on the exact marking schemes of CBSE, IB, and IGCSE." },
                   { title: "Personalized Support", desc: "Dedicated academic advisors to track progress and ensure satisfaction." }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-4">
+                ].map((item) => (
+                  <div key={item.title} className="flex gap-4">
                     <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
                       <ShieldCheck className="w-6 h-6 text-accent" />
                     </div>

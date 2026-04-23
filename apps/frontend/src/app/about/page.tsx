@@ -1,6 +1,6 @@
-import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
+import { FadeIn } from "@/lib/animations";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Target, Users, BookOpen, ChevronRight, MapPin } from "lucide-react";
+import { ShieldCheck, Target, Users, BookOpen, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { constructMetadata } from "@/lib/seo";
@@ -57,8 +57,8 @@ export default function AboutPage() {
                     icon: <ShieldCheck className="w-6 h-6" />,
                     desc: "We accept fewer than 2% of the tutors who apply. Every educator passes through a 5-step screening process including technical board-specific interviews." 
                   }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-4">
+                ].map((item) => (
+                  <div key={item.title} className="flex gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 text-primary">
                       {item.icon}
                     </div>

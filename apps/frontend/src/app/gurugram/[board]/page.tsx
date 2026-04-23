@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { TutorCard } from "@/components/cards/TutorCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Target, BookOpen, GraduationCap, ChevronRight, Award, Zap } from "lucide-react";
+import { Target, BookOpen, ChevronRight, Award, Zap } from "lucide-react";
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
 import { LeadForm } from "@/components/forms/LeadForm";

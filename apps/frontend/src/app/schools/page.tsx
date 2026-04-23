@@ -115,7 +115,7 @@ export default function SchoolsHubPage() {
                   Use the Schools hub to discover school-aware tutoring by curriculum, class stage, subject focus, and Gurgaon locality without falling into a generic tuition-directory flow.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20school-aware%20board%20tutoring%20in%20Gurgaon." target="_blank">
+                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20school-aware%20board%20tutoring%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                     <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
                       Talk on WhatsApp
                     </Button>

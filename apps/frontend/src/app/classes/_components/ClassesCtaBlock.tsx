@@ -21,6 +21,7 @@ export function ClassesCtaBlock({
           <Link
             href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20Class%2010%20or%20Class%2012%20board%20tutoring%20in%20Gurgaon."
             target="_blank"
+            rel="noopener noreferrer"
             className="block w-full"
           >
             <Button className="h-12 w-full justify-center rounded-xl bg-white px-4 text-primary hover:bg-white/90">

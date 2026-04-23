@@ -21,6 +21,7 @@ export function ResultCtaBlock({
           <Link
             href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20to%20discuss%20a%20results-oriented%20tutoring%20path."
             target="_blank"
+            rel="noopener noreferrer"
             className="block w-full"
           >
             <Button className="h-12 w-full justify-center rounded-xl bg-white px-4 text-primary hover:bg-white/90">
@@ -50,4 +51,3 @@ export function ResultCtaBlock({
     </section>
   );
 }
-

@@ -84,6 +84,7 @@ export default async function ProcessDetailPage({ params }: PageProps) {
                   <Link
                     href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20with%20this%20process%20step%20for%20my%20child."
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
                       Talk on WhatsApp

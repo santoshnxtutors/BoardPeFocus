@@ -1,9 +1,8 @@
 import { mockSchools, mockBoards, mockSubjects, mockTutors } from "@/data/mock";
 import { notFound } from "next/navigation";
 import { TutorCard } from "@/components/cards/TutorCard";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Target, BookOpen } from "lucide-react";
+import { ChevronRight, Target } from "lucide-react";
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
 import { LeadForm } from "@/components/forms/LeadForm";

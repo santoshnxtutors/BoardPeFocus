@@ -188,7 +188,7 @@ export default async function AreaClusterPage({ params }: PageProps) {
                     <Link href="/contact">
                       <Button className="rounded-xl bg-white px-5 text-primary hover:bg-white/90">Request Callback</Button>
                     </Link>
-                    <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20a%20tutor%20in%20Gurgaon." target="_blank">
+                    <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20a%20tutor%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                       <Button variant="outline" className="rounded-xl border-white/20 bg-white/10 px-5 text-white hover:bg-white/15 hover:text-white">
                         WhatsApp Us
                       </Button>

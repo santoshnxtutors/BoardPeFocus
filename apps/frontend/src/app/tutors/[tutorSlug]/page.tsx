@@ -185,8 +185,8 @@ export default async function TutorProfilePage({ params }: PageProps) {
                     <School className="w-8 h-8 text-accent" /> Teaching Snapshot
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {tutor.results.map((result, i) => (
-                      <div key={i} className="text-center p-8 rounded-[2rem] bg-white border border-border shadow-sm group hover:border-primary/20 transition-all">
+                    {tutor.results.map((result) => (
+                      <div key={result.label} className="text-center p-8 rounded-[2rem] bg-white border border-border shadow-sm group hover:border-primary/20 transition-all">
                         <p className="text-2xl md:text-3xl font-heading font-bold text-primary mb-2 group-hover:scale-105 transition-transform">{result.value}</p>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{result.label}</p>
                       </div>
@@ -265,11 +265,11 @@ export default async function TutorProfilePage({ params }: PageProps) {
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-accent">Quick Inquiry</p>
-                      <p className="font-black text-primary uppercase">+91 XXXXX XXXXX</p>
+                      <p className="font-black text-primary uppercase">+91 95827 06764</p>
                     </div>
                   </div>
                   
-                  <Link href={`https://wa.me/91XXXXXXXXXX?text=Hi, I'm interested in booking a demo with ${tutor.name}`} target="_blank" className="block">
+                  <Link href={`https://wa.me/919582706764?text=Hi, I'm interested in booking a demo with ${tutor.name}`} target="_blank" rel="noopener noreferrer" className="block">
                     <Button variant="outline" className="w-full h-14 rounded-2xl border-accent/20 text-accent font-black uppercase tracking-widest text-xs hover:bg-accent hover:text-white transition-all shadow-xl shadow-accent/5">
                       <MessageSquare className="w-4 h-4 mr-2" /> Chat on WhatsApp
                     </Button>

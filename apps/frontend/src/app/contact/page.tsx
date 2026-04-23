@@ -103,7 +103,7 @@ export default function ContactPage() {
                 Our team is available Monday through Saturday, 9:00 AM to 8:00 PM, for consultations, callback requests, and tutor-matching support.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Link href="https://wa.me/919582706764" target="_blank">
+                <Link href="https://wa.me/919582706764" target="_blank" rel="noopener noreferrer">
                   <Button className="h-14 w-full rounded-xl bg-accent text-lg font-bold text-white shadow-lg hover:bg-accent/90">
                     Chat with an Advisor
                   </Button>

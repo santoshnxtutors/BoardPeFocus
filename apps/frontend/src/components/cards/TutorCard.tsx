@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, Clock, GraduationCap, ChevronRight, MapPin, BookOpen } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface TutorCardProps {
   tutor: Tutor;
@@ -19,7 +20,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
           <div className="relative shrink-0">
             <div className="w-24 h-24 lg:w-28 lg:h-28 rounded-2xl bg-muted overflow-hidden border-4 border-white shadow-md group-hover:scale-105 transition-transform duration-500">
               {tutor.photoUrl ? (
-                <img src={tutor.photoUrl} alt={`${tutor.name}, board-focused home tutor in Gurugram`} className="w-full h-full object-cover" />
+                <Image src={tutor.photoUrl} alt={`${tutor.name}, board-focused home tutor in Gurugram`} width={112} height={112} sizes="(min-width: 1024px) 112px, 96px" className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-3xl font-heading font-bold">
                   {tutor.name.charAt(0)}

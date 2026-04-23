@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Clock, School, CheckCircle2 } from "lucide-react";
 import { FadeIn } from "@/lib/animations";
 import { TutorProfileViewModel } from "@/types/tutor-profile";
+import Image from "next/image";
 
 interface TutorHeroProps {
   tutor: TutorProfileViewModel;
@@ -21,7 +22,7 @@ export const TutorHero = ({ tutor }: TutorHeroProps) => {
             <div className="relative">
               <div className="w-48 h-48 md:w-64 md:h-64 rounded-3xl overflow-hidden border-8 border-white shadow-2xl">
                 {tutor.photoUrl ? (
-                  <img src={tutor.photoUrl} alt={`${tutor.name}, premium home tutor profile photo`} className="w-full h-full object-cover" />
+                  <Image src={tutor.photoUrl} alt={`${tutor.name}, premium home tutor profile photo`} width={256} height={256} priority sizes="(min-width: 768px) 256px, 192px" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary text-6xl font-heading font-bold uppercase">
                     {tutor.name.charAt(0)}

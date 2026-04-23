@@ -76,7 +76,7 @@ export default function ClassesHubPage() {
                   Use the Classes hub to move from Class 10 or Class 12 into the right board, subject, school, area, and premium one-to-one tutoring path.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20choosing%20the%20right%20Class%2010%20or%20Class%2012%20tutor%20in%20Gurgaon." target="_blank">
+                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20choosing%20the%20right%20Class%2010%20or%20Class%2012%20tutor%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                     <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
                       Talk on WhatsApp
                     </Button>

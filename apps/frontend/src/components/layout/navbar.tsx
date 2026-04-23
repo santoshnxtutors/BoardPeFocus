@@ -13,8 +13,25 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    let ticking = false;
+
+    const updateScrolled = () => {
+      setScrolled((current) => {
+        const next = window.scrollY > 20;
+        return current === next ? current : next;
+      });
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(updateScrolled);
+      }
+    };
+
+    updateScrolled();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -66,6 +83,9 @@ export function Navbar() {
           <button 
             className="md:hidden p-2 rounded-lg text-primary hover:bg-black/5 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -77,7 +97,7 @@ export function Navbar() {
         "md:hidden absolute top-full left-0 w-full bg-white shadow-2xl transition-all duration-300 overflow-hidden",
         isOpen ? "max-h-96 opacity-100 border-t" : "max-h-0 opacity-0"
       )}>
-        <nav className="flex flex-col p-6 gap-4">
+        <nav id="mobile-navigation" className="flex flex-col p-6 gap-4">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 

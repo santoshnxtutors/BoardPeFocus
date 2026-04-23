@@ -1,6 +1,6 @@
-import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
+import { FadeIn } from "@/lib/animations";
 import { constructMetadata } from "@/lib/seo";
-import { CheckCircle2, Trophy, Users, School, Clock, ShieldCheck, Target, BarChart3 } from "lucide-react";
+import { Trophy, School, Clock, ShieldCheck, BarChart3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -99,7 +99,7 @@ export default function TransparencyPage() {
                   { title: "Training", desc: "Board rubric & empathy training" },
                   { title: "Matching", desc: "Strict compatibility criteria" }
                 ].map((step, i) => (
-                  <Card key={i} className="border-border/50 hover:border-accent/30 transition-colors bg-white">
+                  <Card key={step.title} className="border-border/50 hover:border-accent/30 transition-colors bg-white">
                     <CardContent className="p-6 text-center">
                       <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold mx-auto mb-4">
                         {i + 1}

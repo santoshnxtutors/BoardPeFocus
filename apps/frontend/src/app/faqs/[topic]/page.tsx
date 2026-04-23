@@ -87,6 +87,7 @@ export default async function FaqTopicPage({ params }: PageProps) {
                   <Link
                     href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20have%20a%20question%20after%20reading%20your%20FAQs."
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <Button
                       variant="outline"

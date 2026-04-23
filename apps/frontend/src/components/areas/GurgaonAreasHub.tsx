@@ -367,7 +367,7 @@ export function GurgaonAreasHub() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20a%20home%20tutor%20in%20Gurgaon." target="_blank">
+            <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20a%20home%20tutor%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
               <Button className="h-12 w-full rounded-xl bg-white text-primary hover:bg-white/90">
                 WhatsApp
               </Button>

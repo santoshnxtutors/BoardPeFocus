@@ -12,16 +12,25 @@ export function StickyCTA() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
+
+    const updateVisibility = () => {
+      setIsVisible((current) => {
+        const next = window.scrollY > 300;
+        return current === next ? current : next;
+      });
+      ticking = false;
+    };
+
     const handleScroll = () => {
-      // Show CTA after scrolling down 300px
-      if (window.scrollY > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(updateVisibility);
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    updateVisibility();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -52,6 +61,7 @@ export function StickyCTA() {
           <Link
             href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20to%20talk%20about%20board-exam%20tutoring%20support."
             target="_blank"
+            rel="noopener noreferrer"
             className={cn(
               buttonVariants(),
               "flex-1 md:flex-none h-12 md:h-10 bg-[#25D366] hover:bg-[#25D366]/90 text-white rounded-xl font-medium shadow-md"

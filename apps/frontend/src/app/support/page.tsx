@@ -131,6 +131,7 @@ export default function SupportPage() {
                   <Link
                     href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20support%20to%20choose%20the%20right%20tutoring%20path."
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
                       <MessageCircle className="mr-2 h-4 w-4" />

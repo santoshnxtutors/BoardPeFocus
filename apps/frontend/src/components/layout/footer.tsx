@@ -18,13 +18,15 @@ const topLocalityLinks = [
 ];
 
 export function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="bg-primary text-primary-foreground py-6 border-t border-border/10">
+    <footer className="bg-primary text-primary-foreground py-6 sm:py-8 border-t border-border/10">
       <div className="container mx-auto px-4 max-w-[1400px]">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8 mb-4">
           
           {/* Brand & Contact */}
-          <div className="space-y-4">
+          <div className="col-span-2 lg:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
               <span className="font-heading font-bold text-2xl tracking-tight">
                 BoardPe<span className="text-accent">Focus</span>
@@ -108,7 +110,7 @@ export function Footer() {
         </div>
 
         <div className="pt-4 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-widest text-primary-foreground/40 font-bold">
-          <p>© {new Date().getFullYear()} BoardPeFocus. Gurugram only.</p>
+          <p>© {currentYear} BoardPeFocus. Gurugram only.</p>
           <p>Designed for academic excellence.</p>
         </div>
       </div>

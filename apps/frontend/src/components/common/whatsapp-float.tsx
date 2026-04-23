@@ -17,21 +17,21 @@ export function WhatsAppFloat() {
     subject: "",
     message: ""
   });
-  
+
   const phoneNumber = "919582706764";
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const fullMessage = `Hi BoardPe Focus Team, I'm looking for a tutor.
-    
-📍 Location: ${form.location || 'Not specified'}
-🎓 Board: ${form.board || 'Not specified'}
-🏫 School: ${form.school || 'Not specified'}
-🔢 Grade: ${form.grade || 'Not specified'}
-📚 Subject: ${form.subject || 'Not specified'}
-📝 Inquiry: ${form.message || 'I would like to book a free demo.'}`;
-    
+
+Location: ${form.location || "Not specified"}
+Board: ${form.board || "Not specified"}
+School: ${form.school || "Not specified"}
+Grade: ${form.grade || "Not specified"}
+Subject: ${form.subject || "Not specified"}
+Inquiry: ${form.message || "I would like to book a free demo."}`;
+
     const encodedMessage = encodeURIComponent(fullMessage);
     trackEvent("whatsapp_float_send", {
       board: form.board,
@@ -40,7 +40,7 @@ export function WhatsAppFloat() {
       school: form.school,
       location: form.location,
     });
-    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
+    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank", "noopener,noreferrer");
     setIsOpen(false);
     setForm({ location: "", board: "", school: "", grade: "", subject: "", message: "" });
   };
@@ -50,7 +50,7 @@ export function WhatsAppFloat() {
   return (
     <div className="pointer-events-none fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[100] flex flex-col items-end gap-4">
       {/* Inquiry Popup */}
-      <div 
+      <div
         className={cn(
           "pointer-events-auto",
           "bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-border/40 p-5 sm:p-7 w-[calc(100vw-2rem)] sm:w-[24rem] transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) transform origin-bottom-right max-h-[85vh] overflow-y-auto custom-scrollbar",
@@ -72,47 +72,54 @@ export function WhatsAppFloat() {
               </span>
             </div>
           </div>
-          <button onClick={() => setIsOpen(false)} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-slate-50 flex items-center justify-center text-muted-foreground hover:text-primary transition-all">
+          <button
+            onClick={() => setIsOpen(false)}
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-slate-50 flex items-center justify-center text-muted-foreground hover:text-primary transition-all"
+            aria-label="Close WhatsApp form"
+          >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
-        
+
         <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 mb-5 sm:mb-6 leading-relaxed uppercase tracking-wide">
           Connect with Gurugram's top board experts in seconds.
         </p>
-        
+
         <form onSubmit={handleSend} className="space-y-3 sm:space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="relative group">
               <MapPin className="absolute left-3 top-3 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-              <Input 
+              <Input
                 value={form.location}
-                onChange={(e) => setForm({...form, location: e.target.value})}
+                onChange={(e) => setForm({ ...form, location: e.target.value })}
                 placeholder="Location"
+                aria-label="Location"
                 className="pl-10 h-11 rounded-xl border-slate-100 bg-slate-50 focus-visible:bg-white text-xs font-bold"
               />
             </div>
             <div className="relative group">
               <BookOpen className="absolute left-3 top-3 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors z-10" />
-              <select 
+              <select
                 value={form.board}
-                onChange={(e) => setForm({...form, board: e.target.value})}
+                onChange={(e) => setForm({ ...form, board: e.target.value })}
+                aria-label="Board"
                 className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/20 text-xs font-bold appearance-none transition-all cursor-pointer text-slate-700"
               >
                 <option value="" disabled>Select Board</option>
-                {boards.map(board => (
+                {boards.map((board) => (
                   <option key={board} value={board}>{board}</option>
                 ))}
               </select>
             </div>
           </div>
-          
+
           <div className="relative group">
             <School className="absolute left-3 top-3 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-            <Input 
+            <Input
               value={form.school}
-              onChange={(e) => setForm({...form, school: e.target.value})}
+              onChange={(e) => setForm({ ...form, school: e.target.value })}
               placeholder="School Name (e.g. The Heritage)"
+              aria-label="School name"
               className="pl-10 h-11 rounded-xl border-slate-100 bg-slate-50 focus-visible:bg-white text-xs font-bold"
             />
           </div>
@@ -120,19 +127,21 @@ export function WhatsAppFloat() {
           <div className="grid grid-cols-2 gap-3">
             <div className="relative group">
               <Layers className="absolute left-3 top-3 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-              <Input 
+              <Input
                 value={form.grade}
-                onChange={(e) => setForm({...form, grade: e.target.value})}
+                onChange={(e) => setForm({ ...form, grade: e.target.value })}
                 placeholder="Grade"
+                aria-label="Grade"
                 className="pl-10 h-11 rounded-xl border-slate-100 bg-slate-50 focus-visible:bg-white text-xs font-bold"
               />
             </div>
             <div className="relative group">
               <BookOpen className="absolute left-3 top-3 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-              <Input 
+              <Input
                 value={form.subject}
-                onChange={(e) => setForm({...form, subject: e.target.value})}
+                onChange={(e) => setForm({ ...form, subject: e.target.value })}
                 placeholder="Subject"
+                aria-label="Subject"
                 className="pl-10 h-11 rounded-xl border-slate-100 bg-slate-50 focus-visible:bg-white text-xs font-bold"
               />
             </div>
@@ -140,16 +149,17 @@ export function WhatsAppFloat() {
 
           <div className="relative group">
             <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-            <Input 
+            <Input
               value={form.message}
-              onChange={(e) => setForm({...form, message: e.target.value})}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
               placeholder="How can we help?"
+              aria-label="How can we help?"
               className="pl-10 h-11 rounded-xl border-slate-100 bg-slate-50 focus-visible:bg-white text-xs font-bold"
             />
           </div>
 
           <Button type="submit" className="w-full h-12 sm:h-14 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-2xl gap-3 font-black uppercase tracking-widest text-[10px] sm:text-[11px] shadow-2xl shadow-green-500/20 transition-all active:scale-95 group/btn">
-            <Send className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" /> 
+            <Send className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
             Start WhatsApp Chat
           </Button>
         </form>
@@ -162,6 +172,8 @@ export function WhatsAppFloat() {
           setIsOpen(nextOpen);
           trackEvent("whatsapp_float_toggle", { open: nextOpen });
         }}
+        aria-label={isOpen ? "Close WhatsApp form" : "Open WhatsApp form"}
+        aria-expanded={isOpen}
         className={cn(
           "pointer-events-auto",
           "w-14 h-14 sm:w-18 sm:h-18 rounded-full shadow-[0_15px_40px_rgba(37,211,102,0.4)] flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group relative border-4 border-white",
@@ -176,7 +188,7 @@ export function WhatsAppFloat() {
              <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full border-2 border-[#25D366] animate-bounce" />
           </div>
         )}
-        
+
         {!isOpen && (
           <div className="absolute right-full mr-6 bg-white px-6 py-3.5 rounded-2xl shadow-2xl border border-border/50 whitespace-nowrap text-primary font-black uppercase tracking-widest text-[11px] pointer-events-none opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 hidden sm:block">
             Need Expert Help? Chat Now

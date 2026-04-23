@@ -63,7 +63,7 @@ export function FAQ({
       >
         {items.map((item, index) => (
           <AccordionItem 
-            key={index} 
+            key={item.question} 
             value={`item-${index}`}
             className="border border-border/40 rounded-3xl px-8 py-2 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 overflow-hidden h-fit"
           >

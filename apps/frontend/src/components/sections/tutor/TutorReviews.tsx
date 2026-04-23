@@ -30,7 +30,7 @@ export const TutorReviews = ({ reviews }: TutorReviewsProps) => {
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star 
-                      key={i} 
+                      key={`star-${i}`} 
                       className={`w-4 h-4 ${i < review.rating ? "fill-accent text-accent" : "text-slate-200"}`} 
                     />
                   ))}

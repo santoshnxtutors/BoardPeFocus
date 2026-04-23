@@ -21,6 +21,7 @@ export function FaqTopicCtaBlock({
           <Link
             href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20still%20need%20help%20after%20reading%20your%20FAQs."
             target="_blank"
+            rel="noopener noreferrer"
             className="block w-full"
           >
             <Button className="h-12 w-full justify-center rounded-xl bg-white px-4 text-primary hover:bg-white/90">

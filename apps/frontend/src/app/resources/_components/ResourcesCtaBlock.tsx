@@ -29,6 +29,7 @@ export function ResourcesCtaBlock({
           <Link
             href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20after%20reading%20your%20board%20exam%20resources."
             target="_blank"
+            rel="noopener noreferrer"
             className="block w-full"
           >
             <Button className="h-12 w-full justify-center rounded-xl bg-white px-4 text-primary hover:bg-white/90">
@@ -58,4 +59,3 @@ export function ResourcesCtaBlock({
     </section>
   );
 }
-

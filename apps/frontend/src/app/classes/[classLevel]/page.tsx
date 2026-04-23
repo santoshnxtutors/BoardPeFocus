@@ -93,7 +93,7 @@ export default async function ClassHubDetailPage({ params }: PageProps) {
                 <h1 className="mt-6 text-4xl font-extrabold tracking-tight md:text-6xl">{classHub.heroTitle}</h1>
                 <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">{classHub.heroDescription}</p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20this%20class-specific%20board%20tutoring%20path%20in%20Gurgaon." target="_blank">
+                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20this%20class-specific%20board%20tutoring%20path%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                     <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
                       Talk on WhatsApp
                     </Button>
