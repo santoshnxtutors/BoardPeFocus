@@ -56,10 +56,15 @@ async function main() {
 
   console.log('Seeding admin user...');
   const adminPassword = process.env.ADMIN_SEED_PASSWORD;
-  const adminEmail = process.env.ADMIN_SEED_EMAIL ?? 'admin@boardpefocus.local';
-  const adminName = process.env.ADMIN_SEED_NAME ?? 'BoardPeFocus Admin';
+  const adminEmail = (
+    process.env.ADMIN_SEED_EMAIL ?? 'admin@boardpefocus.local'
+  )
+    .trim()
+    .toLowerCase();
+  const adminName =
+    process.env.ADMIN_SEED_NAME?.trim() || 'BoardPeFocus Admin';
   const shouldResetAdminPassword =
-    process.env.RESET_ADMIN_PASSWORD_ON_SEED === 'true';
+    process.env.RESET_ADMIN_PASSWORD_ON_SEED !== 'false';
 
   if (!adminPassword) {
     throw new Error(
@@ -68,9 +73,13 @@ async function main() {
   }
 
   const passwordHash = await bcrypt.hash(adminPassword, 10);
-  await prisma.user.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: adminEmail },
-    update: shouldResetAdminPassword ? { passwordHash } : {},
+    update: {
+      name: adminName,
+      isActive: true,
+      ...(shouldResetAdminPassword ? { passwordHash } : {}),
+    },
     create: {
       email: adminEmail,
       name: adminName,
@@ -78,6 +87,20 @@ async function main() {
       roles: {
         create: { roleId: superAdminRole.id },
       },
+    },
+  });
+
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: {
+        userId: adminUser.id,
+        roleId: superAdminRole.id,
+      },
+    },
+    update: {},
+    create: {
+      userId: adminUser.id,
+      roleId: superAdminRole.id,
     },
   });
 
