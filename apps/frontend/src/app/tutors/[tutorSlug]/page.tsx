@@ -355,22 +355,19 @@ async function getPublishedTutor(slug: string) {
 }
 
 function normalizeBackendTutor(rawTutor: any) {
-  const boards = (rawTutor.boards ?? [])
-    .map((item: any) => item?.board?.name ?? item?.name)
-    .filter(Boolean);
-  const subjects = (rawTutor.subjects ?? [])
-    .map((item: any) => item?.subject?.name ?? item?.name)
-    .filter(Boolean);
-  const schools = (rawTutor.schools ?? [])
-    .map((item: any) => item?.school?.name ?? item?.name)
-    .filter(Boolean);
+  const boards = normalizeNameList(rawTutor.boards, "board");
+  const subjects = normalizeNameList(rawTutor.subjects, "subject");
+  const schools = normalizeNameList(rawTutor.schools, "school");
   const sectorNames = (rawTutor.locations ?? [])
     .map((item: any) => item?.sector?.name)
     .filter(Boolean);
   const societyNames = (rawTutor.locations ?? [])
     .map((item: any) => item?.society?.name)
     .filter(Boolean);
-  const locations = [...sectorNames, ...societyNames];
+  const locationNames = (rawTutor.locations ?? [])
+    .map((item: any) => (typeof item === "string" ? item : null))
+    .filter(Boolean);
+  const locations = locationNames.length > 0 ? locationNames : [...sectorNames, ...societyNames];
   const about =
     rawTutor.about ||
     rawTutor.bio ||
@@ -394,13 +391,16 @@ function normalizeBackendTutor(rawTutor: any) {
     schools,
     locations,
     coverage: {
-      sectors: sectorNames,
-      societies: societyNames,
+      sectors: rawTutor.coverage?.sectors ?? sectorNames,
+      societies: rawTutor.coverage?.societies ?? societyNames,
     },
-    results: [
-      { label: "Experience", value: `${rawTutor.experienceYrs ?? 0} years` },
-      { label: "Students Taught", value: `${rawTutor.studentsTaught ?? 0}+` },
-    ],
+    results:
+      rawTutor.results && rawTutor.results.length > 0
+        ? rawTutor.results
+        : [
+            { label: "Experience", value: `${rawTutor.experienceYrs ?? 0} years` },
+            { label: "Students Taught", value: `${rawTutor.studentsTaught ?? 0}+` },
+          ],
     reviews: (rawTutor.reviews ?? []).map((review: any) => ({
       id: review.id,
       parentName: review.parentName,
@@ -423,6 +423,15 @@ function normalizeBackendTutor(rawTutor: any) {
         ? normalized.reviews
         : buildGenericTutorNotes(normalized),
   };
+}
+
+function normalizeNameList(items: unknown, relationKey: "board" | "subject" | "school") {
+  return (Array.isArray(items) ? items : [])
+    .map((item: any) => {
+      if (typeof item === "string") return item;
+      return item?.[relationKey]?.name ?? item?.name ?? null;
+    })
+    .filter(Boolean);
 }
 
 function formatList(items: string[]) {
