@@ -52,6 +52,8 @@ jobs:
             "APP_DIR='$APP_DIR' REPO_URL='$REPO_URL' bash -s" <<'REMOTE'
           set -euo pipefail
 
+          git config --global --add safe.directory "$APP_DIR"
+
           if [ -d "$APP_DIR/.git" ]; then
             cd "$APP_DIR"
             git fetch origin main
