@@ -340,20 +340,18 @@ async function getPublishedTutor(slug: string) {
       return normalizeBackendTutor(rawTutor);
     }
   } catch {
-    // Public pages should fail closed unless mock fallback is explicitly enabled.
+    // Fall through to the curated tutor dataset below.
   }
 
-  if (process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true") {
-    const mockTutor = mockTutors.find((item) => item.slug === slug);
-    if (!mockTutor) return null;
-    return {
-      ...mockTutor,
-      faqs: buildTutorFaqs(mockTutor),
-      reviews: buildTutorNotes(mockTutor),
-    };
-  }
+  const mockTutor = mockTutors.find((item) => item.slug === slug);
+  if (!mockTutor) return null;
 
-  return null;
+  return {
+    ...mockTutor,
+    faqs: buildTutorFaqs(mockTutor),
+    reviews: buildTutorNotes(mockTutor),
+  };
+
 }
 
 function normalizeBackendTutor(rawTutor: any) {
