@@ -30,12 +30,17 @@ else
 fi
 
 export CI=1
+export START_ADMIN="${START_ADMIN:-false}"
 export ADMIN_SEED_PASSWORD="${ADMIN_SEED_PASSWORD:-board@1234}"
 export RESET_ADMIN_PASSWORD_ON_SEED="${RESET_ADMIN_PASSWORD_ON_SEED:-true}"
 
 if ! command -v pnpm >/dev/null 2>&1; then
-  corepack enable
-  corepack prepare pnpm@9.5.0 --activate
+  if command -v corepack >/dev/null 2>&1; then
+    corepack enable
+    corepack prepare pnpm@9.5.0 --activate
+  else
+    npm install -g pnpm@9.5.0
+  fi
 fi
 
 pnpm install --frozen-lockfile
