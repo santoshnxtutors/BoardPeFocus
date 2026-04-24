@@ -1,1 +1,89 @@
+name: Deploy to CloudPanel
 
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: cloudpanel-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+
+    env:
+      APP_DIR: /home/boardpefocus/htdocs/www.boardpefocus.in
+      REPO_URL: https://github.com/santoshnxtutors/BoardPeFocus.git
+      CLOUDPANEL_HOST: ${{ secrets.CLOUDPANEL_HOST }}
+      CLOUDPANEL_SSH_USER: ${{ secrets.CLOUDPANEL_SSH_USER }}
+      CLOUDPANEL_SSH_PASSWORD: ${{ secrets.CLOUDPANEL_SSH_PASSWORD }}
+      BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
+      FRONTEND_ENV_PRODUCTION: ${{ secrets.FRONTEND_ENV_PRODUCTION }}
+      ADMIN_ENV_PRODUCTION: ${{ secrets.ADMIN_ENV_PRODUCTION }}
+
+    steps:
+      - name: Check required secrets
+        run: |
+          test -n "$CLOUDPANEL_HOST"
+          test -n "$CLOUDPANEL_SSH_USER"
+          test -n "$CLOUDPANEL_SSH_PASSWORD"
+          test -n "$BACKEND_ENV"
+          test -n "$FRONTEND_ENV_PRODUCTION"
+          test -n "$ADMIN_ENV_PRODUCTION"
+
+      - name: Install SSH password helper
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Trust CloudPanel host
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "$CLOUDPANEL_HOST" >> ~/.ssh/known_hosts
+
+      - name: Sync repository on CloudPanel
+        run: |
+          export SSHPASS="$CLOUDPANEL_SSH_PASSWORD"
+          sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "APP_DIR='$APP_DIR' REPO_URL='$REPO_URL' bash -s" <<'REMOTE'
+          set -euo pipefail
+
+          if [ -d "$APP_DIR/.git" ]; then
+            cd "$APP_DIR"
+            git fetch origin main
+            git reset --hard origin/main
+          else
+            mkdir -p "$APP_DIR"
+            if [ "$(find "$APP_DIR" -mindepth 1 -maxdepth 1 | wc -l)" -gt 0 ]; then
+              echo "APP_DIR exists but is not a git checkout: $APP_DIR"
+              echo "Clear the directory once from CloudPanel/File Manager or SSH, then rerun this workflow."
+              exit 1
+            fi
+            git clone "$REPO_URL" "$APP_DIR"
+          fi
+          REMOTE
+
+      - name: Upload production env files
+        run: |
+          export SSHPASS="$CLOUDPANEL_SSH_PASSWORD"
+          sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "mkdir -p '$APP_DIR/apps/backend' '$APP_DIR/apps/frontend' '$APP_DIR/apps/admin'"
+
+          printf '%s\n' "$BACKEND_ENV" | sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "cat > '$APP_DIR/apps/backend/.env'"
+
+          printf '%s\n' "$FRONTEND_ENV_PRODUCTION" | sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "cat > '$APP_DIR/apps/frontend/.env.production'"
+
+          printf '%s\n' "$ADMIN_ENV_PRODUCTION" | sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "cat > '$APP_DIR/apps/admin/.env.production'"
+
+      - name: Run CloudPanel deploy script
+        run: |
+          export SSHPASS="$CLOUDPANEL_SSH_PASSWORD"
+          sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "cd '$APP_DIR' && APP_DIR='$APP_DIR' BACKEND_ENV_FILE='$APP_DIR/apps/backend/.env' bash scripts/cloudpanel-deploy.sh"
