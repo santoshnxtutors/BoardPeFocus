@@ -13,9 +13,9 @@
     "db:seed": "pnpm --dir packages/database run seed",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "start:frontend": "pnpm --dir apps/frontend exec next start --hostname 0.0.0.0 --port 3001",
+    "start:frontend": "pnpm --dir apps/frontend exec next start --hostname 0.0.0.0",
     "start:backend": "pnpm --filter backend start:prod",
-    "start:admin": "pnpm --dir apps/admin exec next start --hostname 0.0.0.0 --port 3003",
+    "start:admin": "pnpm --dir apps/admin exec next start --hostname 0.0.0.0",
     "deploy:cloudpanel": "bash ./scripts/cloudpanel-deploy.sh"
   },
   "devDependencies": {
