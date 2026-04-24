@@ -49,8 +49,18 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'An unknown error occurred' }));
-      throw new Error(error.message || 'API request failed');
+      if (response.status === 401 && typeof window !== 'undefined') {
+        window.localStorage.removeItem('auth_token');
+        window.localStorage.removeItem('auth_user');
+      }
+
+      const error = await response
+        .json()
+        .catch(() => ({ message: 'An unknown error occurred' }));
+      const message = Array.isArray(error.message)
+        ? error.message.join(', ')
+        : error.message;
+      throw new Error(message || 'API request failed');
     }
 
     if (response.status === 204) {
@@ -101,6 +111,44 @@ class ApiClient {
 
   schools = {
     list: () => this.fetcher<School[]>('/admin/schools'),
+  };
+
+  lookups = {
+    list: () =>
+      this.fetcher<{
+        boards: Board[];
+        classes: any[];
+        subjects: Subject[];
+        schools: School[];
+        sectors: Sector[];
+        societies: Society[];
+        tutors: Tutor[];
+      }>('/admin/lookups'),
+  };
+
+  content = {
+    list: <T = any>(entity: string) =>
+      this.fetcher<T[]>(`/admin/content/${entity}`),
+    get: <T = any>(entity: string, id: string) =>
+      this.fetcher<T>(`/admin/content/${entity}/${id}`),
+    create: <T = any>(entity: string, data: Record<string, unknown>) =>
+      this.fetcher<T>(`/admin/content/${entity}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: <T = any>(
+      entity: string,
+      id: string,
+      data: Record<string, unknown>,
+    ) =>
+      this.fetcher<T>(`/admin/content/${entity}/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    archive: <T = any>(entity: string, id: string) =>
+      this.fetcher<T>(`/admin/content/${entity}/${id}`, {
+        method: 'DELETE',
+      }),
   };
 
   // Leads

@@ -20,6 +20,7 @@ import { Lead } from "@boardpefocus/types";
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadLeads();
@@ -27,39 +28,24 @@ export default function LeadsPage() {
 
   const loadLeads = async () => {
     setIsLoading(true);
+    setError("");
     try {
-      const fallbackLeads: Lead[] = [
-        { 
-          id: '1', 
-          name: 'Sanjeev Kumar', 
-          phone: '+91 9876543210', 
-          email: 'sanjeev@example.com',
-          board: 'CBSE',
-          subject: 'Math',
-          class: '10th',
-          location: 'Sector 43',
-          status: 'NEW',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        { 
-          id: '2', 
-          name: 'Anita Devi', 
-          phone: '+91 9123456789', 
-          status: 'CONTACTED',
-          board: 'IB DP',
-          subject: 'Physics',
-          location: 'DLF Phase 5',
-          createdAt: new Date(Date.now() - 86400000),
-          updatedAt: new Date(Date.now() - 86400000)
-        }
-      ];
-      const data = await api.leads.list().catch(() => fallbackLeads);
+      const data = await api.leads.list();
       setLeads(data);
     } catch (error) {
-      console.error("Failed to load leads:", error);
+      setError(error instanceof Error ? error.message : "Failed to load leads.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    setError("");
+    try {
+      await api.leads.updateStatus(id, status);
+      await loadLeads();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to update lead status.");
     }
   };
 
@@ -145,9 +131,15 @@ export default function LeadsPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="font-bold border-slate-200">Export CSV</Button>
-          <Button className="bg-primary hover:bg-primary/90 text-white font-bold">Refresh</Button>
+          <Button className="bg-primary hover:bg-primary/90 text-white font-bold" onClick={() => void loadLeads()}>Refresh</Button>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-700">
+          {error}
+        </div>
+      )}
 
       <DataTable 
         columns={columns} 
@@ -155,9 +147,18 @@ export default function LeadsPage() {
         isLoading={isLoading}
         searchPlaceholder="Search leads by name or phone..."
         actions={(lead) => (
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4 text-slate-400" />
-          </Button>
+          <select
+            value={lead.status}
+            onChange={(event) => void updateStatus(lead.id, event.target.value)}
+            className="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs font-bold"
+          >
+            <option value="NEW">New</option>
+            <option value="CONTACTED">Contacted</option>
+            <option value="QUALIFIED">Qualified</option>
+            <option value="CONVERTED">Converted</option>
+            <option value="CLOSED">Closed</option>
+            <option value="SPAM">Spam</option>
+          </select>
         )}
       />
     </div>

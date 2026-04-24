@@ -7,14 +7,25 @@ export class BoardsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    return this.prisma.board.findMany();
+    return (this.prisma as any).board.findMany({
+      where: { status: 'PUBLISHED' },
+      include: {
+        subjects: { include: { subject: true } },
+        classes: { include: { classLevel: true } },
+      },
+      orderBy: { name: 'asc' },
+    });
   }
 
   async findBySlug(slug: string) {
-    const board = await this.prisma.board.findUnique({
-      where: { slug },
+    const board = await (this.prisma as any).board.findFirst({
+      where: { slug, status: 'PUBLISHED' },
       include: {
         subjects: { include: { subject: true } },
+        classes: { include: { classLevel: true } },
+        schools: { include: { school: true } },
+        sectors: { include: { sector: true } },
+        societies: { include: { society: true } },
       },
     });
     if (!board) throw new NotFoundException('Board not found');

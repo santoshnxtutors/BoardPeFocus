@@ -6,27 +6,34 @@ export class ContentService {
   constructor(private readonly prisma: PrismaService) {}
 
   listSchools() {
-    return this.prisma.school.findMany({
+    return (this.prisma as any).school.findMany({
+      where: { status: 'PUBLISHED' },
       include: {
         boards: {
           include: {
             board: true,
           },
         },
+        subjects: { include: { subject: true } },
+        sectors: { include: { sector: true } },
+        societies: { include: { society: true } },
       },
       orderBy: { name: 'asc' },
     });
   }
 
   async getSchool(slug: string) {
-    const school = await this.prisma.school.findUnique({
-      where: { slug },
+    const school = await (this.prisma as any).school.findFirst({
+      where: { slug, status: 'PUBLISHED' },
       include: {
         boards: {
           include: {
             board: true,
           },
         },
+        subjects: { include: { subject: true } },
+        sectors: { include: { sector: true } },
+        societies: { include: { society: true } },
       },
     });
 
@@ -39,8 +46,14 @@ export class ContentService {
 
   async listLocations() {
     const [sectors, societies] = await Promise.all([
-      this.prisma.sector.findMany({ orderBy: { name: 'asc' } }),
-      this.prisma.society.findMany({ orderBy: { name: 'asc' } }),
+      (this.prisma as any).sector.findMany({
+        where: { status: 'PUBLISHED' },
+        orderBy: { name: 'asc' },
+      }),
+      (this.prisma as any).society.findMany({
+        where: { status: 'PUBLISHED' },
+        orderBy: { name: 'asc' },
+      }),
     ]);
 
     return [
@@ -62,7 +75,9 @@ export class ContentService {
   }
 
   async getLocation(slug: string) {
-    const sector = await this.prisma.sector.findUnique({ where: { slug } });
+    const sector = await (this.prisma as any).sector.findFirst({
+      where: { slug, status: 'PUBLISHED' },
+    });
     if (sector) {
       return {
         id: sector.id,
@@ -73,7 +88,9 @@ export class ContentService {
       };
     }
 
-    const society = await this.prisma.society.findUnique({ where: { slug } });
+    const society = await (this.prisma as any).society.findFirst({
+      where: { slug, status: 'PUBLISHED' },
+    });
     if (society) {
       return {
         id: society.id,
@@ -88,7 +105,12 @@ export class ContentService {
   }
 
   listSubjects() {
-    return this.prisma.subject.findMany({
+    return (this.prisma as any).subject.findMany({
+      where: { status: 'PUBLISHED' },
+      include: {
+        boards: { include: { board: true } },
+        classes: { include: { classLevel: true } },
+      },
       orderBy: { name: 'asc' },
     });
   }

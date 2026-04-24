@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { saveLead } from "@/lib/mock-api";
+import { fetchBackend } from "@/lib/backend-api";
 
 const leadSchema = z.object({
   name: z.string().min(2),
@@ -27,6 +27,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await saveLead(parsed.data);
-  return NextResponse.json(result, { status: 201 });
+  const response = await fetchBackend("/public/leads", {
+    method: "POST",
+    body: JSON.stringify(parsed.data),
+  });
+
+  return NextResponse.json(await response.json(), { status: response.status });
 }

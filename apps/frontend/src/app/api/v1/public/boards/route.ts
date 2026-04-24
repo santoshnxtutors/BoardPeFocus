@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getBoards } from "@/lib/mock-api";
+import { fetchBackend } from "@/lib/backend-api";
 
 export async function GET() {
-  return NextResponse.json(getBoards());
+  const response = await fetchBackend("/public/boards");
+  return NextResponse.json(await response.json(), { status: response.status });
 }

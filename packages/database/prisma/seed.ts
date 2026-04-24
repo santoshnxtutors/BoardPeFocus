@@ -1,13 +1,17 @@
-import { PrismaClient, TutorStatus, PageStatus, LeadStatus, JobStatus, DeliveryStatus, ReviewStatus } from '@prisma/client';
+import {
+  JobStatus,
+  PageStatus,
+  PrismaClient,
+  TutorStatus,
+} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting Seeding Process (Shared Package)...');
+  console.log('Starting seed process for the shared database package...');
 
-  // 1. Roles & Permissions
-  console.log('--- Seeding Roles & Permissions ---');
+  console.log('Seeding roles and permissions...');
   const permissions = [
     { action: 'tutor:create', description: 'Create new tutors' },
     { action: 'tutor:publish', description: 'Publish tutor profiles' },
@@ -16,11 +20,11 @@ async function main() {
     { action: 'system:audit', description: 'View system audit logs' },
   ];
 
-  for (const p of permissions) {
+  for (const permission of permissions) {
     await prisma.permission.upsert({
-      where: { action: p.action },
+      where: { action: permission.action },
       update: {},
-      create: p,
+      create: permission,
     });
   }
 
@@ -33,28 +37,43 @@ async function main() {
     },
   });
 
-  // Assign all permissions to SuperAdmin
-  const allPerms = await prisma.permission.findMany();
-  for (const perm of allPerms) {
+  const allPermissions = await prisma.permission.findMany();
+  for (const permission of allPermissions) {
     await prisma.rolePermission.upsert({
-      where: { roleId_permissionId: { roleId: superAdminRole.id, permissionId: perm.id } },
+      where: {
+        roleId_permissionId: {
+          roleId: superAdminRole.id,
+          permissionId: permission.id,
+        },
+      },
       update: {},
-      create: { roleId: superAdminRole.id, permissionId: perm.id },
+      create: {
+        roleId: superAdminRole.id,
+        permissionId: permission.id,
+      },
     });
   }
 
-  // 2. Users
-  console.log('--- Seeding Users ---');
-  const adminPassword = process.env.ADMIN_SEED_PASSWORD ?? 'board@1234';
+  console.log('Seeding admin user...');
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD;
+  const adminEmail = process.env.ADMIN_SEED_EMAIL ?? 'admin@boardpefocus.local';
+  const adminName = process.env.ADMIN_SEED_NAME ?? 'BoardPeFocus Admin';
   const shouldResetAdminPassword =
     process.env.RESET_ADMIN_PASSWORD_ON_SEED === 'true';
+
+  if (!adminPassword) {
+    throw new Error(
+      'ADMIN_SEED_PASSWORD is required before running the seed command.',
+    );
+  }
+
   const passwordHash = await bcrypt.hash(adminPassword, 10);
-  const admin = await prisma.user.upsert({
-    where: { email: 'santosh@nxtutors.com' },
+  await prisma.user.upsert({
+    where: { email: adminEmail },
     update: shouldResetAdminPassword ? { passwordHash } : {},
     create: {
-      email: 'santosh@nxtutors.com',
-      name: 'Santosh',
+      email: adminEmail,
+      name: adminName,
       passwordHash,
       roles: {
         create: { roleId: superAdminRole.id },
@@ -62,101 +81,175 @@ async function main() {
     },
   });
 
-  // 3. Boards & Subjects
-  console.log('--- Seeding Boards & Subjects ---');
+  console.log('Seeding boards and subjects...');
   const boards = [
-    { slug: 'cbse', name: 'CBSE', shortName: 'CBSE' },
-    { slug: 'ib-dp', name: 'IB Diploma Programme', shortName: 'IB DP' },
-    { slug: 'igcse', name: 'IGCSE', shortName: 'IGCSE' },
+    { slug: 'cbse', name: 'CBSE', shortName: 'CBSE', status: PageStatus.PUBLISHED },
+    { slug: 'ib-dp', name: 'IB Diploma Programme', shortName: 'IB DP', status: PageStatus.PUBLISHED },
+    { slug: 'igcse', name: 'IGCSE', shortName: 'IGCSE', status: PageStatus.PUBLISHED },
   ];
 
   const createdBoards = [];
-  for (const b of boards) {
+  for (const boardInput of boards) {
     const board = await prisma.board.upsert({
-      where: { slug: b.slug },
-      update: {},
-      create: b,
+      where: { slug: boardInput.slug },
+      update: { status: PageStatus.PUBLISHED },
+      create: boardInput,
     });
     createdBoards.push(board);
   }
 
   const subjects = [
-    { slug: 'mathematics', name: 'Mathematics' },
-    { slug: 'physics', name: 'Physics' },
-    { slug: 'chemistry', name: 'Chemistry' },
-    { slug: 'biology', name: 'Biology' },
-    { slug: 'economics', name: 'Economics' },
+    { slug: 'mathematics', name: 'Mathematics', status: PageStatus.PUBLISHED },
+    { slug: 'physics', name: 'Physics', status: PageStatus.PUBLISHED },
+    { slug: 'chemistry', name: 'Chemistry', status: PageStatus.PUBLISHED },
+    { slug: 'biology', name: 'Biology', status: PageStatus.PUBLISHED },
+    { slug: 'economics', name: 'Economics', status: PageStatus.PUBLISHED },
   ];
 
   const createdSubjects = [];
-  for (const s of subjects) {
+  for (const subjectInput of subjects) {
     const subject = await prisma.subject.upsert({
-      where: { slug: s.slug },
-      update: {},
-      create: s,
+      where: { slug: subjectInput.slug },
+      update: { status: PageStatus.PUBLISHED },
+      create: subjectInput,
     });
     createdSubjects.push(subject);
   }
 
-  // BoardSubject Relations
-  for (const b of createdBoards) {
-    for (const s of createdSubjects) {
+  for (const board of createdBoards) {
+    for (const subject of createdSubjects) {
       await prisma.boardSubject.upsert({
-        where: { boardId_subjectId: { boardId: b.id, subjectId: s.id } },
+        where: {
+          boardId_subjectId: {
+            boardId: board.id,
+            subjectId: subject.id,
+          },
+        },
         update: {},
-        create: { boardId: b.id, subjectId: s.id },
+        create: {
+          boardId: board.id,
+          subjectId: subject.id,
+        },
       });
     }
   }
 
-  // 4. Locations (Sectors & Societies)
-  console.log('--- Seeding Locations ---');
-  const sectors = [
-    { slug: 'sector-43', name: 'Sector 43' },
-    { slug: 'sector-54', name: 'Sector 54' },
-    { slug: 'dlf-phase-5', name: 'DLF Phase 5' },
+  console.log('Seeding class levels...');
+  const classes = [
+    { slug: 'class-10', name: 'Class 10', level: 10 },
+    { slug: 'class-12', name: 'Class 12', level: 12 },
   ];
 
-  for (const sec of sectors) {
+  const createdClasses = [];
+  for (const classInput of classes) {
+    const classLevel = await prisma.classLevel.upsert({
+      where: { slug: classInput.slug },
+      update: {
+        name: classInput.name,
+        level: classInput.level,
+        status: PageStatus.PUBLISHED,
+      },
+      create: {
+        ...classInput,
+        status: PageStatus.PUBLISHED,
+      },
+    });
+    createdClasses.push(classLevel);
+  }
+
+  for (const board of createdBoards) {
+    for (const classLevel of createdClasses) {
+      await prisma.boardClass.upsert({
+        where: {
+          boardId_classLevelId: {
+            boardId: board.id,
+            classLevelId: classLevel.id,
+          },
+        },
+        update: {},
+        create: {
+          boardId: board.id,
+          classLevelId: classLevel.id,
+        },
+      });
+    }
+  }
+
+  for (const subject of createdSubjects) {
+    for (const classLevel of createdClasses) {
+      await prisma.subjectClass.upsert({
+        where: {
+          subjectId_classLevelId: {
+            subjectId: subject.id,
+            classLevelId: classLevel.id,
+          },
+        },
+        update: {},
+        create: {
+          subjectId: subject.id,
+          classLevelId: classLevel.id,
+        },
+      });
+    }
+  }
+
+  console.log('Seeding locations...');
+  const sectors = [
+    { slug: 'sector-43', name: 'Sector 43', status: PageStatus.PUBLISHED },
+    { slug: 'sector-54', name: 'Sector 54', status: PageStatus.PUBLISHED },
+    { slug: 'dlf-phase-5', name: 'DLF Phase 5', status: PageStatus.PUBLISHED },
+  ];
+
+  for (const sectorInput of sectors) {
     const sector = await prisma.sector.upsert({
-      where: { slug: sec.slug },
-      update: {},
-      create: sec,
+      where: { slug: sectorInput.slug },
+      update: { status: PageStatus.PUBLISHED },
+      create: sectorInput,
     });
 
-    if (sec.slug === 'dlf-phase-5') {
+    if (sectorInput.slug === 'dlf-phase-5') {
       const societies = ['The Aralias', 'The Magnolias', 'The Camellias'];
-      for (const socName of societies) {
+      for (const societyName of societies) {
+        const slug = societyName.toLowerCase().replace(/ /g, '-');
         await prisma.society.upsert({
-          where: { slug: socName.toLowerCase().replace(/ /g, '-') },
-          update: {},
+          where: { slug },
+          update: { status: PageStatus.PUBLISHED },
           create: {
-            slug: socName.toLowerCase().replace(/ /g, '-'),
-            name: socName,
+            slug,
+            name: societyName,
             sectorId: sector.id,
+            status: PageStatus.PUBLISHED,
           },
         });
       }
     }
   }
 
-  // 5. Schools
-  console.log('--- Seeding Schools ---');
+  console.log('Seeding schools...');
   const schools = [
-    { slug: 'the-heritage-school', name: 'The Heritage School, Gurugram', address: 'Sector 62' },
-    { slug: 'shri-ram-school', name: 'The Shri Ram School, Moulsari', address: 'DLF Phase 3' },
+    {
+      slug: 'the-heritage-school',
+      name: 'The Heritage School, Gurugram',
+      address: 'Sector 62',
+      status: PageStatus.PUBLISHED,
+    },
+    {
+      slug: 'shri-ram-school',
+      name: 'The Shri Ram School, Moulsari',
+      address: 'DLF Phase 3',
+      status: PageStatus.PUBLISHED,
+    },
   ];
 
-  for (const sch of schools) {
+  for (const schoolInput of schools) {
     await prisma.school.upsert({
-      where: { slug: sch.slug },
-      update: {},
-      create: sch,
+      where: { slug: schoolInput.slug },
+      update: { status: PageStatus.PUBLISHED },
+      create: schoolInput,
     });
   }
 
-  // 6. Page Templates
-  console.log('--- Seeding Page Templates ---');
+  console.log('Seeding page templates...');
   const defaultTemplate = await prisma.pageTemplate.upsert({
     where: { name: 'STANDARD_TUTOR_LIST' },
     update: {},
@@ -168,9 +261,8 @@ async function main() {
     },
   });
 
-  // 7. Tutors
-  console.log('--- Seeding Tutors ---');
-  const sampleTutor = await prisma.tutor.upsert({
+  console.log('Seeding tutors...');
+  await prisma.tutor.upsert({
     where: { slug: 'dr-raj-malhotra' },
     update: {},
     create: {
@@ -189,33 +281,61 @@ async function main() {
       status: TutorStatus.PUBLISHED,
       qualifications: {
         create: [
-          { degree: 'PhD in Physics', institution: 'IIT Delhi', year: 2008 },
-          { degree: 'MSc Physics', institution: 'St. Stephens College', year: 2003 },
+          {
+            degree: 'PhD in Physics',
+            institution: 'IIT Delhi',
+            year: 2008,
+          },
+          {
+            degree: 'MSc Physics',
+            institution: 'St. Stephens College',
+            year: 2003,
+          },
         ],
       },
       boards: {
         create: [
-          { boardId: createdBoards.find((b) => b.slug === 'ib-dp')!.id },
-          { boardId: createdBoards.find((b) => b.slug === 'igcse')!.id },
+          { boardId: createdBoards.find((board) => board.slug === 'ib-dp')!.id },
+          { boardId: createdBoards.find((board) => board.slug === 'igcse')!.id },
         ],
       },
       subjects: {
         create: [
-          { subjectId: createdSubjects.find((s) => s.slug === 'physics')!.id },
+          {
+            subjectId: createdSubjects.find(
+              (subject) => subject.slug === 'physics',
+            )!.id,
+          },
+        ],
+      },
+      classes: {
+        create: [
+          {
+            classLevelId: createdClasses.find(
+              (classLevel) => classLevel.slug === 'class-12',
+            )!.id,
+          },
         ],
       },
       faqs: {
         create: [
-          { question: 'Do you offer online classes?', answer: 'Yes, I use a high-end digital whiteboard setup for online sessions.' },
-          { question: 'What is your success rate?', answer: '90% of my students have achieved a Grade 7 in IB Physics HL.' },
+          {
+            question: 'Do you offer online classes?',
+            answer:
+              'Yes, I use a high-end digital whiteboard setup for online sessions.',
+          },
+          {
+            question: 'What is your success rate?',
+            answer:
+              '90% of my students have achieved a Grade 7 in IB Physics HL.',
+          },
         ],
       },
     },
   });
 
-  // 8. CMS Pages
-  console.log('--- Seeding CMS Pages ---');
-  const homePage = await prisma.pageRecord.upsert({
+  console.log('Seeding CMS pages...');
+  await prisma.pageRecord.upsert({
     where: { slug: 'home' },
     update: {},
     create: {
@@ -225,20 +345,27 @@ async function main() {
       templateId: defaultTemplate.id,
       blocks: {
         create: [
-          { type: 'HERO', content: { title: 'Find the Best Tutors in Gurugram', subtitle: 'Academic Excellence Redefined' }, order: 0 },
+          {
+            type: 'HERO',
+            content: {
+              title: 'Find the Best Tutors in Gurugram',
+              subtitle: 'Academic Excellence Redefined',
+            },
+            order: 0,
+          },
         ],
       },
       seo: {
         create: {
           title: 'Premium Home Tutors in Gurugram | BoardPeFocus',
-          description: 'Connect with elite IB, IGCSE, and CBSE tutors in Gurugram.',
+          description:
+            'Connect with elite IB, IGCSE, and CBSE tutors in Gurugram.',
         },
       },
     },
   });
 
-  // 9. Redirects
-  console.log('--- Seeding Redirects ---');
+  console.log('Seeding redirects...');
   await prisma.redirect.upsert({
     where: { from: '/old-tutors' },
     update: {},
@@ -249,24 +376,26 @@ async function main() {
     },
   });
 
-  // 10. Generation Jobs (Sample)
-  console.log('--- Seeding Generation Jobs ---');
-  await prisma.generationJob.create({
-    data: {
-      type: 'SITEMAP',
-      status: JobStatus.COMPLETED,
-      progress: 100,
-      startedAt: new Date(),
-      completedAt: new Date(),
-    },
-  });
+  console.log('Seeding generation jobs...');
+  const hasGenerationJobs = await prisma.generationJob.count();
+  if (hasGenerationJobs === 0) {
+    await prisma.generationJob.create({
+      data: {
+        type: 'SITEMAP',
+        status: JobStatus.COMPLETED,
+        progress: 100,
+        startedAt: new Date(),
+        completedAt: new Date(),
+      },
+    });
+  }
 
-  console.log('✅ Seeding Completed Successfully!');
+  console.log('Seed completed successfully.');
 }
 
 main()
-  .catch((e) => {
-    console.error('❌ Seeding Failed:', e);
+  .catch((error) => {
+    console.error('Seed failed:', error);
     process.exit(1);
   })
   .finally(async () => {

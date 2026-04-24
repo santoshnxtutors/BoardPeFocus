@@ -31,9 +31,9 @@ export class PageGeneratorService {
       );
 
       // If page existed but no longer eligible, unpublish it (don't delete to preserve history)
-      await this.prisma.page.updateMany({
-        where: { slug, isPublished: true },
-        data: { isPublished: false },
+      await this.prisma.pageRecord.updateMany({
+        where: { slug, status: 'PUBLISHED' },
+        data: { status: 'DRAFT' },
       });
 
       return { status: 'rejected', score, reasons };
@@ -50,56 +50,96 @@ export class PageGeneratorService {
 
     // 6. Transactional Upsert with Versioning & Slug Locking
     const result = await this.prisma.$transaction(async (tx) => {
-      const existingPage = await tx.page.findUnique({ where: { slug } });
+      const existingPage = await tx.pageRecord.findUnique({
+        where: { slug },
+        include: { blocks: true, seo: true },
+      });
 
-      // Slug Locking Check: If a page exists with a different ID but same intent, we might need a redirect
-      // For now, we assume slug is deterministic based on entity IDs.
-
-      const page = await tx.page.upsert({
+      const page = await tx.pageRecord.upsert({
         where: { slug },
         update: {
           title,
-          content,
-          seoTitle: seo.title,
-          seoDesc: seo.description,
-          eligibilityScore: score,
           contentHash: hash,
-          internalLinks: internalLinks as any,
-          isPublished: true,
-          updatedAt: new Date(),
+          status: 'PUBLISHED',
+          ...(context.boardId && { boardId: context.boardId }),
+          ...(context.subjectId && { subjectId: context.subjectId }),
+          ...(context.schoolId && { schoolId: context.schoolId }),
+          ...(context.sectorId && { sectorId: context.sectorId }),
+          ...(context.societyId && { societyId: context.societyId }),
         },
         create: {
           slug,
           title,
-          content,
-          seoTitle: seo.title,
-          seoDesc: seo.description,
-          type: type as any,
-          eligibilityScore: score,
           contentHash: hash,
-          internalLinks: internalLinks as any,
-          isPublished: true,
+          status: 'PUBLISHED',
           ...(context.boardId && { boardId: context.boardId }),
           ...(context.schoolId && { schoolId: context.schoolId }),
           ...(context.subjectId && { subjectId: context.subjectId }),
           ...(context.sectorId && { sectorId: context.sectorId }),
           ...(context.societyId && { societyId: context.societyId }),
-          ...(context.tutorId && { tutorId: context.tutorId }),
         },
       });
 
-      // Create Version History if content changed
+      await tx.contentBlock.deleteMany({ where: { pageRecordId: page.id } });
+      if (Array.isArray(content) && content.length > 0) {
+        await tx.contentBlock.createMany({
+          data: content.map((block, index) => ({
+            pageRecordId: page.id,
+            type: String(block.type ?? 'TEXT_BLOCK').toUpperCase(),
+            content: block as any,
+            order: index,
+          })),
+        });
+      }
+
+      await tx.seoMeta.upsert({
+        where: { pageRecordId: page.id },
+        update: {
+          title: seo.title,
+          description: seo.description,
+        },
+        create: {
+          pageRecordId: page.id,
+          title: seo.title,
+          description: seo.description,
+        },
+      });
+
+      await tx.pageEntityRelation.deleteMany({
+        where: { pageRecordId: page.id },
+      });
+
+      const relationRows = [
+        context.tutorId && { entityType: 'TUTOR', entityId: context.tutorId },
+        context.boardId && { entityType: 'BOARD', entityId: context.boardId },
+        context.subjectId && { entityType: 'SUBJECT', entityId: context.subjectId },
+        context.schoolId && { entityType: 'SCHOOL', entityId: context.schoolId },
+        context.sectorId && { entityType: 'SECTOR', entityId: context.sectorId },
+        context.societyId && { entityType: 'SOCIETY', entityId: context.societyId },
+      ].filter(Boolean);
+
+      if (relationRows.length > 0) {
+        await tx.pageEntityRelation.createMany({
+          data: relationRows.map((row: any) => ({
+            pageRecordId: page.id,
+            entityType: row.entityType,
+            entityId: row.entityId,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      // Create version history if content changed.
       if (!existingPage || existingPage.contentHash !== hash) {
         await tx.pageVersion.create({
           data: {
-            pageId: page.id,
-            content: content,
-            seoTitle: seo.title,
-            seoDesc: seo.description,
-            hash: hash,
-            version: existingPage
-              ? (await tx.pageVersion.count({ where: { pageId: page.id } })) + 1
-              : 1,
+            pageRecordId: page.id,
+            content: {
+              score,
+              blocks: content,
+              seo,
+              internalLinks,
+            } as any,
           },
         });
       }

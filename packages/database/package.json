@@ -4,12 +4,13 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "generate": "prisma generate",
-    "migrate:deploy": "prisma migrate deploy",
-    "db:push": "prisma db push",
-    "db:studio": "prisma studio",
-    "seed": "prisma db seed",
-    "validate": "prisma validate"
+    "generate": "node ../../scripts/prisma-command.cjs generate",
+    "import:frontend-tutors": "node ../../scripts/import-frontend-tutors.cjs",
+    "migrate:deploy": "node ../../scripts/prisma-command.cjs migrate deploy",
+    "db:push": "node ../../scripts/prisma-command.cjs db push",
+    "db:studio": "node ../../scripts/prisma-command.cjs studio",
+    "seed": "node ../../scripts/prisma-command.cjs db seed",
+    "validate": "node ../../scripts/prisma-command.cjs validate"
   },
   "dependencies": {
     "@prisma/client": "^5.19.0",

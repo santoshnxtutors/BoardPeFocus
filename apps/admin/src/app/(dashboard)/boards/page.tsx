@@ -1,69 +1,34 @@
 "use client";
 
-import React from "react";
-import { DataTable } from "@/components/shared/data-table";
-import { Badge } from "@/components/ui/badge";
-import { BookOpen, Plus, Settings2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ContentManager } from "@/components/shared/content-manager";
 
 export default function BoardsPage() {
-  const boards = [
-    { id: '1', name: 'IB', fullName: 'International Baccalaureate', activeSubjects: 24, status: 'ACTIVE' },
-    { id: '2', name: 'IGCSE', fullName: 'Cambridge IGCSE', activeSubjects: 18, status: 'ACTIVE' },
-    { id: '3', name: 'CBSE', fullName: 'Central Board of Secondary Education', activeSubjects: 12, status: 'INACTIVE' },
-  ];
-
-  const columns = [
-    {
-      header: "Board Name",
-      accessorKey: "name",
-      cell: (board: any) => (
-        <div className="space-y-0.5">
-          <p className="font-bold text-slate-900">{board.name}</p>
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{board.fullName}</p>
-        </div>
-      ),
-    },
-    {
-      header: "Active Subjects",
-      accessorKey: "activeSubjects",
-      cell: (board: any) => (
-        <span className="text-sm font-bold text-slate-600">{board.activeSubjects} Subjects</span>
-      ),
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
-      cell: (board: any) => (
-        <Badge variant="outline" className={`text-[9px] font-black tracking-widest uppercase ${board.status === 'ACTIVE' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
-          {board.status}
-        </Badge>
-      ),
-    },
-  ];
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Academic Boards</h1>
-          <p className="text-sm text-slate-500">Manage curriculum boards and their general settings.</p>
-        </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white font-bold">
-          <Plus className="mr-2 h-4 w-4" /> Add Board
-        </Button>
-      </div>
-
-      <DataTable 
-        columns={columns} 
-        data={boards}
-        searchPlaceholder="Search boards..."
-        actions={(board) => (
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Settings2 className="h-4 w-4 text-slate-400" />
-          </Button>
-        )}
-      />
-    </div>
+    <ContentManager
+      entity="boards"
+      title="Academic Boards"
+      description="Create, edit, publish, and relate curriculum boards to classes, subjects, schools, and Gurgaon areas."
+      fields={[
+        { name: "name", label: "Board Name", required: true },
+        { name: "slug", label: "Slug" },
+        { name: "shortName", label: "Short Name" },
+        { name: "description", label: "Short Description", type: "textarea" },
+        { name: "longDescription", label: "Long Description", type: "textarea" },
+        { name: "status", label: "Publish State", type: "select" },
+        { name: "seoTitle", label: "SEO Title" },
+        { name: "metaDescription", label: "Meta Description", type: "textarea" },
+        { name: "canonical", label: "Canonical URL" },
+        { name: "ogTitle", label: "OG Title" },
+        { name: "ogDescription", label: "OG Description", type: "textarea" },
+        { name: "ogImage", label: "OG Image URL" },
+      ]}
+      relationFields={[
+        { name: "classLevelIds", label: "Related Classes", lookupKey: "classes", relationKey: "classes", childKey: "classLevelId", nestedKey: "classLevel" },
+        { name: "subjectIds", label: "Related Subjects", lookupKey: "subjects", relationKey: "subjects", childKey: "subjectId", nestedKey: "subject" },
+        { name: "schoolIds", label: "Related Schools", lookupKey: "schools", relationKey: "schools", childKey: "schoolId", nestedKey: "school" },
+        { name: "sectorIds", label: "Related Sectors", lookupKey: "sectors", relationKey: "sectors", childKey: "sectorId", nestedKey: "sector" },
+        { name: "societyIds", label: "Related Societies", lookupKey: "societies", relationKey: "societies", childKey: "societyId", nestedKey: "society" },
+      ]}
+    />
   );
 }

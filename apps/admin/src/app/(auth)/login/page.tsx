@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Lock, Mail, ChevronRight, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("santosh@nxtutors.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="santosh@nxtutors.com"
+                  placeholder="admin@example.com"
                   className="w-full pl-12 pr-4 py-3 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                 />
               </div>

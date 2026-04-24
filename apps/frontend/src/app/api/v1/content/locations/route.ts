@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getLocations } from "@/lib/mock-api";
+import { fetchBackend } from "@/lib/backend-api";
 
 export async function GET() {
-  return NextResponse.json(getLocations());
+  const response = await fetchBackend("/content/locations");
+  return NextResponse.json(await response.json(), { status: response.status });
 }

@@ -86,7 +86,7 @@ export class ContentAssemblerService {
         {
           type: 'hero',
           h1: `Top Tutors for ${school.name} Students`,
-          text: `Customized support for students of ${school.name}, ${school.location}.`,
+          text: `Customized support for students of ${school.name}, ${(school as any).locality ?? school.address ?? 'Gurugram'}.`,
         },
         {
           type: 'intro',

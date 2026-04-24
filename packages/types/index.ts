@@ -22,6 +22,26 @@ export interface Board {
   name: string;
   shortName?: string;
   description?: string;
+  shortDescription?: string;
+  longDescription?: string;
+  status?: PageStatus;
+  seoTitle?: string;
+  metaDescription?: string;
+  canonical?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ClassLevel {
+  id: string;
+  slug: string;
+  name: string;
+  level?: number;
+  description?: string;
+  status?: PageStatus;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +51,11 @@ export interface Subject {
   slug: string;
   name: string;
   description?: string;
+  shortDescription?: string;
+  longDescription?: string;
+  status?: PageStatus;
+  seoTitle?: string;
+  metaDescription?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +67,12 @@ export interface School {
   description?: string;
   address?: string;
   website?: string;
+  locality?: string;
+  curriculumMix?: string;
+  safeSupportWording?: string;
+  status?: PageStatus;
+  seoTitle?: string;
+  metaDescription?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,6 +82,9 @@ export interface Sector {
   slug: string;
   name: string;
   description?: string;
+  city?: string;
+  corridor?: string;
+  status?: PageStatus;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,6 +94,8 @@ export interface Society {
   slug: string;
   name: string;
   sectorId: string;
+  description?: string;
+  status?: PageStatus;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -74,6 +110,9 @@ export interface Tutor {
   photoUrl?: string;
   tagline?: string;
   bio?: string;
+  about?: string;
+  methodology?: string;
+  teachingMethod?: string;
   experienceYrs: number;
   studentsTaught: number;
   rating: number;
@@ -94,9 +133,55 @@ export interface Lead {
   subject?: string;
   board?: string;
   location?: string;
+  school?: string;
+  preferredMode?: string;
+  preferredTimeSlot?: string;
   message?: string;
   source?: string;
   status: LeadStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Faq {
+  id: string;
+  question: string;
+  answer: string;
+  category?: string;
+  status: PageStatus;
+  visibility: boolean;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ResourceArticle {
+  id: string;
+  slug: string;
+  title: string;
+  category?: string;
+  summary?: string;
+  body?: string;
+  status: PageStatus;
+  seoTitle?: string;
+  metaDescription?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ResultStory {
+  id: string;
+  slug: string;
+  kind: string;
+  title: string;
+  parentName?: string;
+  studentName?: string;
+  context?: string;
+  story: string;
+  rating?: number;
+  scoreLabel?: string;
+  status: ReviewStatus;
+  visibility: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

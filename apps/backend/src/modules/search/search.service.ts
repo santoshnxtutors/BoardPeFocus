@@ -10,59 +10,85 @@ export interface SearchResultItem {
   type: SearchResultType;
 }
 
+export interface SearchResponse {
+  tutors: SearchResultItem[];
+  boards: SearchResultItem[];
+  schools: SearchResultItem[];
+  sectors: SearchResultItem[];
+}
+
 @Injectable()
 export class SearchService {
   constructor(private prisma: PrismaService) {}
 
-  async globalSearch(query: string) {
-    if (!query || query.length < 2) return [];
+  async globalSearch(query: string): Promise<SearchResponse> {
+    const normalizedQuery = query?.trim() ?? '';
+    if (normalizedQuery.length < 2) {
+      return {
+        tutors: [],
+        boards: [],
+        schools: [],
+        sectors: [],
+      };
+    }
 
     const [tutors, boards, schools, sectors] = await Promise.all([
       this.prisma.tutor.findMany({
         where: {
-          name: { contains: query, mode: 'insensitive' },
+          name: { contains: normalizedQuery, mode: 'insensitive' },
           isVerified: true,
+          status: 'PUBLISHED',
+          deletedAt: null,
         },
         take: 5,
       }),
-      this.prisma.board.findMany({
-        where: { name: { contains: query, mode: 'insensitive' } },
+      (this.prisma as any).board.findMany({
+        where: {
+          name: { contains: normalizedQuery, mode: 'insensitive' },
+          status: 'PUBLISHED',
+        },
         take: 3,
       }),
-      this.prisma.school.findMany({
-        where: { name: { contains: query, mode: 'insensitive' } },
+      (this.prisma as any).school.findMany({
+        where: {
+          name: { contains: normalizedQuery, mode: 'insensitive' },
+          status: 'PUBLISHED',
+        },
         take: 3,
       }),
-      this.prisma.sector.findMany({
-        where: { name: { contains: query, mode: 'insensitive' } },
+      (this.prisma as any).sector.findMany({
+        where: {
+          name: { contains: normalizedQuery, mode: 'insensitive' },
+          status: 'PUBLISHED',
+        },
         take: 3,
       }),
     ]);
 
     return {
-      tutors: tutors.map<SearchResultItem>((t) => ({
+      tutors: tutors.map((t) => ({
         id: t.id,
         name: t.name,
         slug: t.slug,
-        type: 'tutor',
+        type: 'tutor' as const,
       })),
-      boards: boards.map<SearchResultItem>((b) => ({
+      boards: boards.map((b) => ({
         id: b.id,
         name: b.name,
         slug: b.slug,
-        type: 'board',
+        type: 'board' as const,
       })),
-      schools: schools.map<SearchResultItem>((s) => ({
+      schools: schools.map((s) => ({
         id: s.id,
         name: s.name,
         slug: s.slug,
-        type: 'school',
+        type: 'school' as const,
       })),
-      sectors: sectors.map<SearchResultItem>((sec) => ({
+      sectors: sectors.map((sec) => ({
         id: sec.id,
         name: sec.name,
         slug: sec.slug,
-        type: 'sector',
+        type: 'sector' as const,
       })),
     };
   }

@@ -20,6 +20,7 @@ import Link from "next/link";
 export default function TutorsPage() {
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadTutors();
@@ -27,13 +28,27 @@ export default function TutorsPage() {
 
   const loadTutors = async () => {
     setIsLoading(true);
+    setError("");
     try {
       const data = await api.tutors.list();
       setTutors(data);
     } catch (error) {
-      console.error("Failed to load tutors:", error);
+      setError(error instanceof Error ? error.message : "Failed to load tutors.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const archiveTutor = async (id: string) => {
+    const confirmed = window.confirm("Archive this tutor profile?");
+    if (!confirmed) return;
+
+    setError("");
+    try {
+      await api.tutors.delete(id);
+      await loadTutors();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to archive tutor.");
     }
   };
 
@@ -121,6 +136,12 @@ export default function TutorsPage() {
         </Link>
       </div>
 
+      {error && (
+        <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-700">
+          {error}
+        </div>
+      )}
+
       <DataTable 
         columns={columns} 
         data={tutors} 
@@ -133,7 +154,7 @@ export default function TutorsPage() {
                 <Edit className="h-4 w-4 text-slate-500" />
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-rose-600">
+            <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-rose-600" onClick={() => void archiveTutor(tutor.id)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getSchools } from "@/lib/mock-api";
+import { fetchBackend } from "@/lib/backend-api";
 
 export async function GET() {
-  return NextResponse.json(getSchools());
+  const response = await fetchBackend("/content/schools");
+  return NextResponse.json(await response.json(), { status: response.status });
 }

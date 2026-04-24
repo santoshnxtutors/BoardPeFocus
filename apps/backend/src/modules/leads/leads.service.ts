@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Lead, LeadStatus } from '@boardpefocus/database';
 import { PrismaService } from '../../common/database/prisma.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
@@ -7,7 +8,10 @@ import { CreateLeadDto } from './dto/create-lead.dto';
 export class LeadsService {
   private readonly logger = new Logger(LeadsService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async create(dto: CreateLeadDto) {
     const lead = await this.prisma.lead.create({
@@ -17,7 +21,7 @@ export class LeadsService {
       },
     });
 
-    this.logger.log(`New lead created: ${lead.id} from ${lead.name}`);
+    this.logger.log(`New lead created: ${lead.id}`);
 
     // Trigger notification (async)
     void this.triggerNotification(lead);
@@ -44,20 +48,37 @@ export class LeadsService {
 
   private async triggerNotification(lead: Lead) {
     try {
+      const adminPhone = this.configService.get<string>('ADMIN_PHONE_NUMBER');
+      if (!adminPhone) {
+        this.logger.warn(
+          `Skipping lead notification for ${lead.id} because ADMIN_PHONE_NUMBER is not configured.`,
+        );
+        return;
+      }
+
       // Persist outbound notification intent until the delivery layer is wired in.
       await this.prisma.notificationDelivery.create({
         data: {
           type: 'WHATSAPP',
-          recipient: process.env.ADMIN_PHONE_NUMBER ?? lead.phone,
+          recipient: adminPhone,
           subject: `New lead: ${lead.name}`,
-          content: JSON.stringify(lead),
+          content: JSON.stringify({
+            leadId: lead.id,
+            name: lead.name,
+            phone: lead.phone,
+            email: lead.email,
+            board: lead.board,
+            subject: lead.subject,
+            location: lead.location,
+            createdAt: lead.createdAt.toISOString(),
+          }),
           status: 'PENDING',
         },
       });
     } catch (error) {
       this.logger.error(
         `Failed to trigger notification for lead ${lead.id}`,
-        error,
+        error instanceof Error ? error.stack : undefined,
       );
     }
   }

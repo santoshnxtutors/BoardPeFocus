@@ -8,6 +8,10 @@ export class PublicLeadsController {
 
   @Post()
   async create(@Body() createLeadDto: CreateLeadDto) {
-    return this.leadsService.create(createLeadDto);
+    const lead = await this.leadsService.create(createLeadDto);
+    return {
+      success: true,
+      id: lead.id,
+    };
   }
 }

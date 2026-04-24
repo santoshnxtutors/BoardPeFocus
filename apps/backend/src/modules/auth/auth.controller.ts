@@ -7,6 +7,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 interface AuthenticatedRequest {
   user: {
     userId: string;
+    role: string;
+    roles: string[];
   };
 }
 

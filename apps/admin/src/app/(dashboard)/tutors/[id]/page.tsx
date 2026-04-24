@@ -35,6 +35,7 @@ export default function TutorDetailPage() {
   const [tutor, setTutor] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (id && id !== "new") {
@@ -47,12 +48,13 @@ export default function TutorDetailPage() {
       const data = await api.tutors.get(tutorId);
       setTutor(data);
     } catch (error) {
-      console.error("Failed to load tutor:", error);
+      setError(error instanceof Error ? error.message : "Failed to load tutor.");
     }
   };
 
   const handleSave = async () => {
     setIsSaving(true);
+    setError("");
     try {
       if (id === "new") {
         await api.tutors.create(tutor);
@@ -61,7 +63,7 @@ export default function TutorDetailPage() {
       }
       router.push("/dashboard/tutors");
     } catch (error) {
-      console.error("Failed to save tutor:", error);
+      setError(error instanceof Error ? error.message : "Failed to save tutor.");
     } finally {
       setIsSaving(false);
     }
@@ -110,10 +112,16 @@ export default function TutorDetailPage() {
             onClick={handleSave}
             disabled={isSaving}
           >
-            <Save className="mr-2 h-4 w-4" /> {isSaving ? "Saving..." : "Publish Changes"}
+            <Save className="mr-2 h-4 w-4" /> {isSaving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-700">
+          {error}
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8">
         <aside className="lg:w-64 shrink-0 space-y-1">
@@ -215,15 +223,24 @@ export default function TutorDetailPage() {
                           className="w-5 h-5 rounded border-slate-300"
                         />
                       </div>
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <span className="text-sm font-bold">Verified Tutor</span>
+                        <input
+                          type="checkbox"
+                          checked={Boolean(tutor.isVerified)}
+                          onChange={(e) => setTutor({...tutor, isVerified: e.target.checked})}
+                          className="w-5 h-5 rounded border-slate-300"
+                        />
+                      </div>
                    </div>
                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-xs font-black uppercase tracking-widest text-slate-400">Experience (Yrs)</label>
-                        <Input type="number" value={tutor.experienceYrs || 0} onChange={(e) => setTutor({...tutor, experienceYrs: parseInt(e.target.value)})} />
+                        <Input type="number" value={tutor.experienceYrs || 0} onChange={(e) => setTutor({...tutor, experienceYrs: Number(e.target.value) || 0})} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-black uppercase tracking-widest text-slate-400">Students Taught</label>
-                        <Input type="number" value={tutor.studentsTaught || 0} onChange={(e) => setTutor({...tutor, studentsTaught: parseInt(e.target.value)})} />
+                        <Input type="number" value={tutor.studentsTaught || 0} onChange={(e) => setTutor({...tutor, studentsTaught: Number(e.target.value) || 0})} />
                       </div>
                    </div>
                 </CardContent>
@@ -343,6 +360,19 @@ export default function TutorDetailPage() {
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-black uppercase tracking-widest text-slate-400">Publish State</label>
+                      <select
+                        value={tutor.status || "DRAFT"}
+                        onChange={(e) => setTutor({...tutor, status: e.target.value})}
+                        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
+                      >
+                        <option value="DRAFT">Draft</option>
+                        <option value="PENDING_REVIEW">Pending Review</option>
+                        <option value="PUBLISHED">Published</option>
+                        <option value="ARCHIVED">Archived</option>
+                      </select>
+                    </div>
                     <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-slate-400">Canonical URL</label>
                       <Input value={`/tutors/${tutor.slug}`} disabled className="bg-slate-50 border-slate-100 font-mono text-xs" />

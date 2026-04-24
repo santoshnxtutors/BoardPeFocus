@@ -93,7 +93,7 @@ export class ScoringService {
     if (!society)
       return { score: 0, eligible: false, reasons: ['Society not found'] };
 
-    const tutorsCount = await this.prisma.tutorLocation.count({
+    const tutorsCount = await (this.prisma as any).tutorLocationCoverage.count({
       where: { sectorId: society.sectorId },
     });
     const eligible =

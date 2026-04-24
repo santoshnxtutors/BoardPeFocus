@@ -20,6 +20,7 @@ import Link from "next/link";
 export default function PagesManagementPage() {
   const [pages, setPages] = useState<PageRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadPages();
@@ -27,18 +28,24 @@ export default function PagesManagementPage() {
 
   const loadPages = async () => {
     setIsLoading(true);
+    setError("");
     try {
-      const fallbackPages: PageRecord[] = [
-        { id: '1', slug: 'home', title: 'Home | BoardPeFocus', status: 'PUBLISHED', createdAt: new Date(), updatedAt: new Date() },
-        { id: '2', slug: 'ib-tutors-gurugram', title: 'IB Tutors in Gurugram', status: 'PUBLISHED', createdAt: new Date(), updatedAt: new Date() },
-        { id: '3', slug: 'igcse-physics-tutor-sector-54', title: 'IGCSE Physics Tutors in Sector 54', status: 'DRAFT', createdAt: new Date(), updatedAt: new Date() },
-      ];
-      const data = await api.pages.list().catch(() => fallbackPages);
+      const data = await api.pages.list();
       setPages(data);
     } catch (error) {
-      console.error("Failed to load pages:", error);
+      setError(error instanceof Error ? error.message : "Failed to load pages.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    setError("");
+    try {
+      await api.pages.update(id, { status });
+      await loadPages();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to update page.");
     }
   };
 
@@ -112,6 +119,12 @@ export default function PagesManagementPage() {
         </div>
       </div>
 
+      {error && (
+        <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-700">
+          {error}
+        </div>
+      )}
+
       <DataTable 
         columns={columns} 
         data={pages} 
@@ -119,9 +132,15 @@ export default function PagesManagementPage() {
         searchPlaceholder="Search pages by title or slug..."
         actions={(page) => (
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Settings2 className="h-4 w-4 text-slate-400" />
-            </Button>
+            <select
+              value={page.status}
+              onChange={(event) => void updateStatus(page.id, event.target.value)}
+              className="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs font-bold"
+            >
+              <option value="DRAFT">Draft</option>
+              <option value="PUBLISHED">Published</option>
+              <option value="ARCHIVED">Archived</option>
+            </select>
           </div>
         )}
       />

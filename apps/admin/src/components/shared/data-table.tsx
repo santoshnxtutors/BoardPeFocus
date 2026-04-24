@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -7,9 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Search, Filter, MoreHorizontal } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 
 interface Column<T> {
   header: string;
@@ -34,6 +33,18 @@ export function DataTable<T>({
   onSearch,
   actions,
 }: DataTableProps<T>) {
+  const [localSearch, setLocalSearch] = useState("");
+  const filteredData = useMemo(() => {
+    if (onSearch) return data;
+    const query = localSearch.trim().toLowerCase();
+    if (!query) return data;
+    return data.filter((item) =>
+      Object.values(item as Record<string, unknown>).some((value) =>
+        String(value ?? "").toLowerCase().includes(query),
+      ),
+    );
+  }, [data, localSearch, onSearch]);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -42,13 +53,13 @@ export function DataTable<T>({
           <Input
             placeholder={searchPlaceholder}
             className="pl-8"
-            onChange={(e) => onSearch?.(e.target.value)}
+            value={localSearch}
+            onChange={(e) => {
+              setLocalSearch(e.target.value);
+              onSearch?.(e.target.value);
+            }}
           />
         </div>
-        <Button variant="outline" size="sm">
-          <Filter className="mr-2 h-4 w-4" />
-          Filter
-        </Button>
       </div>
 
       <div className="rounded-md border bg-white">
@@ -71,15 +82,15 @@ export function DataTable<T>({
                   </div>
                 </TableCell>
               </TableRow>
-            ) : data.length === 0 ? (
+            ) : filteredData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length + (actions ? 1 : 0)} className="h-24 text-center">
                   No results found.
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((item, i) => (
-                <TableRow key={i}>
+              filteredData.map((item, i) => (
+                <TableRow key={(item as any).id ?? i}>
                   {columns.map((col, j) => (
                     <TableCell key={j}>
                       {col.cell ? col.cell(item) : (item as any)[col.accessorKey]}

@@ -14,6 +14,7 @@ import { LeadForm } from "@/components/forms/LeadForm";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJsonLd, generateTutorJsonLd } from "@/lib/seo";
 import { TutorProfileViewModel } from "@/types/tutor-profile";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { fetchBackend } from "@/lib/backend-api";
 
 // New high-fidelity components
 import { TutorHero } from "@/components/sections/tutor/TutorHero";
@@ -28,7 +29,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps) {
   const { tutorSlug } = await params;
-  const tutor = mockTutors.find(t => t.slug === tutorSlug);
+  const tutor = await getPublishedTutor(tutorSlug);
   
   if (!tutor) return constructMetadata({ title: "Tutor Not Found", noIndex: true });
 
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function TutorProfilePage({ params }: PageProps) {
   const { tutorSlug } = await params;
-  const tutorData = mockTutors.find(t => t.slug === tutorSlug);
+  const tutorData = await getPublishedTutor(tutorSlug);
 
   if (!tutorData) {
     notFound();
@@ -67,11 +68,7 @@ export default async function TutorProfilePage({ params }: PageProps) {
     results: { label: string; value: string }[];
     locations: string[];
     coverage: { sectors: string[]; societies: string[] };
-  } = {
-    ...tutorData,
-    faqs: buildTutorFaqs(tutorData),
-    reviews: buildTutorNotes(tutorData),
-  };
+  } = tutorData;
 
   const jsonLd = generateTutorJsonLd(tutor);
   const faqJsonLd = generateFaqJsonLd(tutor.faqs);
@@ -335,11 +332,133 @@ export default async function TutorProfilePage({ params }: PageProps) {
   );
 }
 
+async function getPublishedTutor(slug: string) {
+  try {
+    const response = await fetchBackend(`/public/tutors/${encodeURIComponent(slug)}`);
+    if (response.ok) {
+      const rawTutor = await response.json();
+      return normalizeBackendTutor(rawTutor);
+    }
+  } catch {
+    // Public pages should fail closed unless mock fallback is explicitly enabled.
+  }
+
+  if (process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true") {
+    const mockTutor = mockTutors.find((item) => item.slug === slug);
+    if (!mockTutor) return null;
+    return {
+      ...mockTutor,
+      faqs: buildTutorFaqs(mockTutor),
+      reviews: buildTutorNotes(mockTutor),
+    };
+  }
+
+  return null;
+}
+
+function normalizeBackendTutor(rawTutor: any) {
+  const boards = (rawTutor.boards ?? [])
+    .map((item: any) => item?.board?.name ?? item?.name)
+    .filter(Boolean);
+  const subjects = (rawTutor.subjects ?? [])
+    .map((item: any) => item?.subject?.name ?? item?.name)
+    .filter(Boolean);
+  const schools = (rawTutor.schools ?? [])
+    .map((item: any) => item?.school?.name ?? item?.name)
+    .filter(Boolean);
+  const sectorNames = (rawTutor.locations ?? [])
+    .map((item: any) => item?.sector?.name)
+    .filter(Boolean);
+  const societyNames = (rawTutor.locations ?? [])
+    .map((item: any) => item?.society?.name)
+    .filter(Boolean);
+  const locations = [...sectorNames, ...societyNames];
+  const about =
+    rawTutor.about ||
+    rawTutor.bio ||
+    rawTutor.tagline ||
+    `${rawTutor.name} is a verified BoardPeFocus tutor in Gurugram.`;
+
+  const normalized = {
+    ...rawTutor,
+    rating: rawTutor.rating ?? 0,
+    reviewsCount: rawTutor.reviewsCount ?? rawTutor.reviews?.length ?? 0,
+    experienceYrs: rawTutor.experienceYrs ?? 0,
+    studentsTaught: rawTutor.studentsTaught ?? 0,
+    about,
+    teachingPhilosophy:
+      rawTutor.teachingMethod ||
+      rawTutor.methodology ||
+      "The tutoring plan is built around steady concept clarity, board-aware revision, and calm one-to-one execution.",
+    methodology: rawTutor.methodology || rawTutor.teachingMethod || about,
+    boards,
+    subjects,
+    schools,
+    locations,
+    coverage: {
+      sectors: sectorNames,
+      societies: societyNames,
+    },
+    results: [
+      { label: "Experience", value: `${rawTutor.experienceYrs ?? 0} years` },
+      { label: "Students Taught", value: `${rawTutor.studentsTaught ?? 0}+` },
+    ],
+    reviews: (rawTutor.reviews ?? []).map((review: any) => ({
+      id: review.id,
+      parentName: review.parentName,
+      studentName: review.studentName,
+      rating: review.rating,
+      comment: review.comment,
+    })),
+    faqs: (rawTutor.faqs ?? []).map((faq: any) => ({
+      id: faq.id,
+      question: faq.question,
+      answer: faq.answer,
+    })),
+  };
+
+  return {
+    ...normalized,
+    faqs: normalized.faqs.length > 0 ? normalized.faqs : buildGenericTutorFaqs(normalized),
+    reviews:
+      normalized.reviews.length > 0
+        ? normalized.reviews
+        : buildGenericTutorNotes(normalized),
+  };
+}
+
 function formatList(items: string[]) {
   if (items.length === 0) return "";
   if (items.length === 1) return items[0];
   if (items.length === 2) return `${items[0]} and ${items[1]}`;
   return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
+
+function buildGenericTutorFaqs(tutor: any) {
+  return [
+    {
+      id: "backend-faq-1",
+      question: `Which boards and subjects does ${tutor.name} cover?`,
+      answer: `${tutor.name} supports ${formatList(tutor.boards)} students in ${formatList(tutor.subjects)}.`,
+    },
+    {
+      id: "backend-faq-2",
+      question: `Where is ${tutor.name} available in Gurugram?`,
+      answer: `This profile is relevant for ${formatList(tutor.locations.slice(0, 5)) || "Gurugram"} families, subject to schedule fit.`,
+    },
+  ];
+}
+
+function buildGenericTutorNotes(tutor: any) {
+  return [
+    {
+      id: "backend-review-1",
+      parentName: "BoardPeFocus family",
+      studentName: tutor.subjects[0] ?? "Board preparation",
+      rating: Math.round(tutor.rating || 5),
+      comment: `A structured one-to-one option for families seeking ${formatList(tutor.subjects)} support with board-aware planning.`,
+    },
+  ];
 }
 
 function buildTutorFaqs(tutor: (typeof mockTutors)[number]) {

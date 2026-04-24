@@ -9,11 +9,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TutorsService } from '../tutors.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { CreateTutorDto } from '../dto/create-tutor.dto';
+import { UpdateTutorDto } from '../dto/update-tutor.dto';
+
+const ADMIN_ROLES = ['SUPERADMIN', 'EDITOR'];
 
 @ApiTags('Admin Tutors')
-@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(...ADMIN_ROLES)
 @Controller('admin/tutors')
 export class AdminTutorsController {
   constructor(private readonly tutorsService: TutorsService) {}
@@ -21,7 +29,7 @@ export class AdminTutorsController {
   @Get()
   @ApiOperation({ summary: 'Get all tutors (admin)' })
   findAll() {
-    return this.tutorsService.findAllPublic({});
+    return this.tutorsService.findAllAdmin();
   }
 
   @Get(':id')
@@ -32,13 +40,13 @@ export class AdminTutorsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new tutor' })
-  create(@Body() data: any) {
+  create(@Body() data: CreateTutorDto) {
     return this.tutorsService.create(data);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a tutor' })
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() data: UpdateTutorDto) {
     return this.tutorsService.update(id, data);
   }
 

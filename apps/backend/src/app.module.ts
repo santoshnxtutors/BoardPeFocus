@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { PrismaService } from './common/database/prisma.service';
+import { PrismaModule } from './common/database/prisma.module';
+import { validateEnvironment } from './config/environment';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ContentModule } from './modules/content/content.module';
+import { FaqsModule } from './modules/faqs/faqs.module';
 import { HealthController } from './modules/health/health.controller';
 
 // Leads
@@ -24,10 +26,17 @@ import { PublicBoardsController } from './modules/boards/public-boards.controlle
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+      ignoreEnvFile: true,
+      validate: validateEnvironment,
+    }),
+    PrismaModule,
     AuthModule,
     AdminModule,
     ContentModule,
+    FaqsModule,
     TutorsModule,
   ],
   controllers: [
@@ -36,6 +45,6 @@ import { PublicBoardsController } from './modules/boards/public-boards.controlle
     PublicSearchController,
     PublicBoardsController,
   ],
-  providers: [PrismaService, LeadsService, SearchService, BoardsService],
+  providers: [LeadsService, SearchService, BoardsService],
 })
 export class AppModule {}

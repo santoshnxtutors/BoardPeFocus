@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateLeadDto {
   @IsString()
@@ -35,6 +42,14 @@ export class CreateLeadDto {
 
   @IsString()
   @IsOptional()
+  preferredMode?: string;
+
+  @IsString()
+  @IsOptional()
+  preferredTimeSlot?: string;
+
+  @IsString()
+  @IsOptional()
   message?: string;
 
   @IsString()
@@ -46,5 +61,7 @@ export class CreateLeadDto {
   pageUrl?: string;
 
   @IsOptional()
+  @IsObject()
+  @Type(() => Object)
   campaignParams?: Record<string, string>;
 }
