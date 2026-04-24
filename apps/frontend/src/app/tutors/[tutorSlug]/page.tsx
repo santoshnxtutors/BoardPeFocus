@@ -27,6 +27,10 @@ interface PageProps {
   params: Promise<{ tutorSlug: string }>;
 }
 
+export function generateStaticParams() {
+  return mockTutors.map((tutor) => ({ tutorSlug: tutor.slug }));
+}
+
 export async function generateMetadata({ params }: PageProps) {
   const { tutorSlug } = await params;
   const tutor = await getPublishedTutor(tutorSlug);
@@ -333,6 +337,15 @@ export default async function TutorProfilePage({ params }: PageProps) {
 }
 
 async function getPublishedTutor(slug: string) {
+  const mockTutor = mockTutors.find((item) => item.slug === slug);
+  if (mockTutor) {
+    return {
+      ...mockTutor,
+      faqs: buildTutorFaqs(mockTutor),
+      reviews: buildTutorNotes(mockTutor),
+    };
+  }
+
   try {
     const response = await fetchBackend(`/public/tutors/${encodeURIComponent(slug)}`);
     if (response.ok) {
@@ -340,18 +353,10 @@ async function getPublishedTutor(slug: string) {
       return normalizeBackendTutor(rawTutor);
     }
   } catch {
-    // Fall through to the curated tutor dataset below.
+    // Fall through to the backend miss below.
   }
 
-  const mockTutor = mockTutors.find((item) => item.slug === slug);
-  if (!mockTutor) return null;
-
-  return {
-    ...mockTutor,
-    faqs: buildTutorFaqs(mockTutor),
-    reviews: buildTutorNotes(mockTutor),
-  };
-
+  return null;
 }
 
 function normalizeBackendTutor(rawTutor: any) {
