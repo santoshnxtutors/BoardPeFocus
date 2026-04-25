@@ -2,11 +2,57 @@ const backendApiBaseUrl = (
   process.env.BACKEND_API_URL || "http://127.0.0.1:3001/api"
 ).replace(/\/$/, "");
 
+const allowedOrigins = new Set([
+  "https://www.boardpefocus.in",
+  "https://admin.boardpefocus.in",
+]);
+
 type RouteContext = {
   params: Promise<{
     path: string[];
   }>;
 };
+
+function createCorsHeaders(request: Request) {
+  const headers = new Headers();
+  const origin = request.headers.get("origin");
+
+  if (origin && allowedOrigins.has(origin)) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Access-Control-Allow-Credentials", "true");
+    headers.set("Vary", "Origin");
+  }
+
+  headers.set(
+    "Access-Control-Allow-Methods",
+    "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
+  );
+  headers.set(
+    "Access-Control-Allow-Headers",
+    request.headers.get("access-control-request-headers") ||
+      "Authorization, Content-Type",
+  );
+
+  return headers;
+}
+
+function withCors(response: Response, request: Request) {
+  const headers = new Headers(response.headers);
+  createCorsHeaders(request).forEach((value, key) => {
+    if (key.toLowerCase() === "vary" && headers.has("Vary")) {
+      headers.set("Vary", `${headers.get("Vary")}, ${value}`);
+      return;
+    }
+
+    headers.set(key, value);
+  });
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
 
 function createBackendUrl(path: string[], requestUrl: string) {
   const request = new URL(requestUrl);
@@ -44,10 +90,20 @@ async function proxyToBackend(request: Request, context: RouteContext) {
     duplex: "half",
   } as RequestInit & { duplex: "half" });
 
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: response.headers,
+  return withCors(
+    new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+    }),
+    request,
+  );
+}
+
+export function OPTIONS(request: Request) {
+  return new Response(null, {
+    status: 204,
+    headers: createCorsHeaders(request),
   });
 }
 
