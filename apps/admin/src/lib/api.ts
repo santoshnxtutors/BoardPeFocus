@@ -6,19 +6,27 @@ import {
 function resolveApiBaseUrl() {
   const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
 
-  if (configuredApiBaseUrl) {
-    return configuredApiBaseUrl;
-  }
-
   if (typeof window !== 'undefined') {
     const { protocol, hostname } = window.location;
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+
+    if (!isLocalhost && hostname === 'admin.boardpefocus.in') {
+      return '/api';
+    }
+
+    if (configuredApiBaseUrl) {
+      return configuredApiBaseUrl;
+    }
 
     if (isLocalhost) {
       return 'http://localhost:3001/api';
     }
 
     return `${protocol}//${hostname}/api`;
+  }
+
+  if (configuredApiBaseUrl) {
+    return configuredApiBaseUrl;
   }
 
   return 'http://localhost:3001/api';
