@@ -24,10 +24,7 @@ const apps = [
       PORT: '3001',
     },
   },
-];
-
-if (process.env.START_ADMIN === 'true') {
-  apps.push({
+  {
     name: 'boardpefocus-admin',
     cwd: __dirname,
     script: pnpm,
@@ -38,7 +35,7 @@ if (process.env.START_ADMIN === 'true') {
       PORT: '3002',
       BACKEND_API_URL: 'http://127.0.0.1:3001/api',
     },
-  });
-}
+  },
+];
 
 module.exports = { apps };
