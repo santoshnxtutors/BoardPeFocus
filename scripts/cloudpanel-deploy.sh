@@ -119,6 +119,46 @@ clean_next_build_state() {
     "$APP_DIR/.turbo/cache"
 }
 
+find_port_pids() {
+  local port="$1"
+
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -ti "tcp:$port" 2>/dev/null || true
+    return
+  fi
+
+  if command -v fuser >/dev/null 2>&1; then
+    fuser "$port/tcp" 2>/dev/null || true
+    return
+  fi
+
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltnp "sport = :$port" 2>/dev/null \
+      | sed -n 's/.*pid=\([0-9]\+\).*/\1/p' \
+      | sort -u
+  fi
+}
+
+stop_port_listeners() {
+  local port
+  local pids
+
+  echo "Stopping old listeners on app ports..."
+  for port in 3000 3001 3002; do
+    pids="$(find_port_pids "$port" | tr '\n' ' ')"
+    if [ -z "${pids// }" ]; then
+      continue
+    fi
+
+    echo "Stopping port $port listeners: $pids"
+    # shellcheck disable=SC2086
+    kill $pids >/dev/null 2>&1 || true
+    sleep 2
+    # shellcheck disable=SC2086
+    kill -9 $pids >/dev/null 2>&1 || true
+  done
+}
+
 ensure_pnpm() {
   if command -v pnpm >/dev/null 2>&1; then
     return
@@ -162,6 +202,7 @@ for app in "${PM2_APPS[@]}"; do
 done
 
 stop_stale_build_processes
+stop_port_listeners
 clean_next_build_state
 
 # Load production backend environment so Prisma can read DATABASE_URL.
