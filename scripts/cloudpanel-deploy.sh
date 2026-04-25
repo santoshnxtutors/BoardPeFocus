@@ -59,6 +59,66 @@ require_command() {
   fi
 }
 
+acquire_deploy_lock() {
+  local lock_file="$APP_DIR/.cloudpanel-deploy.lock"
+
+  exec 9>"$lock_file"
+  if ! flock -w 900 9; then
+    echo "Another CloudPanel deploy is still running for $APP_DIR."
+    echo "Wait a few minutes, then rerun this workflow."
+    exit 1
+  fi
+}
+
+stop_stale_build_processes() {
+  local stale_pids=()
+  local pid
+  local args
+  local cwd
+
+  echo "Checking for stale Next.js/Turbo build processes..."
+  while read -r pid args; do
+    if [ -z "${pid:-}" ] || [ "$pid" = "$$" ] || [ "$pid" = "${PPID:-}" ]; then
+      continue
+    fi
+
+    cwd="$(readlink -f "/proc/$pid/cwd" 2>/dev/null || true)"
+    case "$cwd" in
+      "$APP_DIR" | "$APP_DIR"/*) ;;
+      *) continue ;;
+    esac
+
+    case "$args" in
+      *next*" build"* | \
+      *turbo*" run build"* | \
+      *pnpm*" build:prod"* | \
+      *pnpm*" run build"*)
+        stale_pids+=("$pid")
+        ;;
+    esac
+  done < <(ps -eo pid=,args=)
+
+  if [ "${#stale_pids[@]}" -eq 0 ]; then
+    return
+  fi
+
+  echo "Stopping stale build processes: ${stale_pids[*]}"
+  kill "${stale_pids[@]}" >/dev/null 2>&1 || true
+  sleep 5
+  kill -9 "${stale_pids[@]}" >/dev/null 2>&1 || true
+}
+
+clean_next_build_state() {
+  echo "Cleaning stale Next.js build locks..."
+  rm -f \
+    "$APP_DIR/apps/frontend/.next/lock" \
+    "$APP_DIR/apps/admin/.next/lock"
+  rm -rf \
+    "$APP_DIR/apps/frontend/next.lock" \
+    "$APP_DIR/apps/admin/next.lock" \
+    "$APP_DIR/.turbo/cache"
+}
+
 ensure_pnpm() {
   if command -v pnpm >/dev/null 2>&1; then
     return
@@ -93,11 +153,16 @@ export PNPM_BIN
 PNPM_BIN="$(command -v pnpm)"
 
 cd "$APP_DIR"
+require_command "flock" "Install flock on Ubuntu with: sudo apt-get install -y util-linux"
+acquire_deploy_lock
 
 echo "Stopping old BoardPeFocus PM2 apps..."
 for app in "${PM2_APPS[@]}"; do
   pm2 delete "$app" >/dev/null 2>&1 || true
 done
+
+stop_stale_build_processes
+clean_next_build_state
 
 # Load production backend environment so Prisma can read DATABASE_URL.
 if [ -f "$BACKEND_ENV_FILE" ]; then
