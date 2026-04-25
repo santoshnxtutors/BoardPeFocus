@@ -53,7 +53,9 @@ export class TutorsService {
     const slug = this.toSlug(slugSource);
 
     if (!slug) {
-      throw new BadRequestException('Slug could not be generated for this tutor.');
+      throw new BadRequestException(
+        'Slug could not be generated for this tutor.',
+      );
     }
 
     if (
@@ -79,6 +81,12 @@ export class TutorsService {
       about: this.normalizeOptionalString(dto.about),
       methodology: this.normalizeOptionalString(dto.methodology),
       teachingMethod: this.normalizeOptionalString(dto.teachingMethod),
+      seoTitle: this.normalizeOptionalString(dto.seoTitle),
+      metaDescription: this.normalizeOptionalString(dto.metaDescription),
+      canonical: this.normalizeOptionalString(dto.canonical),
+      ogTitle: this.normalizeOptionalString(dto.ogTitle),
+      ogDescription: this.normalizeOptionalString(dto.ogDescription),
+      ogImage: this.normalizeOptionalString(dto.ogImage),
       experienceYrs: dto.experienceYrs ?? 0,
       studentsTaught: dto.studentsTaught ?? 0,
       hourlyRateMin: dto.hourlyRateMin ?? null,
@@ -111,7 +119,9 @@ export class TutorsService {
     if (dto.slug !== undefined) {
       const normalizedSlug = this.toSlug(dto.slug);
       if (!normalizedSlug) {
-        throw new BadRequestException('Slug could not be generated for this tutor.');
+        throw new BadRequestException(
+          'Slug could not be generated for this tutor.',
+        );
       }
       data.slug = normalizedSlug;
     }
@@ -119,7 +129,8 @@ export class TutorsService {
       data.displayName = this.normalizeOptionalString(dto.displayName);
     }
     if (dto.email !== undefined) {
-      data.email = this.normalizeOptionalString(dto.email)?.toLowerCase() ?? null;
+      data.email =
+        this.normalizeOptionalString(dto.email)?.toLowerCase() ?? null;
     }
     if (dto.phone !== undefined) {
       data.phone = this.normalizeOptionalString(dto.phone);
@@ -144,6 +155,24 @@ export class TutorsService {
     }
     if (dto.teachingMethod !== undefined) {
       data.teachingMethod = this.normalizeOptionalString(dto.teachingMethod);
+    }
+    if (dto.seoTitle !== undefined) {
+      data.seoTitle = this.normalizeOptionalString(dto.seoTitle);
+    }
+    if (dto.metaDescription !== undefined) {
+      data.metaDescription = this.normalizeOptionalString(dto.metaDescription);
+    }
+    if (dto.canonical !== undefined) {
+      data.canonical = this.normalizeOptionalString(dto.canonical);
+    }
+    if (dto.ogTitle !== undefined) {
+      data.ogTitle = this.normalizeOptionalString(dto.ogTitle);
+    }
+    if (dto.ogDescription !== undefined) {
+      data.ogDescription = this.normalizeOptionalString(dto.ogDescription);
+    }
+    if (dto.ogImage !== undefined) {
+      data.ogImage = this.normalizeOptionalString(dto.ogImage);
     }
     if (dto.experienceYrs !== undefined) {
       data.experienceYrs = dto.experienceYrs;
@@ -207,6 +236,7 @@ export class TutorsService {
     relationInput?: {
       boardIds?: string[];
       subjectIds?: string[];
+      qualifications?: Array<unknown>;
     },
   ) {
     let qualificationsCount = 0;
@@ -242,7 +272,8 @@ export class TutorsService {
 
       qualificationsCount = tutor.qualifications.length;
       boardsCount = relationInput?.boardIds?.length ?? tutor.boards.length;
-      subjectsCount = relationInput?.subjectIds?.length ?? tutor.subjects.length;
+      subjectsCount =
+        relationInput?.subjectIds?.length ?? tutor.subjects.length;
       currentValues = {
         photoUrl: tutor.photoUrl,
         bio: tutor.bio,
@@ -273,7 +304,8 @@ export class TutorsService {
         'methodology' in data
           ? ((data.methodology as string | null | undefined) ?? null)
           : currentValues.methodology,
-      qualificationsCount,
+      qualificationsCount:
+        relationInput?.qualifications?.length ?? qualificationsCount,
       boardsCount: relationInput?.boardIds?.length ?? boardsCount,
       subjectsCount: relationInput?.subjectIds?.length ?? subjectsCount,
     });
@@ -381,6 +413,7 @@ export class TutorsService {
       include: {
         boards: { include: { board: true } },
         subjects: { include: { subject: true } },
+        classes: { include: { classLevel: true } },
         schools: { include: { school: true } },
         locations: { include: { sector: true, society: true } },
         reviews: true,
@@ -489,6 +522,7 @@ export class TutorsService {
       return await this.prisma.$transaction(async (tx) => {
         const tutor = await tx.tutor.create({ data });
         await this.replaceRelations(tx as any, tutor.id, dto);
+        await this.replaceProfileDetails(tx as any, tutor.id, dto);
         return (tx as any).tutor.findUnique({
           where: { id: tutor.id },
           include: this.adminInclude(),
@@ -521,6 +555,7 @@ export class TutorsService {
           data,
         });
         await this.replaceRelations(tx as any, id, dto);
+        await this.replaceProfileDetails(tx as any, id, dto);
         return (tx as any).tutor.findUnique({
           where: { id },
           include: this.adminInclude(),
@@ -562,11 +597,40 @@ export class TutorsService {
     tutorId: string,
     dto: CreateTutorDto | UpdateTutorDto,
   ) {
-    await this.replaceComposite(tx.tutorBoard, 'tutorId', 'boardId', tutorId, dto.boardIds);
-    await this.replaceComposite(tx.tutorSubject, 'tutorId', 'subjectId', tutorId, dto.subjectIds);
-    await this.replaceComposite(tx.tutorClass, 'tutorId', 'classLevelId', tutorId, dto.classLevelIds);
-    await this.replaceComposite(tx.tutorSchool, 'tutorId', 'schoolId', tutorId, dto.schoolIds);
-    await this.replaceLocationCoverage(tx, tutorId, dto.sectorIds, dto.societyIds);
+    await this.replaceComposite(
+      tx.tutorBoard,
+      'tutorId',
+      'boardId',
+      tutorId,
+      dto.boardIds,
+    );
+    await this.replaceComposite(
+      tx.tutorSubject,
+      'tutorId',
+      'subjectId',
+      tutorId,
+      dto.subjectIds,
+    );
+    await this.replaceComposite(
+      tx.tutorClass,
+      'tutorId',
+      'classLevelId',
+      tutorId,
+      dto.classLevelIds,
+    );
+    await this.replaceComposite(
+      tx.tutorSchool,
+      'tutorId',
+      'schoolId',
+      tutorId,
+      dto.schoolIds,
+    );
+    await this.replaceLocationCoverage(
+      tx,
+      tutorId,
+      dto.sectorIds,
+      dto.societyIds,
+    );
   }
 
   private async replaceComposite(
@@ -611,5 +675,71 @@ export class TutorsService {
     if (data.length > 0) {
       await tx.tutorLocationCoverage.createMany({ data });
     }
+  }
+
+  private async replaceProfileDetails(
+    tx: any,
+    tutorId: string,
+    dto: CreateTutorDto | UpdateTutorDto,
+  ) {
+    if (dto.qualifications !== undefined) {
+      await tx.tutorQualification.deleteMany({ where: { tutorId } });
+      const qualifications = dto.qualifications
+        .map((item) => ({
+          degree: this.normalizeOptionalString(item.degree) ?? '',
+          institution: this.normalizeOptionalString(item.institution) ?? '',
+          year: this.toOptionalInteger(item.year),
+        }))
+        .filter((item) => item.degree && item.institution);
+
+      if (qualifications.length > 0) {
+        await tx.tutorQualification.createMany({
+          data: qualifications.map((item) => ({ ...item, tutorId })),
+        });
+      }
+    }
+
+    if (dto.achievements !== undefined) {
+      await tx.tutorAchievement.deleteMany({ where: { tutorId } });
+      const achievements = dto.achievements
+        .map((item) => ({
+          title: this.normalizeOptionalString(item.title) ?? '',
+          description: this.normalizeOptionalString(item.description),
+          year: this.toOptionalInteger(item.year),
+        }))
+        .filter((item) => item.title);
+
+      if (achievements.length > 0) {
+        await tx.tutorAchievement.createMany({
+          data: achievements.map((item) => ({ ...item, tutorId })),
+        });
+      }
+    }
+
+    if (dto.faqs !== undefined) {
+      await tx.tutorFaq.deleteMany({ where: { tutorId } });
+      const faqs = dto.faqs
+        .map((item, index) => ({
+          question: this.normalizeOptionalString(item.question) ?? '',
+          answer: this.normalizeOptionalString(item.answer) ?? '',
+          order: this.toOptionalInteger(item.order) ?? index,
+        }))
+        .filter((item) => item.question && item.answer);
+
+      if (faqs.length > 0) {
+        await tx.tutorFaq.createMany({
+          data: faqs.map((item) => ({ ...item, tutorId })),
+        });
+      }
+    }
+  }
+
+  private toOptionalInteger(value: unknown): number | null {
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+
+    const numericValue = Number(value);
+    return Number.isInteger(numericValue) ? numericValue : null;
   }
 }

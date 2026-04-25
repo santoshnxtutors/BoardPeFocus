@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertCircle, Archive, CheckCircle2, Edit, Plus, RefreshCw, Save } from "lucide-react";
 import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
@@ -68,6 +68,10 @@ function emptyForm(fields: ContentField[], relationFields: RelationField[] = [])
   return form;
 }
 
+function isBlankValue(value: any) {
+  return value === undefined || value === null || (typeof value === "string" && value.trim() === "");
+}
+
 function relationIds(item: any, relation: RelationField) {
   const relationKey = relation.relationKey ?? relation.lookupKey;
   const childKey = relation.childKey;
@@ -112,7 +116,7 @@ export function ContentManager({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -127,11 +131,11 @@ export function ContentManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [entity]);
 
   useEffect(() => {
     void load();
-  }, [entity]);
+  }, [load]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -189,6 +193,19 @@ export function ContentManager({
     setNotice("");
 
     const payload = { ...form, ...override };
+    const missingField = fields.find((field) => field.required && isBlankValue(payload[field.name]));
+    if (missingField) {
+      setError(`${missingField.label} is required.`);
+      setSaving(false);
+      return;
+    }
+
+    for (const field of fields) {
+      if (field.type === "number" && payload[field.name] === "") {
+        delete payload[field.name];
+      }
+    }
+
     try {
       if (editingId) {
         await api.content.update(entity, editingId, payload);
@@ -347,6 +364,9 @@ export function ContentManager({
                     onChange={(event) => updateField(field.name, event.target.value)}
                     className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                   >
+                    <option value="">
+                      {field.required ? `Select ${field.label}` : "None"}
+                    </option>
                     {(field.options ??
                       (field.lookupKey
                         ? (lookups[field.lookupKey] ?? []).map((option) => ({

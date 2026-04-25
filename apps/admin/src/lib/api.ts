@@ -1,6 +1,6 @@
 import { 
   Tutor, Board, Subject, School, Sector, Society, 
-  Lead, PageRecord, SeoMeta, MediaAsset, User, AuditLog 
+  Lead, PageRecord
 } from '@boardpefocus/types';
 
 function resolveApiBaseUrl() {
@@ -112,13 +112,13 @@ class ApiClient {
 
   // Boards
   boards = {
-    list: () => this.fetcher<Board[]>('/admin/boards'),
-    get: (id: string) => this.fetcher<Board>(`/public/boards/${id}`),
-    create: (data: any) => this.fetcher<Board>('/boards', { method: 'POST', body: JSON.stringify(data) }),
+    list: () => this.fetcher<Board[]>('/admin/content/boards'),
+    get: (id: string) => this.fetcher<Board>(`/admin/content/boards/${id}`),
+    create: (data: any) => this.fetcher<Board>('/admin/content/boards', { method: 'POST', body: JSON.stringify(data) }),
   };
 
   schools = {
-    list: () => this.fetcher<School[]>('/admin/schools'),
+    list: () => this.fetcher<School[]>('/admin/content/schools'),
   };
 
   lookups = {

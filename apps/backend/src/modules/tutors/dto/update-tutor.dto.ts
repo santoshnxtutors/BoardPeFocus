@@ -82,6 +82,30 @@ export class UpdateTutorDto {
   teachingMethod?: string;
 
   @IsOptional()
+  @IsString()
+  seoTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  metaDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  canonical?: string;
+
+  @IsOptional()
+  @IsString()
+  ogTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  ogDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  ogImage?: string;
+
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   experienceYrs?: number;
@@ -159,4 +183,28 @@ export class UpdateTutorDto {
   @IsArray()
   @IsString({ each: true })
   societyIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  qualifications?: Array<{
+    degree?: string;
+    institution?: string;
+    year?: number | null;
+  }>;
+
+  @IsOptional()
+  @IsArray()
+  achievements?: Array<{
+    title?: string;
+    description?: string | null;
+    year?: number | null;
+  }>;
+
+  @IsOptional()
+  @IsArray()
+  faqs?: Array<{
+    question?: string;
+    answer?: string;
+    order?: number | null;
+  }>;
 }
