@@ -46,8 +46,8 @@ const emptyTutor = {
   reviewsCount: 0,
   priority: 0,
   isFeatured: false,
-  isVerified: false,
-  status: "DRAFT",
+  isVerified: true,
+  status: "PUBLISHED",
   seoTitle: "",
   metaDescription: "",
   canonical: "",
@@ -97,42 +97,47 @@ function cleanNumber(value: any) {
   return Number.isFinite(numericValue) ? numericValue : undefined;
 }
 
-function cleanString(value: any) {
-  if (value === undefined || value === null) return undefined;
+function cleanOptionalString(value: any) {
+  if (value === undefined || value === null) return null;
   const normalized = String(value).trim();
-  return normalized.length > 0 ? normalized : undefined;
+  return normalized.length > 0 ? normalized : null;
+}
+
+function cleanSlug(value: any) {
+  const normalized = cleanOptionalString(value);
+  return normalized ?? undefined;
 }
 
 function buildTutorPayload(tutor: any) {
   return {
     name: tutor.name,
-    slug: cleanString(tutor.slug),
-    displayName: cleanString(tutor.displayName),
-    email: cleanString(tutor.email),
-    phone: cleanString(tutor.phone),
-    photoUrl: cleanString(tutor.photoUrl),
-    videoUrl: cleanString(tutor.videoUrl),
-    tagline: cleanString(tutor.tagline),
-    bio: cleanString(tutor.bio),
-    about: cleanString(tutor.about),
-    methodology: cleanString(tutor.methodology),
-    teachingMethod: cleanString(tutor.teachingMethod),
+    slug: cleanSlug(tutor.slug),
+    displayName: cleanOptionalString(tutor.displayName),
+    email: cleanOptionalString(tutor.email),
+    phone: cleanOptionalString(tutor.phone),
+    photoUrl: cleanOptionalString(tutor.photoUrl),
+    videoUrl: cleanOptionalString(tutor.videoUrl),
+    tagline: cleanOptionalString(tutor.tagline),
+    bio: cleanOptionalString(tutor.bio),
+    about: cleanOptionalString(tutor.about),
+    methodology: cleanOptionalString(tutor.methodology),
+    teachingMethod: cleanOptionalString(tutor.teachingMethod),
     experienceYrs: cleanNumber(tutor.experienceYrs) ?? 0,
     studentsTaught: cleanNumber(tutor.studentsTaught) ?? 0,
-    hourlyRateMin: cleanNumber(tutor.hourlyRateMin),
-    hourlyRateMax: cleanNumber(tutor.hourlyRateMax),
+    hourlyRateMin: cleanNumber(tutor.hourlyRateMin) ?? null,
+    hourlyRateMax: cleanNumber(tutor.hourlyRateMax) ?? null,
     rating: cleanNumber(tutor.rating) ?? 0,
     reviewsCount: cleanNumber(tutor.reviewsCount) ?? 0,
     priority: cleanNumber(tutor.priority) ?? 0,
     isFeatured: Boolean(tutor.isFeatured),
     isVerified: Boolean(tutor.isVerified),
     status: tutor.status || "DRAFT",
-    seoTitle: cleanString(tutor.seoTitle),
-    metaDescription: cleanString(tutor.metaDescription),
-    canonical: cleanString(tutor.canonical),
-    ogTitle: cleanString(tutor.ogTitle),
-    ogDescription: cleanString(tutor.ogDescription),
-    ogImage: cleanString(tutor.ogImage),
+    seoTitle: cleanOptionalString(tutor.seoTitle),
+    metaDescription: cleanOptionalString(tutor.metaDescription),
+    canonical: cleanOptionalString(tutor.canonical),
+    ogTitle: cleanOptionalString(tutor.ogTitle),
+    ogDescription: cleanOptionalString(tutor.ogDescription),
+    ogImage: cleanOptionalString(tutor.ogImage),
     boardIds: tutor.boardIds ?? [],
     subjectIds: tutor.subjectIds ?? [],
     classLevelIds: tutor.classLevelIds ?? [],
@@ -141,22 +146,22 @@ function buildTutorPayload(tutor: any) {
     societyIds: tutor.societyIds ?? [],
     qualifications: (tutor.qualifications ?? [])
       .map((item: any) => ({
-        degree: cleanString(item.degree),
-        institution: cleanString(item.institution),
+        degree: cleanOptionalString(item.degree),
+        institution: cleanOptionalString(item.institution),
         year: cleanNumber(item.year),
       }))
       .filter((item: any) => item.degree && item.institution),
     achievements: (tutor.achievements ?? [])
       .map((item: any) => ({
-        title: cleanString(item.title),
-        description: cleanString(item.description),
+        title: cleanOptionalString(item.title),
+        description: cleanOptionalString(item.description),
         year: cleanNumber(item.year),
       }))
       .filter((item: any) => item.title),
     faqs: (tutor.faqs ?? [])
       .map((item: any, index: number) => ({
-        question: cleanString(item.question),
-        answer: cleanString(item.answer),
+        question: cleanOptionalString(item.question),
+        answer: cleanOptionalString(item.answer),
         order: cleanNumber(item.order) ?? index,
       }))
       .filter((item: any) => item.question && item.answer),
@@ -203,7 +208,7 @@ export default function TutorDetailPage() {
     setIsSaving(true);
     setError("");
     try {
-      if (!cleanString(tutor.name)) {
+      if (!cleanOptionalString(tutor.name)) {
         throw new Error("Tutor name is required.");
       }
       const payload = buildTutorPayload(tutor);

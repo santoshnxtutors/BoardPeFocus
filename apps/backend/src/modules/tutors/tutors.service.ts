@@ -29,9 +29,13 @@ export class TutorsService {
     return normalized;
   }
 
-  private normalizeOptionalString(value?: string): string | null | undefined {
+  private normalizeOptionalString(value?: string | null): string | null | undefined {
     if (value === undefined) {
       return undefined;
+    }
+
+    if (value === null) {
+      return null;
     }
 
     const normalized = value.trim();
@@ -59,8 +63,8 @@ export class TutorsService {
     }
 
     if (
-      dto.hourlyRateMin !== undefined &&
-      dto.hourlyRateMax !== undefined &&
+      typeof dto.hourlyRateMin === 'number' &&
+      typeof dto.hourlyRateMax === 'number' &&
       dto.hourlyRateMax < dto.hourlyRateMin
     ) {
       throw new BadRequestException(
@@ -102,8 +106,8 @@ export class TutorsService {
 
   private buildTutorUpdateData(dto: UpdateTutorDto): any {
     if (
-      dto.hourlyRateMin !== undefined &&
-      dto.hourlyRateMax !== undefined &&
+      typeof dto.hourlyRateMin === 'number' &&
+      typeof dto.hourlyRateMax === 'number' &&
       dto.hourlyRateMax < dto.hourlyRateMin
     ) {
       throw new BadRequestException(
@@ -337,7 +341,6 @@ export class TutorsService {
       where: {
         deletedAt: null,
         status: 'PUBLISHED',
-        isVerified: true,
         ...(board && { boards: { some: { board: { slug: board } } } }),
         ...(subject && { subjects: { some: { subject: { slug: subject } } } }),
         ...(location && {
@@ -383,7 +386,6 @@ export class TutorsService {
       where: {
         slug,
         deletedAt: null,
-        isVerified: true,
         status: 'PUBLISHED',
       },
       include: {
@@ -459,15 +461,6 @@ export class TutorsService {
   }
 
   async updateStatus(id: string, status: string) {
-    if (status === 'PUBLISHED') {
-      const score = await this.calculateCompleteness(id);
-      if (score < 80) {
-        throw new BadRequestException(
-          `Profile completeness too low (${score}%). Need 80% to publish.`,
-        );
-      }
-    }
-
     return this.prisma.tutor.update({
       where: { id },
       data: { status: status as TutorStatus },
@@ -514,10 +507,6 @@ export class TutorsService {
   async create(dto: CreateTutorDto) {
     const data = this.buildTutorCreateData(dto);
 
-    if (data.status === TutorStatus.PUBLISHED) {
-      await this.assertPublishable(null, data, dto);
-    }
-
     try {
       return await this.prisma.$transaction(async (tx) => {
         const tutor = await tx.tutor.create({ data });
@@ -544,10 +533,6 @@ export class TutorsService {
     }
 
     const data = this.buildTutorUpdateData(dto);
-    if ((data.status as TutorStatus | undefined) === TutorStatus.PUBLISHED) {
-      await this.assertPublishable(id, data, dto);
-    }
-
     try {
       return await this.prisma.$transaction(async (tx) => {
         await tx.tutor.update({

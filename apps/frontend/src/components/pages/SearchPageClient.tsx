@@ -2,8 +2,10 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { mockTutors, mockBoards, mockSubjects } from "@/data/mock";
+import { mockBoards, mockSubjects } from "@/data/mock";
 import { TutorCard } from "@/components/cards/TutorCard";
+import { Tutor } from "@/types";
+import { tutorMatchesFilters } from "@/lib/tutors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,7 +21,7 @@ import {
   AccordionTrigger
 } from "@/components/ui/accordion";
 
-function SearchPageContent() {
+function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -33,20 +35,14 @@ function SearchPageContent() {
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredTutors = useMemo(() => {
-    return mockTutors.filter((tutor) => {
-      const matchesQuery = !query ||
-        tutor.name.toLowerCase().includes(query.toLowerCase()) ||
-        tutor.subjects.some((s) => s.toLowerCase().includes(query.toLowerCase()));
-
-      const matchesBoard = !selectedBoard ||
-        tutor.boards.some((b) => b.toLowerCase() === selectedBoard.toLowerCase());
-
-      const matchesSubject = !selectedSubject ||
-        tutor.subjects.some((s) => s.toLowerCase() === selectedSubject.toLowerCase());
-
-      return matchesQuery && matchesBoard && matchesSubject;
-    });
-  }, [query, selectedBoard, selectedSubject]);
+    return tutors.filter((tutor) =>
+      tutorMatchesFilters(tutor, {
+        query,
+        board: selectedBoard,
+        subject: selectedSubject,
+      }),
+    );
+  }, [query, selectedBoard, selectedSubject, tutors]);
 
   const clearFilters = () => {
     setQuery("");
@@ -175,13 +171,7 @@ function SearchPageContent() {
               <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {filteredTutors.map((tutor) => (
                   <StaggerItem key={tutor.id}>
-                    <TutorCard tutor={{
-                      ...tutor,
-                      experienceYears: tutor.experienceYrs,
-                      studentsTaught: tutor.studentsTaught,
-                      areas: tutor.locations,
-                      about: tutor.about || "",
-                    }} />
+                    <TutorCard tutor={tutor} />
                   </StaggerItem>
                 ))}
               </StaggerContainer>
@@ -204,10 +194,10 @@ function SearchPageContent() {
   );
 }
 
-export function SearchPageClient() {
+export function SearchPageClient({ tutors }: { tutors: Tutor[] }) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-background pt-32 pb-24" />}>
-      <SearchPageContent />
+      <SearchPageContent tutors={tutors} />
     </Suspense>
   );
 }

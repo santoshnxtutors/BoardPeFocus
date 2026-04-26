@@ -337,15 +337,6 @@ export default async function TutorProfilePage({ params }: PageProps) {
 }
 
 async function getPublishedTutor(slug: string) {
-  const mockTutor = mockTutors.find((item) => item.slug === slug);
-  if (mockTutor) {
-    return {
-      ...mockTutor,
-      faqs: buildTutorFaqs(mockTutor),
-      reviews: buildTutorNotes(mockTutor),
-    };
-  }
-
   try {
     const response = await fetchBackend(`/public/tutors/${encodeURIComponent(slug)}`);
     if (response.ok) {
@@ -354,6 +345,15 @@ async function getPublishedTutor(slug: string) {
     }
   } catch {
     // Fall through to the backend miss below.
+  }
+
+  const mockTutor = mockTutors.find((item) => item.slug === slug);
+  if (mockTutor) {
+    return {
+      ...mockTutor,
+      faqs: buildTutorFaqs(mockTutor),
+      reviews: buildTutorNotes(mockTutor),
+    };
   }
 
   return null;

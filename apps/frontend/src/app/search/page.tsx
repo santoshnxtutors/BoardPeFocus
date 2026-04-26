@@ -1,5 +1,6 @@
 import { SearchPageClient } from "@/components/pages/SearchPageClient";
 import { constructMetadata } from "@/lib/seo";
+import { getPublicTutorCards } from "@/lib/tutors";
 
 export const metadata = constructMetadata({
   title: "Tutor Search | BoardPeFocus",
@@ -8,6 +9,8 @@ export const metadata = constructMetadata({
   noIndex: true,
 });
 
-export default function SearchPage() {
-  return <SearchPageClient />;
+export default async function SearchPage() {
+  const tutors = await getPublicTutorCards();
+
+  return <SearchPageClient tutors={tutors} />;
 }

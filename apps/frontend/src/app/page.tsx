@@ -11,10 +11,10 @@ import { ChevronRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { FAQ } from "@/components/faq/FAQ";
 import { platformStats } from "@/data/stats";
-import { mockTutors } from "@/data/mock";
 import { TutorCard } from "@/components/cards/TutorCard";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { BlogSection } from "@/components/blog/BlogSection";
+import { getPublicTutorCards } from "@/lib/tutors";
 
 export const metadata = constructMetadata({
   title: "Premium Home Tutors in Gurugram | BoardPeFocus",
@@ -22,9 +22,10 @@ export const metadata = constructMetadata({
   pathname: "/",
 });
 
-export default function HomePage() {
+export default async function HomePage() {
   const organizationJsonLd = generateOrganizationJsonLd();
   const websiteJsonLd = generateWebsiteJsonLd();
+  const featuredTutors = (await getPublicTutorCards()).slice(0, 3);
   const boardDiscovery = [
     {
       name: "CBSE",
@@ -492,15 +493,9 @@ export default function HomePage() {
           </FadeIn>
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {mockTutors.slice(0, 3).map((tutor) => (
+            {featuredTutors.map((tutor) => (
               <StaggerItem key={tutor.id}>
-                <TutorCard tutor={{
-                  ...tutor,
-                  experienceYears: tutor.experienceYrs,
-                  studentsTaught: tutor.studentsTaught,
-                  areas: tutor.locations,
-                  about: tutor.about || "",
-                }} />
+                <TutorCard tutor={tutor} />
               </StaggerItem>
             ))}
           </StaggerContainer>
