@@ -17,6 +17,7 @@ jobs:
 
     env:
       APP_DIR: /home/boardpefocus/htdocs/www.boardpefocus.in
+      ADMIN_APP_DIR: /home/boardpefocus/htdocs/admin.boardpefocus.in
       REPO_URL: https://github.com/santoshnxtutors/BoardPeFocus.git
       CLOUDPANEL_HOST: ${{ secrets.CLOUDPANEL_HOST }}
       CLOUDPANEL_SSH_USER: ${{ secrets.CLOUDPANEL_SSH_USER }}
@@ -89,3 +90,97 @@ jobs:
           export SSHPASS="$CLOUDPANEL_SSH_PASSWORD"
           sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
             "cd '$APP_DIR' && APP_DIR='$APP_DIR' BACKEND_ENV_FILE='$APP_DIR/apps/backend/.env' bash scripts/cloudpanel-deploy.sh"
+
+      - name: Refresh admin domain checkout
+        run: |
+          export SSHPASS="$CLOUDPANEL_SSH_PASSWORD"
+          sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "APP_DIR='$APP_DIR' ADMIN_APP_DIR='$ADMIN_APP_DIR' REPO_URL='$REPO_URL' bash -s" <<'REMOTE'
+          set -euo pipefail
+
+          if [ "$ADMIN_APP_DIR" = "$APP_DIR" ]; then
+            exit 0
+          fi
+
+          if [ ! -d "$ADMIN_APP_DIR" ]; then
+            exit 0
+          fi
+
+          git config --global --add safe.directory "$ADMIN_APP_DIR"
+
+          if [ -d "$ADMIN_APP_DIR/.git" ]; then
+            cd "$ADMIN_APP_DIR"
+            git fetch origin main
+            git reset --hard origin/main
+          elif [ "$(find "$ADMIN_APP_DIR" -mindepth 1 -maxdepth 1 | wc -l)" -eq 0 ]; then
+            git clone "$REPO_URL" "$ADMIN_APP_DIR"
+            cd "$ADMIN_APP_DIR"
+          else
+            echo "Admin site directory exists but is not a git checkout: $ADMIN_APP_DIR"
+            echo "Skipping admin-domain mirror deploy to avoid overwriting unknown files."
+            exit 0
+          fi
+
+          mkdir -p apps/admin apps/backend apps/frontend
+          REMOTE
+
+          printf '%s\n' "$BACKEND_ENV" | sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "if [ -d '$ADMIN_APP_DIR/.git' ]; then cat > '$ADMIN_APP_DIR/apps/backend/.env'; fi"
+
+          printf '%s\n' "$FRONTEND_ENV_PRODUCTION" | sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "if [ -d '$ADMIN_APP_DIR/.git' ]; then cat > '$ADMIN_APP_DIR/apps/frontend/.env.production'; fi"
+
+          printf '%s\n' "$ADMIN_ENV_PRODUCTION" | sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "if [ -d '$ADMIN_APP_DIR/.git' ]; then cat > '$ADMIN_APP_DIR/apps/admin/.env.production'; fi"
+
+          sshpass -e ssh "$CLOUDPANEL_SSH_USER@$CLOUDPANEL_HOST" \
+            "APP_DIR='$ADMIN_APP_DIR' BACKEND_ENV_FILE='$ADMIN_APP_DIR/apps/backend/.env' START_FRONTEND=false START_BACKEND=false START_ADMIN=true bash -s" <<'REMOTE'
+          set -euo pipefail
+
+          if [ ! -d "$APP_DIR/.git" ]; then
+            exit 0
+          fi
+
+          cd "$APP_DIR"
+
+          for profile in /etc/profile "$HOME/.profile" "$HOME/.bash_profile" "$HOME/.bashrc"; do
+            if [ -r "$profile" ]; then
+              set +u
+              . "$profile" >/dev/null 2>&1 || true
+              set -u
+            fi
+          done
+
+          export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+          if [ -s "$NVM_DIR/nvm.sh" ]; then
+            set +u
+            . "$NVM_DIR/nvm.sh" >/dev/null 2>&1 || true
+            set -u
+          fi
+
+          for bin_dir in "$HOME/.local/share/pnpm" "$HOME/.npm-global/bin" "$HOME/.npm-packages/bin" /usr/local/bin /usr/bin /bin; do
+            if [ -d "$bin_dir" ] && [[ ":$PATH:" != *":$bin_dir:"* ]]; then
+              PATH="$bin_dir:$PATH"
+            fi
+          done
+          export PATH
+
+          if ! command -v pnpm >/dev/null 2>&1; then
+            if command -v corepack >/dev/null 2>&1; then
+              corepack enable >/dev/null 2>&1 || true
+              corepack prepare pnpm@9.5.0 --activate
+              hash -r
+            fi
+          fi
+
+          PNPM_BIN="$(command -v pnpm)"
+          export PNPM_BIN
+
+          pm2 delete boardpefocus-admin >/dev/null 2>&1 || true
+          rm -rf apps/admin/.next .turbo/cache
+          "$PNPM_BIN" install --frozen-lockfile --prod=false
+          "$PNPM_BIN" db:generate
+          "$PNPM_BIN" --dir apps/admin run build
+          pm2 start ecosystem.config.cjs --only boardpefocus-admin --env production --update-env
+          pm2 save
+          REMOTE
