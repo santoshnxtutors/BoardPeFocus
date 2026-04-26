@@ -9,22 +9,15 @@ import {
   BookOpen, 
   MapPin, 
   FileText, 
-  Image as ImageIcon, 
   Star, 
   Settings, 
   History,
-  LogOut,
-  ChevronRight,
   Globe,
   GraduationCap,
   School,
-  Tags,
-  Map,
-  FileCode,
   Sparkles,
   Inbox
 } from "lucide-react";
-import { useAuth } from "@/lib/auth-context";
 
 const menuItems = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
@@ -43,9 +36,6 @@ const menuItems = [
   { label: "Pages", icon: FileText, href: "/dashboard/pages" },
   { label: "Resources", icon: FileText, href: "/dashboard/blog" },
   { label: "Page Generator", icon: Sparkles, href: "/dashboard/page-generator" },
-  { label: "SEO Metadata", icon: Globe, href: "/dashboard/seo" },
-  { label: "Redirects", icon: History, href: "/dashboard/redirects" },
-  { label: "Media Library", icon: ImageIcon, href: "/dashboard/media" },
   
   { type: "divider", label: "Interactions" },
   { label: "Reviews", icon: Star, href: "/dashboard/reviews" },
@@ -59,7 +49,6 @@ const menuItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { logout, user } = useAuth();
 
   return (
     <aside className="w-64 bg-primary text-white shrink-0 flex flex-col h-screen sticky top-0 border-r border-white/10 shadow-2xl">
