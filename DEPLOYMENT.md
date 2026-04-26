@@ -17,6 +17,9 @@ In CloudPanel, create or confirm:
 - Site: `www.boardpefocus.in`
 - Site user: `boardpefocus`
 - Root directory: `/home/boardpefocus/htdocs/www.boardpefocus.in`
+- Admin site: `admin.boardpefocus.in`
+- Admin site user: `boardpefocus-admin`
+- Admin root directory: `/home/boardpefocus-admin/htdocs/admin.boardpefocus.in`
 - SSH user: use a user that can write to `/home/boardpefocus/htdocs/www.boardpefocus.in`
 
 From the screenshots, the server IP is `13.127.64.109`. If you use the SSH user

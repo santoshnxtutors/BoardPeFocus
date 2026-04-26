@@ -17,7 +17,7 @@ jobs:
 
     env:
       APP_DIR: /home/boardpefocus/htdocs/www.boardpefocus.in
-      ADMIN_APP_DIR: /home/boardpefocus/htdocs/admin.boardpefocus.in
+      ADMIN_APP_DIR: /home/boardpefocus-admin/htdocs/admin.boardpefocus.in
       REPO_URL: https://github.com/santoshnxtutors/BoardPeFocus.git
       CLOUDPANEL_HOST: ${{ secrets.CLOUDPANEL_HOST }}
       CLOUDPANEL_SSH_USER: ${{ secrets.CLOUDPANEL_SSH_USER }}
