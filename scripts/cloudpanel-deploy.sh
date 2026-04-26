@@ -227,6 +227,7 @@ require_command "pm2" "Install PM2 once on the server with: sudo npm install -g 
 "$PNPM_BIN" db:generate
 "$PNPM_BIN" db:migrate:deploy
 "$PNPM_BIN" db:seed
+"$PNPM_BIN" db:import:frontend-tutors
 "$PNPM_BIN" build:prod
 
 pm2 start ecosystem.config.cjs --env production --update-env
