@@ -287,7 +287,21 @@ async function main() {
   console.log('Seeding tutors...');
   await prisma.tutor.upsert({
     where: { slug: 'dr-raj-malhotra' },
-    update: {},
+    update: {
+      name: 'Dr. Raj Malhotra',
+      displayName: 'Raj Malhotra, PhD',
+      email: 'raj@example.com',
+      tagline: 'Expert IB & IGCSE Physics Tutor with 15+ Years Experience',
+      bio: 'PhD in Physics from IIT Delhi, helping students achieve 7s in IB DP for over a decade.',
+      experienceYrs: 15,
+      studentsTaught: 500,
+      rating: 4.9,
+      reviewsCount: 42,
+      isFeatured: true,
+      isVerified: true,
+      status: TutorStatus.PUBLISHED,
+      deletedAt: null,
+    },
     create: {
       slug: 'dr-raj-malhotra',
       name: 'Dr. Raj Malhotra',
