@@ -109,11 +109,13 @@ stop_stale_build_processes() {
 }
 
 clean_next_build_state() {
-  echo "Cleaning stale Next.js build locks..."
+  echo "Cleaning stale Next.js build output..."
   rm -f \
     "$APP_DIR/apps/frontend/.next/lock" \
     "$APP_DIR/apps/admin/.next/lock"
   rm -rf \
+    "$APP_DIR/apps/frontend/.next" \
+    "$APP_DIR/apps/admin/.next" \
     "$APP_DIR/apps/frontend/next.lock" \
     "$APP_DIR/apps/admin/next.lock" \
     "$APP_DIR/.turbo/cache"
