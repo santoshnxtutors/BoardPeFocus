@@ -75,7 +75,7 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <Link href="/become-our-tutor" className="hidden sm:block">
             <Button className="bg-primary text-white hover:bg-primary/90 shadow-lg rounded-xl px-6 font-bold">
-              Join as Tutor
+              Become Our Tutor
             </Button>
           </Link>
 
