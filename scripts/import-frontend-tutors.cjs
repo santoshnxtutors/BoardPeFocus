@@ -265,9 +265,10 @@ async function main() {
 
     for (const [index, tutorInput] of tutors.entries()) {
       const tutor = await prisma.tutor.upsert({
-        where: { slug: tutorInput.slug },
+        where: { id: tutorInput.id },
         update: {
           name: tutorInput.name,
+          slug: tutorInput.slug,
           photoUrl: tutorInput.photoUrl,
           tagline: tutorInput.tagline,
           bio: tutorInput.about,

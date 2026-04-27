@@ -75,3 +75,5 @@
  GET / 200 in 194ms (next.js: 28ms, proxy.ts: 10ms, application-code: 156ms)
  GET /become-our-tutor 200 in 102ms (next.js: 25ms, proxy.ts: 9ms, application-code: 67ms)
  GET / 200 in 221ms (next.js: 8ms, proxy.ts: 15ms, application-code: 197ms)
+ GET /become-our-tutor 200 in 69ms (next.js: 4ms, proxy.ts: 10ms, application-code: 54ms)
+ GET / 200 in 175ms (next.js: 4ms, proxy.ts: 9ms, application-code: 161ms)
