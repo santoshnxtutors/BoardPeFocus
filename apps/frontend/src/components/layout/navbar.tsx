@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Logo } from "@/components/common/Logo";
@@ -72,10 +72,17 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
-          <Link href="/become-our-tutor" className="hidden sm:block">
-            <Button className="bg-primary text-white hover:bg-primary/90 shadow-lg rounded-xl px-6 font-bold">
-              Become Our Tutor
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Link 
+            href="/become-our-tutor" 
+            className="sm:hidden text-xs font-bold text-primary border-2 border-primary hover:bg-primary hover:text-white px-3.5 py-1.5 rounded-full transition-all whitespace-nowrap"
+          >
+            Join as Tutor
+          </Link>
+          <Link href="/become-our-tutor" className="hidden sm:block group">
+            <Button className="bg-primary text-white hover:bg-primary/95 shadow-md hover:shadow-xl hover:shadow-primary/20 rounded-full h-10 px-6 font-bold transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2 border border-transparent hover:border-primary/10">
+              <span>Join as Tutor</span>
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Button>
           </Link>
 
@@ -115,7 +122,7 @@ export function Navbar() {
           <div className="pt-4">
             <Link href="/become-our-tutor" onClick={() => setIsOpen(false)}>
               <Button className="w-full bg-primary h-14 text-lg rounded-xl">
-                Become Our Tutor
+                Join as Tutor
               </Button>
             </Link>
           </div>
