@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { ClassHubConfig } from "@/app/classes/_data/classes";
+import { ClassHubConfig, getClassHubPath } from "@/app/classes/_data/classes";
 
 export function ClassCard({ classHub }: { classHub: ClassHubConfig }) {
   return (
     <Link
-      href={`/classes/${classHub.slug}`}
+      href={getClassHubPath(classHub.slug)}
       className="group rounded-[2rem] border border-border/60 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/15 hover:shadow-lg"
     >
       <div className="flex flex-wrap items-center gap-3">

@@ -10,6 +10,7 @@ import { AreaSection } from "@/components/areas/AreaSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { areaClusters, getAreaCluster, getClusterSectors } from "@/data/areas";
 import { mockSchools } from "@/data/mock";
+import { getBoardPath } from "@/app/boards/_data/boards";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { getSchoolHubLink } from "@/app/schools/_data/linking";
 
@@ -213,7 +214,7 @@ export default async function AreaClusterPage({ params }: PageProps) {
                 {
                   title: "CBSE Tutors in Gurgaon",
                   description: "Useful for board-specific parent journeys after locality discovery.",
-                  href: "/boards/cbse",
+                  href: getBoardPath("cbse"),
                 },
                 {
                   title: "Top School Pages",

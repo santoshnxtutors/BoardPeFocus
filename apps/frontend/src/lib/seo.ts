@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { TutorProfileViewModel } from '@/types/tutor-profile';
+import { getTutorPath } from '@/lib/tutor-paths';
 
 export const siteConfig = {
   name: 'BoardPeFocus',
@@ -165,7 +166,7 @@ export function generateTutorJsonLd(tutor: TutorProfileViewModel) {
     jobTitle: 'Home Tutor',
     description: tutor.about,
     image: tutor.photoUrl,
-    url: absoluteUrl(`/tutors/${tutor.slug ?? ''}`),
+    url: absoluteUrl(getTutorPath(tutor.slug ?? '')),
     homeLocation: {
       '@type': 'Place',
       name: 'Gurugram, Haryana, India',

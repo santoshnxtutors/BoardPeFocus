@@ -1,4 +1,6 @@
 import { ResourceCategory, ResourceFaqItem, ResourceLinkCard } from "@/app/resources/_data/types";
+import { getBoardPath } from "@/app/boards/_data/boards";
+import { getClassHubPath } from "@/app/classes/_data/classes";
 
 export const resourceCategories: ResourceCategory[] = [
   {
@@ -117,16 +119,16 @@ export const resourcesHubFaqs: ResourceFaqItem[] = [
 ];
 
 export const resourceBoardsBrowse = [
-  { label: "CBSE", href: "/boards/cbse" },
-  { label: "ICSE", href: "/boards/icse" },
-  { label: "ISC", href: "/boards/isc" },
-  { label: "IGCSE", href: "/boards/igcse" },
-  { label: "IB", href: "/boards/ib" },
+  { label: "CBSE", href: getBoardPath("cbse") },
+  { label: "ICSE", href: getBoardPath("icse") },
+  { label: "ISC", href: getBoardPath("isc") },
+  { label: "IGCSE", href: getBoardPath("igcse") },
+  { label: "IB", href: getBoardPath("ib") },
 ];
 
 export const resourceClassesBrowse = [
-  { label: "Class 10 Hub", href: "/classes/class-10" },
-  { label: "Class 12 Hub", href: "/classes/class-12" },
+  { label: "Class 10 Hub", href: getClassHubPath("class-10") },
+  { label: "Class 12 Hub", href: getClassHubPath("class-12") },
 ];
 
 export const resourceSubjectsBrowse = [

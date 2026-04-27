@@ -82,13 +82,27 @@ async function proxyToBackend(request: Request, context: RouteContext) {
     "upgrade",
   ].forEach((header) => headers.delete(header));
 
-  const response = await fetch(createBackendUrl(path, request.url), {
-    method: request.method,
-    headers,
-    body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,
-    cache: "no-store",
-    duplex: "half",
-  } as RequestInit & { duplex: "half" });
+  let response: Response;
+  try {
+    response = await fetch(createBackendUrl(path, request.url), {
+      method: request.method,
+      headers,
+      body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,
+      cache: "no-store",
+      duplex: "half",
+    } as RequestInit & { duplex: "half" });
+  } catch {
+    return withCors(
+      Response.json(
+        {
+          statusCode: 503,
+          message: "Backend service is unavailable. Start the backend and try again.",
+        },
+        { status: 503 },
+      ),
+      request,
+    );
+  }
 
   return withCors(
     new Response(response.body, {

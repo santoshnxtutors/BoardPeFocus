@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock, Mail, MapPin, MessageSquare, Phone } from "lucide-react";
 import { FadeIn } from "@/lib/animations";
+import { FAQ } from "@/components/faq/FAQ";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/button";
@@ -8,8 +9,17 @@ import {
   absoluteUrl,
   constructMetadata,
   generateBreadcrumbJsonLd,
+  generateFaqJsonLd,
   generateOrganizationJsonLd,
 } from "@/lib/seo";
+import { getLiveContentItem, getLiveFaqs } from "@/lib/live-content";
+
+interface LiveContactContent {
+  slug: string;
+  title: string;
+  summary?: string | null;
+  body?: string | null;
+}
 
 export const metadata = constructMetadata({
   title: "Contact Us | BoardPeFocus Gurugram",
@@ -18,17 +28,23 @@ export const metadata = constructMetadata({
   pathname: "/contact",
 });
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const [liveContact, liveFaqs] = await Promise.all([
+    getLiveContentItem<LiveContactContent>("/content/process-content/contact"),
+    getLiveFaqs({ pageSlug: "contact" }),
+  ]);
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Contact", url: absoluteUrl("/contact") },
   ]);
   const organizationJsonLd = generateOrganizationJsonLd();
+  const faqJsonLd = liveFaqs.length > 0 ? generateFaqJsonLd(liveFaqs) : null;
 
   return (
     <div className="bg-background min-h-screen pt-32 pb-24">
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={organizationJsonLd} />
+      {faqJsonLd ? <JsonLd data={faqJsonLd} /> : null}
 
       <div className="container mx-auto px-4">
         <nav aria-label="Breadcrumb" className="mb-8 max-w-6xl mx-auto">
@@ -46,16 +62,23 @@ export default function ContactPage() {
         <FadeIn>
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h1 className="mb-6 text-4xl font-extrabold text-primary md:text-6xl">
-              Let&apos;s start your child&apos;s success journey.
+              {liveContact?.title ?? "Let's start your child's success journey."}
             </h1>
             <p className="text-xl leading-relaxed text-muted-foreground">
-              Our academic advisors are ready to help you find the right board-specialized home tutoring path in Gurugram.
+              {liveContact?.summary ??
+                "Our academic advisors are ready to help you find the right board-specialized home tutoring path in Gurugram."}
             </p>
           </div>
         </FadeIn>
 
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-16 lg:grid-cols-2">
           <FadeIn direction="right" className="space-y-10">
+            {liveContact?.body ? (
+              <div className="rounded-3xl border border-border/50 bg-white p-8 shadow-sm">
+                <div className="whitespace-pre-line leading-relaxed text-primary/80">{liveContact.body}</div>
+              </div>
+            ) : null}
+
             <div>
               <h2 className="mb-8 text-3xl font-bold text-primary">Get in touch</h2>
               <div className="space-y-6">
@@ -150,6 +173,17 @@ export default function ContactPage() {
             />
           </FadeIn>
         </div>
+
+        {liveFaqs.length > 0 ? (
+          <div className="mx-auto mt-16 max-w-6xl">
+            <FAQ
+              items={liveFaqs}
+              title="Contact FAQs"
+              subtitle="These FAQs are assigned from the admin panel and published live on the contact route."
+              columns={2}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

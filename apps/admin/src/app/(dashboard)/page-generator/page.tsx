@@ -12,7 +12,6 @@ import {
   CheckCircle2, 
   AlertTriangle,
   RefreshCw,
-  Search,
   ArrowRight,
   Globe,
   GraduationCap,
@@ -21,15 +20,26 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { DataTable } from "@/components/shared/data-table";
 import { api } from "@/lib/api";
+import { Input } from "@/components/ui/input";
 
 export default function PageGeneratorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [thresholds, setThresholds] = useState({
+    minTutorsForGeo: 5,
+    minProfileCompleteness: 80,
+    maxDuplicationScore: 30,
+  });
+  const [showThresholds, setShowThresholds] = useState(false);
+  const [counts, setCounts] = useState({ tutors: 0, academic: 0, geo: 0 });
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadJobs();
-    const interval = setInterval(loadJobs, 5000); // Poll every 5s
+    loadThresholds();
+    loadCounts();
+    const interval = setInterval(loadJobs, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -39,7 +49,7 @@ export default function PageGeneratorPage() {
       setJobs(data);
       
       // Check if any job is currently running to update UI state
-      const runningJob = data.find(j => j.status === 'RUNNING');
+      const runningJob = data.find(j => j.status === 'RUNNING' || j.status === 'QUEUED');
       if (runningJob) {
         setIsGenerating(true);
         setProgress(runningJob.progress || 0);
@@ -51,15 +61,48 @@ export default function PageGeneratorPage() {
     }
   };
 
+  const loadThresholds = async () => {
+    try {
+      setThresholds(await api.pageGenerator.getThresholds());
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to load thresholds.");
+    }
+  };
+
+  const loadCounts = async () => {
+    try {
+      const lookups = await api.lookups.list();
+      setCounts({
+        tutors: lookups.tutors.length,
+        academic: lookups.boards.length + lookups.classes.length + lookups.subjects.length,
+        geo: lookups.schools.length + lookups.sectors.length + lookups.societies.length,
+      });
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to load generation counts.");
+    }
+  };
+
   const handleStartGeneration = async (type: string) => {
     setIsGenerating(true);
     setProgress(0);
+    setError("");
     try {
       await api.pageGenerator.trigger(type);
       await loadJobs();
     } catch (error) {
-      console.error("Failed to start generation:", error);
+      setError(error instanceof Error ? error.message : "Failed to start generation.");
       setIsGenerating(false);
+    }
+  };
+
+  const saveThresholds = async () => {
+    setError("");
+    try {
+      const response = await api.pageGenerator.updateThresholds(thresholds);
+      setThresholds(response.data ?? thresholds);
+      setShowThresholds(false);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to save thresholds.");
     }
   };
 
@@ -79,6 +122,7 @@ export default function PageGeneratorPage() {
           COMPLETED: "bg-green-100 text-green-700 border-green-200",
           FAILED: "bg-rose-100 text-rose-700 border-rose-200",
           RUNNING: "bg-blue-100 text-blue-700 border-blue-200",
+          QUEUED: "bg-amber-100 text-amber-700 border-amber-200",
         };
         return (
           <Badge variant="outline" className={`${variants[job.status]} font-black uppercase text-[9px] tracking-widest`}>
@@ -118,14 +162,44 @@ export default function PageGeneratorPage() {
           <p className="text-sm text-slate-500">Generate scalable SEO pages from structured data with quality thresholds.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="font-bold border-slate-200">
+          <Button variant="outline" className="font-bold border-slate-200" onClick={() => setShowThresholds((value) => !value)}>
             <Settings2 className="mr-2 h-4 w-4" /> Thresholds
           </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-white font-bold px-6 shadow-xl shadow-primary/20">
+          <Button className="bg-primary hover:bg-primary/90 text-white font-bold px-6 shadow-xl shadow-primary/20" onClick={() => { void loadJobs(); void loadCounts(); }}>
             <RefreshCw className="mr-2 h-4 w-4" /> Re-sync Data
           </Button>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-700">
+          {error}
+        </div>
+      )}
+
+      {showThresholds && (
+        <Card className="border-slate-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-black uppercase tracking-tight">Quality Thresholds</CardTitle>
+            <CardDescription>These values are persisted and used by the admin generation run.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Min Tutors For Geo</label>
+              <Input type="number" value={thresholds.minTutorsForGeo} onChange={(event) => setThresholds((current) => ({ ...current, minTutorsForGeo: Number(event.target.value) }))} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Profile Completeness</label>
+              <Input type="number" value={thresholds.minProfileCompleteness} onChange={(event) => setThresholds((current) => ({ ...current, minProfileCompleteness: Number(event.target.value) }))} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Max Duplication</label>
+              <Input type="number" value={thresholds.maxDuplicationScore} onChange={(event) => setThresholds((current) => ({ ...current, maxDuplicationScore: Number(event.target.value) }))} />
+            </div>
+            <Button className="bg-primary font-bold text-white hover:bg-primary/90" onClick={() => void saveThresholds()}>Save</Button>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="shadow-sm border-slate-200 hover:border-primary transition-all group overflow-hidden">
@@ -142,7 +216,7 @@ export default function PageGeneratorPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
                 <span>Eligible Tutors</span>
-                <span>42 / 50</span>
+                <span>{counts.tutors}</span>
               </div>
               <Button 
                 onClick={() => handleStartGeneration('TUTOR')} 
@@ -168,8 +242,8 @@ export default function PageGeneratorPage() {
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
-                <span>Eligible Combos</span>
-                <span>128 / 500</span>
+                <span>Eligible Records</span>
+                <span>{counts.academic}</span>
               </div>
               <Button 
                 onClick={() => handleStartGeneration('ACADEMIC')}
@@ -196,7 +270,7 @@ export default function PageGeneratorPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
                 <span>Eligible Pages</span>
-                <span>85 / 1200</span>
+                <span>{counts.geo}</span>
               </div>
               <Button 
                 onClick={() => handleStartGeneration('GEO')}
@@ -227,8 +301,8 @@ export default function PageGeneratorPage() {
             </div>
             <Progress value={progress} className="h-1 bg-white/10" />
             <div className="flex gap-4">
-              <div className="text-[10px] font-bold text-white/40 uppercase">Processed: 124 entities</div>
-              <div className="text-[10px] font-bold text-white/40 uppercase">Skipped: 42 (Low Score)</div>
+              <div className="text-[10px] font-bold text-white/40 uppercase">Processed records are written to PageRecord</div>
+              <div className="text-[10px] font-bold text-white/40 uppercase">Skipped records appear as job issues</div>
               <div className="text-[10px] font-bold text-rose-400 uppercase">Errors: 0</div>
             </div>
           </CardContent>

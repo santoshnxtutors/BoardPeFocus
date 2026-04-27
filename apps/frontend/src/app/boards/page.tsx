@@ -16,10 +16,14 @@ import {
   boardsHubFaqs,
   boardsHubRelatedPages,
   getAreaDetails,
+  getBoardClassPath,
+  getBoardPath,
   getBoardSubjectCards,
 } from "@/app/boards/_data/boards";
+import { getClassHubPath } from "@/app/classes/_data/classes";
 import { getSchoolHubLink } from "@/app/schools/_data/linking";
 import { mockSchools } from "@/data/mock";
+import { getLiveContent } from "@/lib/live-content";
 
 export const metadata = constructMetadata({
   title: "Boards Hub | Premium Board Exam Home Tutors in Gurgaon | BoardPeFocus",
@@ -34,9 +38,9 @@ const classPathways = [
     description:
       "Useful for parents who want to start at the class level and then choose the right CBSE, ICSE, or IGCSE route.",
     links: [
-      { label: "Explore Class 10 Hub", href: "/classes/class-10" },
-      { label: "CBSE Class 10", href: "/boards/cbse/class-10" },
-      { label: "ICSE Class 10", href: "/boards/icse/class-10" },
+      { label: "Explore Class 10 Hub", href: getClassHubPath("class-10") },
+      { label: "CBSE Class 10", href: getBoardClassPath("cbse", "class-10") },
+      { label: "ICSE Class 10", href: getBoardClassPath("icse", "class-10") },
     ],
   },
   {
@@ -44,9 +48,9 @@ const classPathways = [
     description:
       "Built for premium Gurgaon families who want a clearer Class 12 path before moving into subject-expert board pages.",
     links: [
-      { label: "Explore Class 12 Hub", href: "/classes/class-12" },
-      { label: "CBSE Class 12", href: "/boards/cbse/class-12" },
-      { label: "ISC Class 12", href: "/boards/isc/class-12" },
+      { label: "Explore Class 12 Hub", href: getClassHubPath("class-12") },
+      { label: "CBSE Class 12", href: getBoardClassPath("cbse", "class-12") },
+      { label: "ISC Class 12", href: getBoardClassPath("isc", "class-12") },
     ],
   },
 ];
@@ -77,7 +81,16 @@ const areaLinks = getAreaDetails([
   "new-gurgaon",
 ]);
 
-export default function BoardsHubPage() {
+interface LiveBoard {
+  id: string;
+  slug: string;
+  name: string;
+  shortDescription?: string | null;
+  description?: string | null;
+}
+
+export default async function BoardsHubPage() {
+  const liveBoards = await getLiveContent<LiveBoard>("/content/boards");
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Boards", url: absoluteUrl("/boards") },
@@ -146,6 +159,22 @@ export default function BoardsHubPage() {
               title="Choose the board path that fits your child's school and exam stage"
               description="Each board card is designed to feel useful in 10–20 seconds, not like a thin category list."
             >
+              {liveBoards.length > 0 ? (
+                <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {liveBoards.map((board) => (
+                    <Link
+                      key={board.id}
+                      href={getBoardPath(board.slug)}
+                      className="rounded-[1.75rem] border border-primary/10 bg-primary/5 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+                    >
+                      <h3 className="text-xl font-bold text-primary">{board.name}</h3>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                        {board.shortDescription ?? board.description ?? `Explore ${board.name} board support in Gurgaon.`}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {boardHubConfigs.map((board) => (
                   <BoardCard key={board.slug} board={board} />

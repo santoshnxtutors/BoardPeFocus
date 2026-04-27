@@ -17,6 +17,7 @@ import {
   getManifestLeadDefaults,
   getManifestPageTitle,
   getManifestRelatedLinks,
+  getManifestRoutePath,
   getManifestSections,
   isEditorialManifestPage,
   ManifestPageRecord,
@@ -35,6 +36,7 @@ export function GeneratedManifestPage({ record }: { record: ManifestPageRecord }
   const faqs = getManifestFaqs(record);
   const breadcrumbs = getManifestBreadcrumbs(record);
   const jsonLd = buildManifestJsonLd(record);
+  const routePath = getManifestRoutePath(record);
 
   return (
     <div className="min-h-screen bg-background">
@@ -217,7 +219,7 @@ export function GeneratedManifestPage({ record }: { record: ManifestPageRecord }
                     <h2 className="text-xl font-bold">Route snapshot</h2>
                   </div>
                   <div className="mt-5 space-y-3 text-sm leading-7 text-muted-foreground">
-                    <p>Path: {record.normalizedPath}</p>
+                    <p>Path: {routePath}</p>
                     {record.searchIntent ? <p>Intent: {record.searchIntent}</p> : null}
                     {record.wordCountTarget ? <p>Word target: {record.wordCountTarget}</p> : null}
                     {record.indexationAdvice ? <p>Indexation: {record.indexationAdvice}</p> : null}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { BookOpen, GraduationCap, MapPin, School } from "lucide-react";
 import { FAQ } from "@/components/faq/FAQ";
 import { LeadForm } from "@/components/forms/LeadForm";
@@ -11,6 +11,7 @@ import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJs
 import {
   buildGeneratedMetadata,
   getBoardSubjectFallbackParams,
+  getManifestRedirectTarget,
   getManifestPage,
 } from "@/lib/generated-pages";
 import { BoardsBreadcrumbs } from "@/app/boards/_components/BoardsBreadcrumbs";
@@ -22,7 +23,9 @@ import {
   getAllSubjectParams,
   getAreaDetails,
   getBoardClassConfig,
+  getBoardClassPath,
   getBoardConfig,
+  getBoardPath,
   getBoardSubjectConfig,
   getBoardSubjectPath,
   getSchoolDetails,
@@ -65,10 +68,16 @@ export default async function BoardSubjectPage({ params }: PageProps) {
   const board = getBoardConfig(boardSlug);
   const classConfig = getBoardClassConfig(boardSlug, classLevel);
   const subject = getBoardSubjectConfig(boardSlug, classLevel, subjectSlug);
-  const generatedPage = getManifestPage(`/boards/${boardSlug}/${classLevel}/${subjectSlug}`);
+  const pathname = `/boards/${boardSlug}/${classLevel}/${subjectSlug}`;
+  const generatedPage = getManifestPage(pathname);
 
   if ((!board || !classConfig || !subject) && !generatedPage) notFound();
   if (!board || !classConfig || !subject) {
+    const redirectTarget = getManifestRedirectTarget(pathname);
+    if (redirectTarget) {
+      redirect(redirectTarget);
+    }
+
     return <GeneratedManifestPage record={generatedPage!} />;
   }
 
@@ -79,8 +88,8 @@ export default async function BoardSubjectPage({ params }: PageProps) {
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Boards", url: absoluteUrl("/boards") },
-    { name: board.name, url: absoluteUrl(`/boards/${board.slug}`) },
-    { name: classConfig.label, url: absoluteUrl(`/boards/${board.slug}/${classConfig.slug}`) },
+    { name: board.name, url: absoluteUrl(getBoardPath(board.slug)) },
+    { name: classConfig.label, url: absoluteUrl(getBoardClassPath(board.slug, classConfig.slug)) },
     { name: subject.shortLabel, url: absoluteUrl(getBoardSubjectPath(board.slug, classConfig.slug, subject.slug)) },
   ]);
   const faqJsonLd = generateFaqJsonLd(subject.faq);
@@ -96,8 +105,8 @@ export default async function BoardSubjectPage({ params }: PageProps) {
             items={[
               { label: "Home", href: "/" },
               { label: "Boards", href: "/boards" },
-              { label: board.name, href: `/boards/${board.slug}` },
-              { label: classConfig.label, href: `/boards/${board.slug}/${classConfig.slug}` },
+              { label: board.name, href: getBoardPath(board.slug) },
+              { label: classConfig.label, href: getBoardClassPath(board.slug, classConfig.slug) },
               { label: subject.shortLabel },
             ]}
           />
@@ -245,12 +254,12 @@ export default async function BoardSubjectPage({ params }: PageProps) {
                 links={[
                   {
                     title: `${board.name} ${classConfig.label}`,
-                    href: `/boards/${board.slug}/${classConfig.slug}`,
+                    href: getBoardClassPath(board.slug, classConfig.slug),
                     description: "Move up one step to the class page for broader subject and revision context.",
                   },
                   {
                     title: `${board.name} board hub`,
-                    href: `/boards/${board.slug}`,
+                    href: getBoardPath(board.slug),
                     description: "Return to the full board page for class, school, and area pathways.",
                   },
                   {

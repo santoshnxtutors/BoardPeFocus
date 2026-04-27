@@ -7,6 +7,7 @@ import {
   generateFaqJsonLd,
 } from "@/lib/seo";
 import { ResourceArticleView } from "@/app/resources/_components/ResourceArticleView";
+import { fetchBackend } from "@/lib/backend-api";
 import {
   getAllResourceArticleParams,
   getRelatedArticles,
@@ -15,19 +16,46 @@ import {
   getResourceCategoryFromArticle,
 } from "@/app/resources/_data/articles";
 
+interface LiveResourceArticle {
+  id: string;
+  slug: string;
+  title: string;
+  category?: string | null;
+  summary?: string | null;
+  body?: string | null;
+  seoTitle?: string | null;
+  metaDescription?: string | null;
+}
+
+async function getLiveResource(slug: string) {
+  const response = await fetchBackend(`/content/resources/${encodeURIComponent(slug)}`);
+  if (!response.ok) return null;
+  return (await response.json()) as LiveResourceArticle;
+}
+
 export function generateStaticParams() {
   return getAllResourceArticleParams();
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { category: string; slug: string };
+  params: Promise<{ category: string; slug: string }>;
 }) {
-  const article = getResourceArticle(params.category, params.slug);
+  const { category, slug } = await params;
+  const article = getResourceArticle(category, slug);
 
   if (!article) {
-    return constructMetadata({ title: "Resource Not Found | BoardPeFocus", noIndex: true });
+    const liveArticle = await getLiveResource(slug);
+    if (!liveArticle) {
+      return constructMetadata({ title: "Resource Not Found | BoardPeFocus", noIndex: true });
+    }
+
+    return constructMetadata({
+      title: liveArticle.seoTitle ?? `${liveArticle.title} | BoardPeFocus Resources`,
+      description: liveArticle.metaDescription ?? liveArticle.summary ?? undefined,
+      pathname: `/resources/${category}/${slug}`,
+    });
   }
 
   return constructMetadata({
@@ -37,15 +65,21 @@ export function generateMetadata({
   });
 }
 
-export default function ResourceArticlePage({
+export default async function ResourceArticlePage({
   params,
 }: {
-  params: { category: string; slug: string };
+  params: Promise<{ category: string; slug: string }>;
 }) {
-  const article = getResourceArticle(params.category, params.slug);
+  const { category: categorySlug, slug } = await params;
+  const article = getResourceArticle(categorySlug, slug);
 
   if (!article) {
-    notFound();
+    const liveArticle = await getLiveResource(slug);
+    if (!liveArticle) {
+      notFound();
+    }
+
+    return <LiveResourceView article={liveArticle} categorySlug={categorySlug} />;
   }
 
   const category = getResourceCategoryFromArticle(article);
@@ -88,6 +122,47 @@ export default function ResourceArticlePage({
       <JsonLd data={faqJsonLd} />
       <JsonLd data={articleJsonLd} />
       <ResourceArticleView article={article} category={category} relatedArticles={relatedArticles} />
+    </div>
+  );
+}
+
+function LiveResourceView({
+  article,
+  categorySlug,
+}: {
+  article: LiveResourceArticle;
+  categorySlug: string;
+}) {
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Resources", url: absoluteUrl("/resources") },
+    { name: article.category ?? categorySlug, url: absoluteUrl(`/resources/${categorySlug}`) },
+    { name: article.title, url: absoluteUrl(`/resources/${categorySlug}/${article.slug}`) },
+  ]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <JsonLd data={breadcrumbJsonLd} />
+      <section className="pt-32">
+        <div className="container mx-auto max-w-4xl px-4">
+          <article className="rounded-[2rem] border border-border/60 bg-white p-8 shadow-sm md:p-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">
+              {article.category ?? "Resource"}
+            </p>
+            <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-primary md:text-6xl">
+              {article.title}
+            </h1>
+            {article.summary ? (
+              <p className="mt-6 text-lg leading-8 text-muted-foreground">{article.summary}</p>
+            ) : null}
+            {article.body ? (
+              <div className="mt-10 whitespace-pre-line text-base leading-8 text-foreground">
+                {article.body}
+              </div>
+            ) : null}
+          </article>
+        </div>
+      </section>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { absoluteUrl, generateBreadcrumbJsonLd } from "@/lib/seo";
+import { getTutorPath } from "@/lib/tutor-paths";
 
 export async function generateMetadata({ params }: { params: { schoolSlug: string } }) {
   const school = mockSchools.find(s => s.slug === params.schoolSlug);
@@ -123,7 +124,7 @@ export default function SchoolLandingPage({ params }: { params: { schoolSlug: st
                                </div>
                             </div>
                           </div>
-                          <Link href={`/tutors/${tutor.slug}`} className="w-full">
+                          <Link href={getTutorPath(tutor.slug)} className="w-full">
                             <Button className="w-full rounded-xl bg-primary hover:bg-primary/90">View Full Profile</Button>
                           </Link>
                         </CardContent>

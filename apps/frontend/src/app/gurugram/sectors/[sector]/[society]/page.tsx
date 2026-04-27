@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { GraduationCap, Home, ShieldCheck } from "lucide-react";
+import { FAQ } from "@/components/faq/FAQ";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { GeneratedManifestPage } from "@/components/generated-pages/GeneratedManifestPage";
 import { TutorCard } from "@/components/cards/TutorCard";
@@ -14,8 +15,11 @@ import { getAreaCluster, getSectorDetail, getSocietyDetail } from "@/data/areas"
 import { mockSchools, mockTutors } from "@/data/mock";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { getSchoolHubLink } from "@/app/schools/_data/linking";
+import { fetchBackend } from "@/lib/backend-api";
+import { getLiveFaqs } from "@/lib/live-content";
 import {
   buildGeneratedMetadata,
+  getManifestRedirectTarget,
   getManifestPage,
   getSectorFallbackParams,
 } from "@/lib/generated-pages";
@@ -24,12 +28,37 @@ interface PageProps {
   params: Promise<{ sector: string; society: string }>;
 }
 
+interface LiveSociety {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  seoTitle?: string | null;
+  metaDescription?: string | null;
+  sector?: { slug: string; name: string } | null;
+}
+
+async function getLiveSociety(slug: string) {
+  const response = await fetchBackend(`/content/societies/${encodeURIComponent(slug)}`);
+  if (!response.ok) return null;
+  return (await response.json()) as LiveSociety;
+}
+
 export async function generateStaticParams() {
   return getSectorFallbackParams();
 }
 
 export async function generateMetadata({ params }: PageProps) {
   const { sector: sectorSlug, society: societySlug } = await params;
+  const liveSociety = await getLiveSociety(societySlug);
+  if (liveSociety) {
+    return constructMetadata({
+      title: liveSociety.seoTitle ?? `Premium Home Tutors in ${liveSociety.name} | BoardPeFocus`,
+      description: liveSociety.metaDescription ?? liveSociety.description ?? undefined,
+      pathname: `/gurugram/sectors/${sectorSlug}/${societySlug}`,
+    });
+  }
+
   const sector = getSectorDetail(sectorSlug);
   const society = getSocietyDetail(sectorSlug, societySlug);
   const generatedPage = getManifestPage(`/gurugram/sectors/${sectorSlug}/${societySlug}`);
@@ -51,17 +80,32 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function SocietyPage({ params }: PageProps) {
   const { sector: sectorSlug, society: societySlug } = await params;
+  const liveSociety = await getLiveSociety(societySlug);
   const sector = getSectorDetail(sectorSlug);
   const society = getSocietyDetail(sectorSlug, societySlug);
-  const generatedPage = getManifestPage(`/gurugram/sectors/${sectorSlug}/${societySlug}`);
+  const pathname = `/gurugram/sectors/${sectorSlug}/${societySlug}`;
+  const generatedPage = getManifestPage(pathname);
 
   if (!sector || !society) {
     if (generatedPage) {
+      const redirectTarget = getManifestRedirectTarget(pathname);
+      if (redirectTarget) {
+        redirect(redirectTarget);
+      }
+
       return <GeneratedManifestPage record={generatedPage} />;
+    }
+
+    if (liveSociety) {
+      return <LiveSocietyPage society={liveSociety} sectorSlug={sectorSlug} />;
     }
 
     notFound();
   }
+
+  const liveFaqs =
+    liveSociety?.id ? await getLiveFaqs({ entityType: "SOCIETY", entityId: liveSociety.id }) : [];
+  const heroDescription = liveSociety?.description ?? society.summary;
 
   const cluster = getAreaCluster(sector.clusterSlug);
   const nearbySchools = sector.nearbySchoolSlugs
@@ -103,7 +147,7 @@ export default async function SocietyPage({ params }: PageProps) {
             <div className="text-xs font-semibold uppercase tracking-[0.26em] text-primary/60">Society Page</div>
             <h1 className="mt-5 text-4xl font-extrabold text-primary md:text-6xl">{`Home Tutors in ${society.name}`}</h1>
             <p className="mt-6 text-lg leading-8 text-muted-foreground md:text-xl">
-              {society.summary} This micro-location page stays focused on convenience, school relevance, and premium one-to-one board preparation.
+              {heroDescription} This micro-location page stays focused on convenience, school relevance, and premium one-to-one board preparation.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/contact">
@@ -224,6 +268,15 @@ export default async function SocietyPage({ params }: PageProps) {
                   },
                 ]}
               />
+
+              {liveFaqs.length > 0 ? (
+                <FAQ
+                  items={liveFaqs}
+                  title={`${society.name} FAQs`}
+                  subtitle="These FAQs are assigned from the admin panel and published live on this society route."
+                  columns={2}
+                />
+              ) : null}
             </div>
 
             <div className="space-y-6">
@@ -248,6 +301,56 @@ export default async function SocietyPage({ params }: PageProps) {
                   </Link>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function LiveSocietyPage({
+  society,
+  sectorSlug,
+}: {
+  society: LiveSociety;
+  sectorSlug: string;
+}) {
+  const parentSectorSlug = society.sector?.slug ?? sectorSlug;
+  const parentSectorName = society.sector?.name ?? "Sector";
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Gurugram", url: absoluteUrl("/gurugram") },
+    { name: parentSectorName, url: absoluteUrl(`/gurugram/sectors/${parentSectorSlug}`) },
+    { name: society.name, url: absoluteUrl(`/gurugram/sectors/${parentSectorSlug}/${society.slug}`) },
+  ]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <JsonLd data={breadcrumbJsonLd} />
+      <section className="pt-32">
+        <div className="container mx-auto max-w-5xl px-4">
+          <AreaBreadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Gurugram", href: "/gurugram" },
+              { label: parentSectorName, href: `/gurugram/sectors/${parentSectorSlug}` },
+              { label: society.name },
+            ]}
+          />
+          <div className="rounded-[2rem] border border-border/60 bg-white p-8 shadow-sm md:p-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">Society Page</p>
+            <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-primary md:text-6xl">
+              Home Tutors in {society.name}
+            </h1>
+            {society.description ? <p className="mt-6 text-lg leading-8 text-muted-foreground">{society.description}</p> : null}
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link href={`/gurugram/sectors/${parentSectorSlug}`}>
+                <Button variant="outline" className="rounded-xl px-6">Back to {parentSectorName}</Button>
+              </Link>
+              <Link href="/contact">
+                <Button className="rounded-xl px-6">Request Callback</Button>
+              </Link>
             </div>
           </div>
         </div>

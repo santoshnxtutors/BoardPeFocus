@@ -1,6 +1,8 @@
 import { areaClusters } from "@/data/areas";
 import { mockTutors } from "@/data/mock";
 import { Tutor } from "@/types";
+import { getBoardPath } from "@/app/boards/_data/boards";
+import { getClassHubPath } from "@/app/classes/_data/classes";
 
 export interface SchoolFaqItem {
   question: string;
@@ -71,16 +73,16 @@ export interface SchoolConfig {
 }
 
 const boardHrefMap = {
-  cbse: "/boards/cbse",
-  icse: "/boards/icse",
-  isc: "/boards/isc",
-  igcse: "/boards/igcse",
-  ib: "/boards/ib",
+  cbse: getBoardPath("cbse"),
+  icse: getBoardPath("icse"),
+  isc: getBoardPath("isc"),
+  igcse: getBoardPath("igcse"),
+  ib: getBoardPath("ib"),
 } as const;
 
 const classHrefMap = {
-  "class-10": "/classes/class-10",
-  "class-12": "/classes/class-12",
+  "class-10": getClassHubPath("class-10"),
+  "class-12": getClassHubPath("class-12"),
 } as const;
 
 function makeBoardSupport(
@@ -1521,12 +1523,12 @@ export const schoolsHubRelatedLinks: RelatedLink[] = [
   },
   {
     title: "Class 10 Hub",
-    href: "/classes/class-10",
+    href: getClassHubPath("class-10"),
     description: "Explore the Class 10 discovery hub for board-stage tutoring decisions.",
   },
   {
     title: "Class 12 Hub",
-    href: "/classes/class-12",
+    href: getClassHubPath("class-12"),
     description: "Explore the Class 12 hub for senior-board subject and revision pathways.",
   },
   {

@@ -1,5 +1,6 @@
 import { areaClusters } from "@/data/areas";
 import { mockSchools } from "@/data/mock";
+import { getBoardClassPath } from "@/app/boards/_data/boards";
 
 export interface ClassFaqItem {
   question: string;
@@ -81,21 +82,21 @@ export const classHubConfigs: ClassHubConfig[] = [
     boardPathways: [
       {
         board: "CBSE Class 10",
-        href: "/boards/cbse/class-10",
+        href: getBoardClassPath("cbse", "class-10"),
         description:
           "Useful for Gurgaon families who want NCERT discipline, better Science and Maths structure, and steadier pre-board preparation.",
         keySubjects: ["Maths", "Science", "English"],
       },
       {
         board: "ICSE Class 10",
-        href: "/boards/icse/class-10",
+        href: getBoardClassPath("icse", "class-10"),
         description:
           "Useful when families want sharper written quality, stronger conceptual depth, and school-aware one-to-one support at home.",
         keySubjects: ["Maths", "Science", "English"],
       },
       {
         board: "IGCSE Year 10",
-        href: "/boards/igcse/class-10",
+        href: getBoardClassPath("igcse", "class-10"),
         description:
           "Best suited to internationally paced subject support where concept depth and exam technique both need closer attention.",
         keySubjects: ["Maths", "Physics", "Chemistry", "Biology", "English"],
@@ -157,9 +158,9 @@ export const classHubConfigs: ClassHubConfig[] = [
         title: "Board-confidence pathways",
         description: "Where Class 10 tutoring usually matters most is in revision quality, writing discipline, and pre-board calm.",
         items: [
-          { subject: "CBSE revision flow", boards: ["CBSE"], href: "/boards/cbse/class-10" },
-          { subject: "ICSE written precision", boards: ["ICSE"], href: "/boards/icse/class-10" },
-          { subject: "IGCSE concept depth", boards: ["IGCSE"], href: "/boards/igcse/class-10" },
+          { subject: "CBSE revision flow", boards: ["CBSE"], href: getBoardClassPath("cbse", "class-10") },
+          { subject: "ICSE written precision", boards: ["ICSE"], href: getBoardClassPath("icse", "class-10") },
+          { subject: "IGCSE concept depth", boards: ["IGCSE"], href: getBoardClassPath("igcse", "class-10") },
         ],
       },
     ],
@@ -222,12 +223,12 @@ export const classHubConfigs: ClassHubConfig[] = [
       },
       {
         title: "CBSE Class 10",
-        href: "/boards/cbse/class-10",
+        href: getBoardClassPath("cbse", "class-10"),
         description: "Move into the CBSE-specific Class 10 page for subject and revision pathways.",
       },
       {
         title: "ICSE Class 10",
-        href: "/boards/icse/class-10",
+        href: getBoardClassPath("icse", "class-10"),
         description: "Explore the ICSE route for written precision, subject depth, and school-aware support.",
       },
       {
@@ -255,21 +256,21 @@ export const classHubConfigs: ClassHubConfig[] = [
     boardPathways: [
       {
         board: "CBSE Class 12",
-        href: "/boards/cbse/class-12",
+        href: getBoardClassPath("cbse", "class-12"),
         description:
           "Useful for Gurgaon families seeking subject-wise depth in Maths, Physics, Chemistry, Biology, Economics, Accountancy, and Computer Science.",
         keySubjects: ["Maths", "Physics", "Chemistry", "Biology", "Commerce"],
       },
       {
         board: "ISC Class 12",
-        href: "/boards/isc/class-12",
+        href: getBoardClassPath("isc", "class-12"),
         description:
           "Useful where written quality, concept control, and calmer board execution matter across Science and Commerce subjects.",
         keySubjects: ["Maths", "Physics", "Chemistry", "Biology", "Economics"],
       },
       {
         board: "IBDP",
-        href: "/boards/ib/ibdp",
+        href: getBoardClassPath("ib", "ibdp"),
         description:
           "Best suited to premium Gurgaon families who need deeper one-to-one senior-subject support in a demanding international-school environment.",
         keySubjects: ["IB Maths", "IB Physics", "IB Chemistry", "IB Biology", "IB Economics"],
@@ -415,12 +416,12 @@ export const classHubConfigs: ClassHubConfig[] = [
       },
       {
         title: "CBSE Class 12",
-        href: "/boards/cbse/class-12",
+        href: getBoardClassPath("cbse", "class-12"),
         description: "Explore the CBSE Class 12 route for Science and Commerce subject pathways.",
       },
       {
         title: "ISC Class 12",
-        href: "/boards/isc/class-12",
+        href: getBoardClassPath("isc", "class-12"),
         description: "Move into the ISC Class 12 page for board-specific subject and revision support.",
       },
       {
@@ -490,6 +491,10 @@ export function getAllClassHubParams() {
 }
 
 export function getClassHubPath(classLevel: string) {
+  return `/classes/${classLevel}/home-tutors`;
+}
+
+export function getLegacyClassHubPath(classLevel: string) {
   return `/classes/${classLevel}`;
 }
 

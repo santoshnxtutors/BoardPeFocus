@@ -9,6 +9,7 @@ import { FAQ } from "@/components/faq/FAQ";
 import { platformStats } from "@/data/stats";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getSchoolHubLink } from "@/app/schools/_data/linking";
+import { getLiveContent } from "@/lib/live-content";
 
 export const metadata = constructMetadata({
   title: "Premium Home Tutors in Gurugram | BoardPeFocus",
@@ -16,7 +17,58 @@ export const metadata = constructMetadata({
   pathname: "/gurugram",
 });
 
-export default function GurugramCityPage() {
+interface LiveBoard {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  shortDescription?: string | null;
+}
+
+interface LiveSector {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  societies?: Array<{ id: string; name: string; slug: string }>;
+}
+
+interface LiveSchool {
+  id: string;
+  slug: string;
+  name: string;
+  locality?: string | null;
+  curriculumMix?: string | null;
+}
+
+export default async function GurugramCityPage() {
+  const [liveBoards, liveSectors, liveSchools] = await Promise.all([
+    getLiveContent<LiveBoard>("/content/boards"),
+    getLiveContent<LiveSector>("/content/sectors"),
+    getLiveContent<LiveSchool>("/content/schools"),
+  ]);
+  const boardItems = liveBoards.length
+    ? liveBoards.map((board) => ({
+        slug: board.slug,
+        name: board.name,
+        description: board.shortDescription ?? board.description ?? `Explore ${board.name} tutors in Gurugram.`,
+      }))
+    : mockBoards;
+  const sectorItems = liveSectors.length
+    ? liveSectors.map((sector) => ({
+        slug: sector.slug,
+        name: sector.name,
+        societies: (sector.societies ?? []).map((society) => society.name),
+      }))
+    : mockSectors;
+  const schoolItems = liveSchools.length
+    ? liveSchools.map((school) => ({
+        slug: school.slug,
+        name: school.name,
+        boards: school.curriculumMix ? [school.curriculumMix] : [],
+        location: school.locality ?? "Gurugram",
+      }))
+    : mockSchools;
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Gurugram", url: absoluteUrl("/gurugram") },
@@ -81,7 +133,7 @@ export default function GurugramCityPage() {
               <p className="text-lg text-muted-foreground">Expert educators specialized in specific boards.</p>
             </div>
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mockBoards.map((board) => (
+              {boardItems.map((board) => (
                 <StaggerItem key={board.slug}>
                   <Link href={`/gurugram/${board.slug}`}>
                     <Card className="glass-card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border-border/50 h-full">
@@ -121,12 +173,14 @@ export default function GurugramCityPage() {
                 </Link>
               </div>
               <div className="space-y-4">
-                {mockSectors.map(sector => (
+                {sectorItems.map(sector => (
                   <Link key={sector.slug} href={`/gurugram/sectors/${sector.slug}`}>
                     <div className="p-6 rounded-2xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-colors flex justify-between items-center group">
                       <div>
                         <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">{sector.name}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">Including {sector.societies.slice(0, 2).join(", ")}</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {sector.societies.length > 0 ? `Including ${sector.societies.slice(0, 2).join(", ")}` : "Explore this locality"}
+                        </p>
                       </div>
                       <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
@@ -142,7 +196,7 @@ export default function GurugramCityPage() {
                 <GraduationCap className="w-8 h-8 text-secondary" /> Familiar with Top Schools
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {mockSchools.map(school => (
+                {schoolItems.map(school => (
                   <Link key={school.slug} href={getSchoolHubLink(school.slug)}>
                     <div className="p-5 rounded-2xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-colors h-full flex flex-col justify-center">
                       <h3 className="font-bold text-foreground mb-1">{school.name}</h3>

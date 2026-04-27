@@ -20,6 +20,7 @@ import {
   getFeaturedSocieties,
   getSectorDetail,
 } from "@/data/areas";
+import { getBoardPath } from "@/app/boards/_data/boards";
 import { AreaCard } from "@/components/areas/AreaCard";
 import { AreaSection } from "@/components/areas/AreaSection";
 import { FAQ } from "@/components/faq/FAQ";
@@ -404,9 +405,9 @@ export function GurgaonAreasHub() {
               title: "Related Boards",
               icon: <Sparkles className="h-5 w-5 text-accent" />,
               links: [
-                { label: "CBSE Tutors", href: "/boards/cbse" },
-                { label: "ICSE Tutors", href: "/boards/icse" },
-                { label: "IB DP Tutors", href: "/boards/ib" },
+                { label: "CBSE Tutors", href: getBoardPath("cbse") },
+                { label: "ICSE Tutors", href: getBoardPath("icse") },
+                { label: "IB DP Tutors", href: getBoardPath("ib") },
               ],
             },
             {

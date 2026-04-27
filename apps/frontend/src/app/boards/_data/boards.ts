@@ -2242,15 +2242,23 @@ export function getAllSubjectParams() {
 }
 
 export function getBoardPath(boardSlug: string) {
+  return `/boards/${boardSlug}/home-tutors`;
+}
+
+export function getLegacyBoardPath(boardSlug: string) {
   return `/boards/${boardSlug}`;
 }
 
 export function getBoardClassPath(boardSlug: string, classSlug: string) {
-  return `${getBoardPath(boardSlug)}/${classSlug}`;
+  return `${getLegacyBoardPath(boardSlug)}/${classSlug}/home-tutors`;
+}
+
+export function getLegacyBoardClassPath(boardSlug: string, classSlug: string) {
+  return `${getLegacyBoardPath(boardSlug)}/${classSlug}`;
 }
 
 export function getBoardSubjectPath(boardSlug: string, classSlug: string, subjectSlug: string) {
-  return `${getBoardClassPath(boardSlug, classSlug)}/${subjectSlug}`;
+  return `${getLegacyBoardClassPath(boardSlug, classSlug)}/${subjectSlug}`;
 }
 
 export function getBoardSubjectCards() {

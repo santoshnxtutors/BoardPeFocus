@@ -15,9 +15,35 @@ import { ProcessBreadcrumbs } from "@/app/process/_components/ProcessBreadcrumbs
 import { ProcessCtaBlock } from "@/app/process/_components/ProcessCtaBlock";
 import { ProcessSection } from "@/app/process/_components/ProcessSection";
 import { getAllProcessParams, getProcessPage } from "@/app/process/_data/process";
+import { getLiveContentItem, getLiveFaqs } from "@/lib/live-content";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+interface LiveProcessContent {
+  id: string;
+  slug: string;
+  title: string;
+  summary?: string | null;
+  body?: string | null;
+  seoTitle?: string | null;
+  metaDescription?: string | null;
+}
+
+async function getLiveProcessContent(slug: string) {
+  return getLiveContentItem<LiveProcessContent>(`/content/process-content/${encodeURIComponent(slug)}`);
+}
+
+async function getLiveProcessFaqs(item: LiveProcessContent) {
+  const [entityFaqs, pageFaqs] = await Promise.all([
+    getLiveFaqs({ entityType: "PROCESS_CONTENT", entityId: item.id }),
+    getLiveFaqs({ pageSlug: item.slug }),
+  ]);
+
+  return [...entityFaqs, ...pageFaqs].filter((faq, index, items) => {
+    return items.findIndex((candidate) => candidate.id === faq.id) === index;
+  });
 }
 
 export async function generateStaticParams() {
@@ -26,6 +52,15 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
+  const livePage = await getLiveProcessContent(slug);
+  if (livePage) {
+    return constructMetadata({
+      title: livePage.seoTitle ?? `${livePage.title} | BoardPeFocus Service Journey`,
+      description: livePage.metaDescription ?? livePage.summary ?? livePage.body ?? undefined,
+      pathname: `/process/${livePage.slug}`,
+    });
+  }
+
   const page = getProcessPage(slug);
 
   if (!page) {
@@ -41,6 +76,12 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function ProcessDetailPage({ params }: PageProps) {
   const { slug } = await params;
+  const livePage = await getLiveProcessContent(slug);
+  if (livePage) {
+    const liveFaqs = await getLiveProcessFaqs(livePage);
+    return <LiveProcessDetailPage page={livePage} faqs={liveFaqs} />;
+  }
+
   const page = getProcessPage(slug);
 
   if (!page) {
@@ -209,6 +250,110 @@ export default async function ProcessDetailPage({ params }: PageProps) {
             />
 
             <ProcessCtaBlock title={page.ctaTitle} description={page.ctaDescription} />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function LiveProcessDetailPage({
+  page,
+  faqs,
+}: {
+  page: LiveProcessContent;
+  faqs: Array<{ question: string; answer: string }>;
+}) {
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Process", url: absoluteUrl("/process") },
+    { name: page.title, url: absoluteUrl(`/process/${page.slug}`) },
+  ]);
+  const faqJsonLd = generateFaqJsonLd(faqs);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <JsonLd data={breadcrumbJsonLd} />
+      {faqs.length > 0 ? <JsonLd data={faqJsonLd} /> : null}
+
+      <section className="pt-32">
+        <div className="container mx-auto max-w-7xl px-4">
+          <ProcessBreadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Process", href: "/process" },
+              { label: page.title },
+            ]}
+          />
+
+          <section className="relative overflow-hidden rounded-[2.5rem] border border-border/60 bg-[linear-gradient(135deg,rgba(21,48,96,0.96),rgba(28,67,124,0.92))] px-6 py-16 text-white shadow-[0_30px_80px_rgba(21,48,96,0.18)] md:px-10 md:py-20">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,191,64,0.22),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_30%)]" />
+            <div className="relative z-10 grid gap-12 lg:grid-cols-[1.12fr_0.88fr] lg:items-end">
+              <div className="max-w-3xl">
+                <Badge variant="outline" className="border-white/20 bg-white/10 px-4 py-2 text-white">
+                  Live Process Content
+                </Badge>
+                <h1 className="mt-6 text-4xl font-extrabold tracking-tight md:text-6xl">{page.title}</h1>
+                <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">
+                  {page.summary ?? "Published guidance from the BoardPeFocus admin content system."}
+                </p>
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <Link
+                    href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20with%20this%20process%20step%20for%20my%20child."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
+                      Talk on WhatsApp
+                    </Button>
+                  </Link>
+                  <Link href="/contact">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="h-12 rounded-xl border-white/20 bg-white/10 px-6 text-white hover:bg-white/15 hover:text-white"
+                    >
+                      Request Callback
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="rounded-[2rem] border border-white/10 bg-white/10 p-6 backdrop-blur-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">Published summary</p>
+                <p className="mt-5 text-base leading-8 text-white/85">
+                  {page.summary ?? "This page is being managed from the admin panel and is ready for live updates."}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <div className="space-y-24 py-24">
+            <ProcessSection
+              eyebrow="Published Content"
+              title="Current live guidance"
+              description="This section reflects the latest published process copy from the admin panel."
+            >
+              <div className="rounded-[2rem] border border-border/60 bg-white p-8 shadow-sm">
+                <div className="whitespace-pre-line text-base leading-8 text-foreground">
+                  {page.body ?? page.summary ?? "No body content has been published for this route yet."}
+                </div>
+              </div>
+            </ProcessSection>
+
+            {faqs.length > 0 ? (
+              <FAQ
+                items={faqs}
+                title={`${page.title} FAQs`}
+                subtitle="These FAQs are assigned from the admin panel and published live on this route."
+                columns={2}
+              />
+            ) : null}
+
+            <ProcessCtaBlock
+              title="Need help with the next step?"
+              description="We can help you move from reading this process page into the right callback, support, or matching conversation."
+            />
           </div>
         </div>
       </section>

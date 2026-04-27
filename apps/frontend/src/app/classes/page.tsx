@@ -16,9 +16,11 @@ import {
   classesHubFaqs,
   classesHubRelatedLinks,
   getAreaDetails,
+  getClassHubPath,
   getSchoolDetails,
 } from "@/app/classes/_data/classes";
 import { getSchoolHubLink } from "@/app/schools/_data/linking";
+import { getLiveContent } from "@/lib/live-content";
 
 export const metadata = constructMetadata({
   title: "Classes Hub | Class 10 & Class 12 Home Tutors in Gurgaon | BoardPeFocus",
@@ -45,7 +47,15 @@ const classesHubSchools = getSchoolDetails([
   "scottish-high-international-school",
 ]);
 
-export default function ClassesHubPage() {
+interface LiveClassLevel {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+}
+
+export default async function ClassesHubPage() {
+  const liveClasses = await getLiveContent<LiveClassLevel>("/content/classes");
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Classes", url: absoluteUrl("/classes") },
@@ -114,6 +124,22 @@ export default function ClassesHubPage() {
               title="Choose the class path that matches your child’s board stage"
               description="These class cards are built to feel premium, clear, and commercially useful within a few seconds."
             >
+              {liveClasses.length > 0 ? (
+                <div className="mb-8 grid gap-5 lg:grid-cols-2">
+                  {liveClasses.map((classLevel) => (
+                    <Link
+                      key={classLevel.id}
+                      href={getClassHubPath(classLevel.slug)}
+                      className="rounded-[1.75rem] border border-primary/10 bg-primary/5 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+                    >
+                      <h3 className="text-xl font-bold text-primary">{classLevel.name}</h3>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                        {classLevel.description ?? `Explore ${classLevel.name} tutoring pathways in Gurgaon.`}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <div className="grid gap-6 lg:grid-cols-2">
                 {classHubConfigs.map((classHub) => (
                   <ClassCard key={classHub.slug} classHub={classHub} />

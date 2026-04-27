@@ -12,6 +12,9 @@ import { SchoolsCtaBlock } from "@/app/schools/_components/SchoolsCtaBlock";
 import { SchoolsRelatedLinks } from "@/app/schools/_components/SchoolsRelatedLinks";
 import { SchoolsSection } from "@/app/schools/_components/SchoolsSection";
 import { getAreaClusterDetail, schoolConfigs, schoolsHubFaqs, schoolsHubRelatedLinks } from "@/app/schools/_data/schools";
+import { getBoardPath } from "@/app/boards/_data/boards";
+import { getClassHubPath } from "@/app/classes/_data/classes";
+import { getLiveContent } from "@/lib/live-content";
 
 export const metadata = constructMetadata({
   title: "Schools Hub | Home Tutors for Leading Gurgaon Schools | BoardPeFocus",
@@ -25,19 +28,19 @@ const discoveryPathways = [
     title: "Browse by curriculum",
     description: "Start with CBSE, ICSE, ISC, IB, or IGCSE relevance and then move into the school where that route matters most.",
     links: [
-      { label: "CBSE", href: "/boards/cbse" },
-      { label: "ICSE", href: "/boards/icse" },
-      { label: "ISC", href: "/boards/isc" },
-      { label: "IB", href: "/boards/ib" },
-      { label: "IGCSE", href: "/boards/igcse" },
+      { label: "CBSE", href: getBoardPath("cbse") },
+      { label: "ICSE", href: getBoardPath("icse") },
+      { label: "ISC", href: getBoardPath("isc") },
+      { label: "IB", href: getBoardPath("ib") },
+      { label: "IGCSE", href: getBoardPath("igcse") },
     ],
   },
   {
     title: "Browse by class stage",
     description: "Move from school discovery into the right Class 10 or Class 12 pathway before shortlisting subject-specific pages.",
     links: [
-      { label: "Class 10", href: "/classes/class-10" },
-      { label: "Class 12", href: "/classes/class-12" },
+      { label: "Class 10", href: getClassHubPath("class-10") },
+      { label: "Class 12", href: getClassHubPath("class-12") },
     ],
   },
   {
@@ -84,7 +87,17 @@ const areaCards = nearbyAreaLinks
   .map((slug) => getAreaClusterDetail(slug))
   .filter((area): area is NonNullable<ReturnType<typeof getAreaClusterDetail>> => Boolean(area));
 
-export default function SchoolsHubPage() {
+interface LiveSchool {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  locality?: string | null;
+  curriculumMix?: string | null;
+}
+
+export default async function SchoolsHubPage() {
+  const liveSchools = await getLiveContent<LiveSchool>("/content/schools");
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Schools", url: absoluteUrl("/schools") },
@@ -153,6 +166,25 @@ export default function SchoolsHubPage() {
               title="Explore premium Gurgaon school clusters"
               description="These school cards are designed to help parents move naturally into the right school-aware tutoring path without clutter or keyword noise."
             >
+              {liveSchools.length > 0 ? (
+                <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {liveSchools.map((school) => (
+                    <Link
+                      key={school.id}
+                      href={`/schools/${school.slug}`}
+                      className="rounded-[1.75rem] border border-primary/10 bg-primary/5 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">
+                        {school.curriculumMix ?? school.locality ?? "Gurgaon School"}
+                      </p>
+                      <h3 className="mt-3 text-xl font-bold text-primary">{school.name}</h3>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                        {school.description ?? "Explore school-aware tutoring support for this Gurgaon school."}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {schoolConfigs.map((school) => (
                   <SchoolCard key={school.slug} school={school} />
@@ -257,13 +289,13 @@ export default function SchoolsHubPage() {
                   },
                   {
                     title: "Class 10 Hub",
-                    href: "/classes/class-10",
+                    href: getClassHubPath("class-10"),
                     description: "A cleaner Class 10 discovery path for school-aware board support.",
                     icon: <GraduationCap className="h-5 w-5 text-accent" />,
                   },
                   {
                     title: "Class 12 Hub",
-                    href: "/classes/class-12",
+                    href: getClassHubPath("class-12"),
                     description: "The senior-board route for subject specialists and calmer revision planning.",
                     icon: <GraduationCap className="h-5 w-5 text-accent" />,
                   },

@@ -24,6 +24,7 @@ import {
   resourceCategories,
 } from "@/app/resources/_data/catalog";
 import { getFeaturedArticlesWithCategories } from "@/app/resources/_data/articles";
+import { getLiveContent } from "@/lib/live-content";
 
 export const metadata = constructMetadata({
   title: "Resources Hub | Board Exam Guides and Revision Support in Gurgaon | BoardPeFocus",
@@ -34,7 +35,24 @@ export const metadata = constructMetadata({
 
 const featuredResources = getFeaturedArticlesWithCategories();
 
-export default function ResourcesHubPage() {
+interface LiveResource {
+  id: string;
+  slug: string;
+  title: string;
+  category?: string | null;
+  summary?: string | null;
+}
+
+function toRouteSlug(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export default async function ResourcesHubPage() {
+  const liveResources = await getLiveContent<LiveResource>("/content/resources");
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Resources", url: absoluteUrl("/resources") },
@@ -115,6 +133,25 @@ export default function ResourcesHubPage() {
               title="Start with the highest-priority resources"
               description="This featured set covers the most commercially important board, class, subject, parent, and Gurgaon-locality questions first."
             >
+              {liveResources.length > 0 ? (
+                <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {liveResources.slice(0, 9).map((resource) => (
+                    <Link
+                      key={resource.id}
+                      href={`/resources/${toRouteSlug(resource.category ?? "guides")}/${resource.slug}`}
+                      className="rounded-[1.75rem] border border-primary/10 bg-primary/5 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">
+                        {resource.category ?? "Resource"}
+                      </p>
+                      <h3 className="mt-3 text-xl font-bold text-primary">{resource.title}</h3>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                        {resource.summary ?? "Read this BoardPeFocus resource guide."}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <div className="grid gap-6 xl:grid-cols-3">
                 {featuredResources.slice(0, 9).map(({ article, category }) => (
                   <ResourceArticleCard key={article.slug} article={article} category={category} />

@@ -29,6 +29,7 @@ export interface RelationField {
   relationKey?: string;
   childKey?: string;
   nestedKey?: string;
+  entityType?: string;
 }
 
 interface ContentManagerProps {
@@ -79,6 +80,7 @@ function relationIds(item: any, relation: RelationField) {
   const rows = Array.isArray(item?.[relationKey]) ? item[relationKey] : [];
 
   return rows
+    .filter((row: any) => !relation.entityType || row?.entityType === relation.entityType)
     .map((row: any) => {
       if (childKey && row?.[childKey]) return row[childKey];
       if (nestedKey && row?.[nestedKey]?.id) return row[nestedKey].id;
@@ -439,7 +441,7 @@ export function ContentManager({
               <Button
                 className="bg-primary hover:bg-primary/90 text-white font-bold"
                 disabled={saving}
-                onClick={() => void save(form.status !== undefined ? undefined : { status: "PUBLISHED" })}
+                onClick={() => void save(supportsDraftStatus ? { status: "PUBLISHED" } : undefined)}
               >
                 <CheckCircle2 className="mr-2 h-4 w-4" /> {saving ? "Saving..." : "Save"}
               </Button>

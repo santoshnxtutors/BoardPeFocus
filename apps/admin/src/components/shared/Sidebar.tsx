@@ -12,11 +12,13 @@ import {
   Star, 
   Settings, 
   History,
-  Globe,
   GraduationCap,
   School,
   Sparkles,
-  Inbox
+  Inbox,
+  Image,
+  Route,
+  SearchCheck
 } from "lucide-react";
 
 const menuItems = [
@@ -34,8 +36,11 @@ const menuItems = [
   
   { type: "divider", label: "CMS & Intelligence" },
   { label: "Pages", icon: FileText, href: "/dashboard/pages" },
-  { label: "Resources", icon: FileText, href: "/dashboard/blog" },
+  { label: "Resources", icon: FileText, href: "/dashboard/resources" },
   { label: "Page Generator", icon: Sparkles, href: "/dashboard/page-generator" },
+  { label: "SEO Metadata", icon: SearchCheck, href: "/dashboard/seo" },
+  { label: "Redirects", icon: Route, href: "/dashboard/redirects" },
+  { label: "Media Library", icon: Image, href: "/dashboard/media" },
   
   { type: "divider", label: "Interactions" },
   { label: "Reviews", icon: Star, href: "/dashboard/reviews" },

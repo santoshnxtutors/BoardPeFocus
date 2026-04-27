@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FadeIn } from "@/lib/animations";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { mockBoards, mockSubjects, mockTutors } from "@/data/mock";
+import { getTutorPath } from "@/lib/tutor-paths";
 import { CheckCircle2, ChevronRight, Target } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -146,7 +147,7 @@ export default function BoardSubjectPage({ params }: { params: { board: string, 
                         </div>
                         <CardContent className="p-6 flex-1 flex flex-col justify-between">
                           <div>
-                            <Link href={`/tutors/${tutor.slug}`}>
+                            <Link href={getTutorPath(tutor.slug)}>
                               <h3 className="font-heading font-bold text-xl text-primary hover:text-accent mb-2">{tutor.name}</h3>
                             </Link>
                             <p className="text-sm font-medium text-secondary mb-4">{tutor.experienceYrs} Years Experience • {tutor.rating} Rating</p>
@@ -156,7 +157,7 @@ export default function BoardSubjectPage({ params }: { params: { board: string, 
                             <div className="flex gap-2">
                               {tutor.boards.slice(0,2).map(b => <Badge key={b} variant="secondary">{b}</Badge>)}
                             </div>
-                            <Link href={`/tutors/${tutor.slug}`}>
+                            <Link href={getTutorPath(tutor.slug)}>
                               <Button variant="outline" className="rounded-xl">View Profile</Button>
                             </Link>
                           </div>

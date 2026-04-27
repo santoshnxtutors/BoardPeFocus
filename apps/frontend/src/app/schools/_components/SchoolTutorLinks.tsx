@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, Clock, GraduationCap, MapPin, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tutor } from "@/types";
+import { getTutorPath } from "@/lib/tutor-paths";
 
 export function SchoolTutorLinks({
   tutors,
@@ -41,7 +42,7 @@ export function SchoolTutorLinks({
         {visibleTutors.map((tutor) => (
           <Link
             key={tutor.slug}
-            href={`/tutors/${tutor.slug}`}
+            href={getTutorPath(tutor.slug)}
             className="group rounded-[2rem] border border-border/60 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg"
           >
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start">

@@ -3,33 +3,106 @@ import {
   Lead, PageRecord
 } from '@boardpefocus/types';
 
+export interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  isActive: boolean;
+  role: string;
+  roles: string[];
+  lastLogin: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminUserPayload {
+  name: string;
+  email: string;
+  password?: string;
+  role: string;
+  isActive: boolean;
+}
+
+export interface SeoMetadataTarget {
+  id: string;
+  targetType: string;
+  targetId: string;
+  label: string;
+  slug: string | null;
+  status: string | null;
+  seoTitle: string;
+  metaDescription: string;
+  keywords: string;
+  canonical: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  noIndex: boolean;
+  updatedAt: string;
+}
+
+export interface RedirectRule {
+  id: string;
+  from: string;
+  to: string;
+  code: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface MediaAssetRecord {
+  id: string;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  url: string;
+  provider: string;
+  bucket?: string | null;
+  key?: string | null;
+  altText?: string | null;
+  metadata?: unknown;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LookupRecord {
+  id: string;
+  name?: string;
+  title?: string;
+  slug?: string | null;
+}
+
+export interface LookupCatalog {
+  boards: Board[];
+  classes: LookupRecord[];
+  subjects: Subject[];
+  schools: School[];
+  sectors: Sector[];
+  societies: Society[];
+  tutors: LookupRecord[];
+  resources: LookupRecord[];
+  results: LookupRecord[];
+  processContent: LookupRecord[];
+  pages: LookupRecord[];
+}
+
 function resolveApiBaseUrl() {
   const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
 
   if (typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location;
-    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
-
-    if (!isLocalhost && hostname === 'admin.boardpefocus.in') {
-      return '/api';
-    }
-
     if (configuredApiBaseUrl) {
       return configuredApiBaseUrl;
     }
 
-    if (isLocalhost) {
-      return 'http://localhost:3001/api';
-    }
-
-    return `${protocol}//${hostname}/api`;
+    return '/api';
   }
 
   if (configuredApiBaseUrl) {
     return configuredApiBaseUrl;
   }
 
-  return 'http://localhost:3001/api';
+  return 'http://127.0.0.1:3001/api';
 }
 
 class ApiClient {
@@ -47,14 +120,21 @@ class ApiClient {
     const apiBaseUrl = rawApiBaseUrl.endsWith('/v1')
       ? rawApiBaseUrl
       : `${rawApiBaseUrl.replace(/\/$/, '')}/v1`;
-    const response = await fetch(`${apiBaseUrl}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options?.headers,
-      },
-    });
+    let response: Response;
+    try {
+      response = await fetch(`${apiBaseUrl}${path}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...options?.headers,
+        },
+      });
+    } catch {
+      throw new Error(
+        'Unable to reach the admin API. Make sure the backend service is running.',
+      );
+    }
 
     if (!response.ok) {
       if (response.status === 401 && typeof window !== 'undefined') {
@@ -122,16 +202,7 @@ class ApiClient {
   };
 
   lookups = {
-    list: () =>
-      this.fetcher<{
-        boards: Board[];
-        classes: any[];
-        subjects: Subject[];
-        schools: School[];
-        sectors: Sector[];
-        societies: Society[];
-        tutors: Tutor[];
-      }>('/admin/lookups'),
+    list: () => this.fetcher<LookupCatalog>('/admin/lookups'),
   };
 
   content = {
@@ -165,11 +236,78 @@ class ApiClient {
     updateStatus: (id: string, status: string) => this.fetcher<Lead>(`/admin/leads/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   };
 
+  // Admin Users
+  adminUsers = {
+    list: () => this.fetcher<AdminUser[]>('/admin/users'),
+    create: (data: AdminUserPayload) =>
+      this.fetcher<AdminUser>('/admin/users', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: Partial<AdminUserPayload>) =>
+      this.fetcher<AdminUser>(`/admin/users/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: string) =>
+      this.fetcher<AdminUser>(`/admin/users/${id}`, { method: 'DELETE' }),
+  };
+
   // Pages
   pages = {
     list: () => this.fetcher<PageRecord[]>('/admin/pages'),
     get: (id: string) => this.fetcher<PageRecord>(`/admin/pages/${id}`),
+    create: (data: any) => this.fetcher<PageRecord>('/admin/pages', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: any) => this.fetcher<PageRecord>(`/admin/pages/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id: string) => this.fetcher<PageRecord>(`/admin/pages/${id}`, { method: 'DELETE' }),
+  };
+
+  seo = {
+    list: () => this.fetcher<SeoMetadataTarget[]>('/admin/seo'),
+    update: (targetType: string, id: string, data: Record<string, unknown>) =>
+      this.fetcher<any>(`/admin/seo/${targetType}/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+  };
+
+  redirects = {
+    list: () => this.fetcher<RedirectRule[]>('/admin/redirects'),
+    create: (data: Record<string, unknown>) =>
+      this.fetcher<RedirectRule>('/admin/redirects', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: Record<string, unknown>) =>
+      this.fetcher<RedirectRule>(`/admin/redirects/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: string) =>
+      this.fetcher<RedirectRule>(`/admin/redirects/${id}`, {
+        method: 'DELETE',
+      }),
+  };
+
+  media = {
+    list: (query?: string) =>
+      this.fetcher<MediaAssetRecord[]>(
+        `/admin/media${query ? `?q=${encodeURIComponent(query)}` : ''}`,
+      ),
+    create: (data: Record<string, unknown>) =>
+      this.fetcher<MediaAssetRecord>('/admin/media', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: Record<string, unknown>) =>
+      this.fetcher<MediaAssetRecord>(`/admin/media/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: string) =>
+      this.fetcher<MediaAssetRecord>(`/admin/media/${id}`, {
+        method: 'DELETE',
+      }),
   };
 
   // Stats

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/lib/animations";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJsonLd } from "@/lib/seo";
+import { getLiveContent, getLiveFaqs } from "@/lib/live-content";
 import { ResultBreadcrumbs } from "@/app/result/_components/ResultBreadcrumbs";
 import { ResultCtaBlock } from "@/app/result/_components/ResultCtaBlock";
 import { ResultSection } from "@/app/result/_components/ResultSection";
@@ -19,6 +20,18 @@ import {
   resultTutorLinks,
 } from "@/app/result/_data/results";
 
+interface LiveResultStory {
+  id: string;
+  title: string;
+  story: string;
+  kind?: string | null;
+  parentName?: string | null;
+  studentName?: string | null;
+  context?: string | null;
+  scoreLabel?: string | null;
+  rating?: number | null;
+}
+
 export const metadata = constructMetadata({
   title: "Results Hub | Testimonials, Proof Paths, and Success Stories | BoardPeFocus",
   description:
@@ -26,12 +39,17 @@ export const metadata = constructMetadata({
   pathname: "/result",
 });
 
-export default function ResultHubPage() {
+export default async function ResultHubPage() {
+  const [liveResults, liveFaqs] = await Promise.all([
+    getLiveContent<LiveResultStory>("/content/reviews"),
+    getLiveFaqs({ pageSlug: "result" }),
+  ]);
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Results", url: absoluteUrl("/result") },
   ]);
-  const faqJsonLd = generateFaqJsonLd(resultsFaqs);
+  const faqItems = liveFaqs.length > 0 ? liveFaqs : resultsFaqs;
+  const faqJsonLd = generateFaqJsonLd(faqItems);
 
   return (
     <div className="min-h-screen bg-background">
@@ -90,6 +108,34 @@ export default function ResultHubPage() {
           </section>
 
           <div className="space-y-24 py-24">
+            {liveResults.length > 0 ? (
+              <ResultSection
+                eyebrow="Live Stories"
+                title="Published testimonials and result stories from the admin panel"
+                description="This block reflects the currently approved and visible stories managed through the admin system."
+              >
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {liveResults.slice(0, 6).map((story) => (
+                    <div key={story.id} className="rounded-[1.75rem] border border-border/60 bg-white p-6 shadow-sm">
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">
+                        {story.kind ?? "Story"}
+                      </p>
+                      <h3 className="mt-3 text-xl font-bold text-primary">{story.title}</h3>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                        {story.story}
+                      </p>
+                      <div className="mt-5 space-y-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary/60">
+                        {story.parentName ? <p>Parent: {story.parentName}</p> : null}
+                        {story.studentName ? <p>Student: {story.studentName}</p> : null}
+                        {story.context ? <p>{story.context}</p> : null}
+                        {story.scoreLabel ? <p>{story.scoreLabel}</p> : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ResultSection>
+            ) : null}
+
             <ResultSection
               eyebrow="Trust Categories"
               title="Choose the kind of proof or reassurance you want first"
@@ -233,7 +279,7 @@ export default function ResultHubPage() {
             </ResultSection>
 
             <FAQ
-              items={resultsFaqs}
+              items={faqItems}
               title="Results FAQs"
               subtitle="A visible FAQ layer helps keep the trust conversation clear and grounded."
             />
@@ -248,4 +294,3 @@ export default function ResultHubPage() {
     </div>
   );
 }
-

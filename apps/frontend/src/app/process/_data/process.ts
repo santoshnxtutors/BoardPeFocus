@@ -1,3 +1,5 @@
+import { getClassHubPath } from "@/app/classes/_data/classes";
+
 export interface ProcessStep {
   title: string;
   description: string;
@@ -293,12 +295,12 @@ export const processPages: ProcessPageConfig[] = [
     relatedLinks: [
       {
         title: "Class 10 hub",
-        href: "/classes/class-10",
+        href: getClassHubPath("class-10"),
         description: "Use the Class 10 hub if the start plan needs to stay board-foundation focused.",
       },
       {
         title: "Class 12 hub",
-        href: "/classes/class-12",
+        href: getClassHubPath("class-12"),
         description: "Use the Class 12 hub when stream complexity is shaping the plan.",
       },
       {

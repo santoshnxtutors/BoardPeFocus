@@ -10,6 +10,8 @@ import {
 import { ChevronRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { FAQ } from "@/components/faq/FAQ";
+import { getBoardPath } from "@/app/boards/_data/boards";
+import { getClassHubPath } from "@/app/classes/_data/classes";
 import { platformStats } from "@/data/stats";
 import { TutorCard } from "@/components/cards/TutorCard";
 import { LeadForm } from "@/components/forms/LeadForm";
@@ -29,39 +31,39 @@ export default async function HomePage() {
   const boardDiscovery = [
     {
       name: "CBSE",
-      href: "/boards/cbse",
+      href: getBoardPath("cbse"),
       description: "Class 10 and 12 support with structured board revision in Gurgaon.",
     },
     {
       name: "ICSE",
-      href: "/boards/icse",
+      href: getBoardPath("icse"),
       description: "Premium Class 10 guidance for strong concepts and board writing.",
     },
     {
       name: "ISC",
-      href: "/boards/isc",
+      href: getBoardPath("isc"),
       description: "Senior-school support for Physics, Chemistry, Maths, and English.",
     },
     {
       name: "IGCSE",
-      href: "/boards/igcse",
+      href: getBoardPath("igcse"),
       description: "Subject-specific tutoring for Cambridge learners in Gurugram.",
     },
     {
       name: "IB",
-      href: "/boards/ib",
+      href: getBoardPath("ib"),
       description: "Focused MYP and DP support with one-to-one planning.",
     },
   ];
   const classDiscovery = [
     {
       name: "Class 10",
-      href: "/classes/class-10",
+      href: getClassHubPath("class-10"),
       description: "Board-year tutoring across Maths, Science, English, and revision support.",
     },
     {
       name: "Class 12",
-      href: "/classes/class-12",
+      href: getClassHubPath("class-12"),
       description: "Premium support for PCM, PCB, commerce, and international board pathways.",
     },
   ];

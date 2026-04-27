@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { MapPin, Mail, Phone } from "lucide-react";
+import { getBoardPath } from "@/app/boards/_data/boards";
+import { getClassHubPath } from "@/app/classes/_data/classes";
 
 const boardLinks = [
   { slug: "cbse", name: "CBSE" },
@@ -57,18 +59,18 @@ export function Footer() {
             <ul className="grid grid-cols-1 gap-2 text-sm text-primary-foreground/70">
               {boardLinks.map((board) => (
                 <li key={board.slug}>
-                  <Link href={`/boards/${board.slug}`} className="hover:text-accent transition-colors">
+                  <Link href={getBoardPath(board.slug)} className="hover:text-accent transition-colors">
                     {board.name} Tutors
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href="/classes/class-10" className="hover:text-accent transition-colors">
+                <Link href={getClassHubPath("class-10")} className="hover:text-accent transition-colors">
                   Class 10 Hub
                 </Link>
               </li>
               <li>
-                <Link href="/classes/class-12" className="hover:text-accent transition-colors">
+                <Link href={getClassHubPath("class-12")} className="hover:text-accent transition-colors">
                   Class 12 Hub
                 </Link>
               </li>

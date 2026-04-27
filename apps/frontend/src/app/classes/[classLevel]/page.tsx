@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { BookOpen, MapPin, School, ShieldCheck } from "lucide-react";
 import { FAQ } from "@/components/faq/FAQ";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,8 @@ import {
   getClassFallbackParams,
   getManifestPage,
 } from "@/lib/generated-pages";
+import { fetchBackend } from "@/lib/backend-api";
+import { getLiveFaqs } from "@/lib/live-content";
 import { ClassesBreadcrumbs } from "@/app/classes/_components/ClassesBreadcrumbs";
 import { ClassesCtaBlock } from "@/app/classes/_components/ClassesCtaBlock";
 import { ClassesRelatedLinks } from "@/app/classes/_components/ClassesRelatedLinks";
@@ -29,16 +31,41 @@ interface PageProps {
   params: Promise<{ classLevel: string }>;
 }
 
+interface LiveClassLevel {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  seoTitle?: string | null;
+  metaDescription?: string | null;
+}
+
+async function getLiveClass(slug: string) {
+  const response = await fetchBackend(`/content/classes/${encodeURIComponent(slug)}`);
+  if (!response.ok) return null;
+  return (await response.json()) as LiveClassLevel;
+}
+
 export async function generateStaticParams() {
   return [...getAllClassHubParams(), ...getClassFallbackParams()];
 }
 
-export async function generateMetadata({ params }: PageProps) {
-  const { classLevel } = await params;
+export async function getClassHubPageMetadata(classLevel: string) {
+  const liveClass = await getLiveClass(classLevel);
+  if (liveClass) {
+    return constructMetadata({
+      title: liveClass.seoTitle ?? `${liveClass.name} Home Tutors in Gurgaon | BoardPeFocus`,
+      description: liveClass.metaDescription ?? liveClass.description ?? undefined,
+      pathname: getClassHubPath(liveClass.slug),
+    });
+  }
+
   const classHub = getClassHubConfig(classLevel);
   const generatedPage = getManifestPage(`/classes/${classLevel}`);
 
-  if (!classHub && !generatedPage) return constructMetadata({ title: "Class Page Not Found", noIndex: true });
+  if (!classHub && !generatedPage) {
+    return constructMetadata({ title: "Class Page Not Found", noIndex: true });
+  }
   if (!classHub) return constructMetadata(buildGeneratedMetadata(generatedPage!));
 
   return constructMetadata({
@@ -48,15 +75,28 @@ export async function generateMetadata({ params }: PageProps) {
   });
 }
 
-export default async function ClassHubDetailPage({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps) {
   const { classLevel } = await params;
+  return getClassHubPageMetadata(classLevel);
+}
+
+export async function renderClassHubDetailPage(classLevel: string) {
+  const liveClass = await getLiveClass(classLevel);
   const classHub = getClassHubConfig(classLevel);
   const generatedPage = getManifestPage(`/classes/${classLevel}`);
 
-  if (!classHub && !generatedPage) notFound();
+  if (!classHub && !generatedPage) {
+    if (!liveClass) notFound();
+    return <LiveClassPage classLevel={liveClass} />;
+  }
   if (!classHub) {
     return <GeneratedManifestPage record={generatedPage!} />;
   }
+
+  const liveFaqs =
+    liveClass?.id ? await getLiveFaqs({ entityType: "CLASS", entityId: liveClass.id }) : [];
+  const faqItems = liveFaqs.length > 0 ? liveFaqs : classHub.faq;
+  const heroDescription = liveClass?.description ?? classHub.heroDescription;
 
   const schools = getSchoolDetails(classHub.schoolReferences.map((school) => school.slug));
   const areas = getAreaDetails(classHub.areaReferences.map((area) => area.slug));
@@ -66,7 +106,7 @@ export default async function ClassHubDetailPage({ params }: PageProps) {
     { name: "Classes", url: absoluteUrl("/classes") },
     { name: classHub.label, url: absoluteUrl(getClassHubPath(classHub.slug)) },
   ]);
-  const faqJsonLd = generateFaqJsonLd(classHub.faq);
+  const faqJsonLd = generateFaqJsonLd(faqItems);
 
   return (
     <div className="min-h-screen bg-background">
@@ -91,7 +131,7 @@ export default async function ClassHubDetailPage({ params }: PageProps) {
                   {classHub.label} Hub
                 </Badge>
                 <h1 className="mt-6 text-4xl font-extrabold tracking-tight md:text-6xl">{classHub.heroTitle}</h1>
-                <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">{classHub.heroDescription}</p>
+                <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">{heroDescription}</p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20this%20class-specific%20board%20tutoring%20path%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                     <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
@@ -313,13 +353,53 @@ export default async function ClassHubDetailPage({ params }: PageProps) {
             <FAQ
               title={`${classHub.label} FAQs`}
               subtitle={`Visible answers for parents exploring ${classHub.label.toLowerCase()} tutoring in Gurgaon.`}
-              items={classHub.faq}
+              items={faqItems}
               columns={2}
             />
 
             <ClassesRelatedLinks links={classHub.relatedLinks} />
 
             <ClassesCtaBlock title={classHub.ctaTitle} description={classHub.ctaDescription} />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export default async function ClassHubDetailPage({ params }: PageProps) {
+  const { classLevel } = await params;
+  redirect(getClassHubPath(classLevel));
+}
+
+function LiveClassPage({ classLevel }: { classLevel: LiveClassLevel }) {
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Classes", url: absoluteUrl("/classes") },
+    { name: classLevel.name, url: absoluteUrl(getClassHubPath(classLevel.slug)) },
+  ]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <JsonLd data={breadcrumbJsonLd} />
+      <section className="pt-32">
+        <div className="container mx-auto max-w-4xl px-4">
+          <div className="rounded-[2rem] border border-border/60 bg-white p-8 shadow-sm md:p-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">Class</p>
+            <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-primary md:text-6xl">
+              {classLevel.name} Home Tutors in Gurgaon
+            </h1>
+            {classLevel.description ? (
+              <p className="mt-6 text-lg leading-8 text-muted-foreground">{classLevel.description}</p>
+            ) : null}
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link href="/classes">
+                <Button variant="outline" className="rounded-xl px-6">Back to Classes</Button>
+              </Link>
+              <Link href="/contact">
+                <Button className="rounded-xl px-6">Request Callback</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

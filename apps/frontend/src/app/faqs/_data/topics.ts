@@ -1,3 +1,5 @@
+import { getClassHubPath } from "@/app/classes/_data/classes";
+
 export interface FaqTopicLink {
   title: string;
   href: string;
@@ -141,12 +143,12 @@ export const faqTopics: FaqTopicConfig[] = [
       },
       {
         title: "Class 10 hub",
-        href: "/classes/class-10",
+        href: getClassHubPath("class-10"),
         description: "Use this route for board-foundation year questions and revision planning.",
       },
       {
         title: "Class 12 hub",
-        href: "/classes/class-12",
+        href: getClassHubPath("class-12"),
         description: "Use this route for stream-heavy board preparation and subject demand.",
       },
     ],

@@ -1,6 +1,14 @@
 import pageManifest from "@/data/generated/page-manifest.json";
-import { getAllBoardParams, getAllClassParams, getAllSubjectParams } from "@/app/boards/_data/boards";
-import { getAllClassHubParams } from "@/app/classes/_data/classes";
+import {
+  getAllBoardParams,
+  getAllClassParams,
+  getAllSubjectParams,
+  getBoardClassPath,
+  getBoardPath,
+  getLegacyBoardClassPath,
+  getLegacyBoardPath,
+} from "@/app/boards/_data/boards";
+import { getAllClassHubParams, getClassHubPath, getLegacyClassHubPath } from "@/app/classes/_data/classes";
 import { getAllFaqTopicParams } from "@/app/faqs/_data/topics";
 import { getAllProcessParams } from "@/app/process/_data/process";
 import { getAllResourceArticleParams } from "@/app/resources/_data/articles";
@@ -15,6 +23,12 @@ import {
 import { areaClusters, sectorDetails } from "@/data/areas";
 import { mockBoards, mockSchools, mockSubjects, mockTutors } from "@/data/mock";
 import { absoluteUrl } from "@/lib/seo";
+import { getLegacyTutorPath, getTutorPath } from "@/lib/tutor-paths";
+import {
+  getCanonicalCommercialPath,
+  getCommercialManifestTitle,
+  normalizeUrlPathname,
+} from "@/lib/url-policy";
 
 export interface ManifestPageRecord {
   id: number;
@@ -63,19 +77,11 @@ export interface GeneratedFaqItem {
 const manifest = pageManifest as ManifestPageRecord[];
 
 export function normalizeManifestPath(pathname: string) {
-  const value = pathname.trim();
-  if (!value) {
-    return "/";
-  }
+  return normalizeUrlPathname(pathname);
+}
 
-  const withLeadingSlash = value.startsWith("/") ? value : `/${value}`;
-  const normalized = withLeadingSlash.replace(/\/+/g, "/").toLowerCase();
-
-  if (normalized.length > 1 && normalized.endsWith("/")) {
-    return normalized.slice(0, -1);
-  }
-
-  return normalized;
+export function getManifestRoutePath(record: ManifestPageRecord) {
+  return getCanonicalCommercialPath(record);
 }
 
 function humanizeSlug(value: string) {
@@ -141,11 +147,13 @@ function buildExistingExactRouteSet() {
   const routes = new Set(getStaticRoutes().map((route) => normalizeManifestPath(route)));
 
   for (const { board } of getAllBoardParams()) {
-    routes.add(`/boards/${board}`);
+    routes.add(getBoardPath(board));
+    routes.add(getLegacyBoardPath(board));
   }
 
   for (const { board, classLevel } of getAllClassParams()) {
-    routes.add(`/boards/${board}/${classLevel}`);
+    routes.add(getBoardClassPath(board, classLevel));
+    routes.add(getLegacyBoardClassPath(board, classLevel));
   }
 
   for (const { board, classLevel, subjectSlug } of getAllSubjectParams()) {
@@ -153,7 +161,8 @@ function buildExistingExactRouteSet() {
   }
 
   for (const { classLevel } of getAllClassHubParams()) {
-    routes.add(`/classes/${classLevel}`);
+    routes.add(getClassHubPath(classLevel));
+    routes.add(getLegacyClassHubPath(classLevel));
   }
 
   for (const { topic } of getAllFaqTopicParams()) {
@@ -222,17 +231,35 @@ function buildExistingExactRouteSet() {
   }
 
   for (const tutor of mockTutors) {
-    routes.add(`/tutors/${tutor.slug}`);
+    routes.add(getTutorPath(tutor.slug));
+    routes.add(getLegacyTutorPath(tutor.slug));
   }
 
   return routes;
 }
 
 const existingExactRoutes = buildExistingExactRouteSet();
-const manifestByPath = new Map(manifest.map((record) => [record.normalizedPath, record]));
+const manifestByPath = new Map<string, ManifestPageRecord>();
+
+for (const record of manifest) {
+  manifestByPath.set(record.normalizedPath, record);
+  manifestByPath.set(getManifestRoutePath(record), record);
+}
 
 export function getManifestPage(pathname: string) {
   return manifestByPath.get(normalizeManifestPath(pathname)) ?? null;
+}
+
+export function getManifestRedirectTarget(pathname: string) {
+  const normalized = normalizeManifestPath(pathname);
+  const record = getManifestPage(normalized);
+
+  if (!record) {
+    return null;
+  }
+
+  const canonicalPath = getManifestRoutePath(record);
+  return canonicalPath !== normalized ? canonicalPath : null;
 }
 
 export function getAllManifestPages() {
@@ -260,7 +287,7 @@ function isPathAssignedToGurugramFallback(pathname: string) {
     return false;
   }
 
-  return ["home-tuition", "premium-schools", "premium-societies"].includes(segments[1]);
+  return ["home-tuition", "home-tutors", "premium-schools", "premium-societies"].includes(segments[1]);
 }
 
 function isPathAssignedToSectorFallback(pathname: string) {
@@ -291,9 +318,9 @@ function isAssignedToCatchAll(pathname: string) {
 
 export function getBoardSubjectFallbackParams() {
   return manifest
-    .filter((record) => isPathAssignedToBoardFallback(record.normalizedPath))
+    .filter((record) => isPathAssignedToBoardFallback(getManifestRoutePath(record)))
     .map((record) => {
-      const [board, classLevel, subjectSlug] = getSegments(record.normalizedPath).slice(1);
+      const [board, classLevel, subjectSlug] = getSegments(getManifestRoutePath(record)).slice(1);
 
       return {
         board,
@@ -305,25 +332,25 @@ export function getBoardSubjectFallbackParams() {
 
 export function getClassFallbackParams() {
   return manifest
-    .filter((record) => isPathAssignedToClassFallback(record.normalizedPath))
+    .filter((record) => isPathAssignedToClassFallback(getManifestRoutePath(record)))
     .map((record) => ({
-      classLevel: getSegments(record.normalizedPath)[1],
+      classLevel: getSegments(getManifestRoutePath(record))[1],
     }));
 }
 
 export function getGurugramFallbackParams() {
   return manifest
-    .filter((record) => isPathAssignedToGurugramFallback(record.normalizedPath))
+    .filter((record) => isPathAssignedToGurugramFallback(getManifestRoutePath(record)))
     .map((record) => ({
-      board: getSegments(record.normalizedPath)[1],
+      board: getSegments(getManifestRoutePath(record))[1],
     }));
 }
 
 export function getSectorFallbackParams() {
   return manifest
-    .filter((record) => isPathAssignedToSectorFallback(record.normalizedPath))
+    .filter((record) => isPathAssignedToSectorFallback(getManifestRoutePath(record)))
     .map((record) => {
-      const [, , sector, society] = getSegments(record.normalizedPath);
+      const [, , sector, society] = getSegments(getManifestRoutePath(record));
 
       return {
         sector,
@@ -334,9 +361,9 @@ export function getSectorFallbackParams() {
 
 export function getSchoolServiceFallbackParams() {
   return manifest
-    .filter((record) => isPathAssignedToSchoolServiceFallback(record.normalizedPath))
+    .filter((record) => isPathAssignedToSchoolServiceFallback(getManifestRoutePath(record)))
     .map((record) => {
-      const [, , schoolSlug, board] = getSegments(record.normalizedPath);
+      const [, , schoolSlug, board] = getSegments(getManifestRoutePath(record));
 
       return {
         schoolSlug,
@@ -347,9 +374,9 @@ export function getSchoolServiceFallbackParams() {
 
 export function getCatchAllManifestParams() {
   return manifest
-    .filter((record) => isAssignedToCatchAll(record.normalizedPath))
+    .filter((record) => isAssignedToCatchAll(getManifestRoutePath(record)))
     .map((record) => ({
-      slug: getSegments(record.normalizedPath),
+      slug: getSegments(getManifestRoutePath(record)),
     }));
 }
 
@@ -376,10 +403,12 @@ export function isIndexableManifestPage(record: ManifestPageRecord) {
 }
 
 export function getGeneratedSitemapRoutes() {
-  return manifest
+  const routes = manifest
     .filter((record) => isIndexableManifestPage(record))
-    .map((record) => record.normalizedPath)
+    .map((record) => getManifestRoutePath(record))
     .filter((route) => !isExistingExactRoute(route) && route !== "/faq");
+
+  return Array.from(new Set(routes));
 }
 
 function getBadgeLabel(record: ManifestPageRecord) {
@@ -393,7 +422,7 @@ function buildPrimaryDescription(record: ManifestPageRecord) {
     return record.contentAngle;
   }
 
-  const keyword = record.primaryKeyword ?? humanizeSlug(getSegments(record.normalizedPath).slice(-1)[0] ?? "Page");
+  const keyword = getManifestPageTitle(record);
   const board = record.board?.toUpperCase();
   const classLabel = record.classLabel;
   const subject = titleCase(record.subject);
@@ -409,7 +438,8 @@ function buildPrimaryDescription(record: ManifestPageRecord) {
 }
 
 export function getManifestPageTitle(record: ManifestPageRecord) {
-  return record.primaryKeyword ?? humanizeSlug(getSegments(record.normalizedPath).slice(-1)[0] ?? "Page");
+  const fallbackTitle = humanizeSlug(getSegments(getManifestRoutePath(record)).slice(-1)[0] ?? "Page");
+  return getCommercialManifestTitle(record, fallbackTitle);
 }
 
 export function getManifestMetaDescription(record: ManifestPageRecord) {
@@ -426,7 +456,7 @@ export function buildGeneratedMetadata(record: ManifestPageRecord) {
   return {
     title: `${getManifestPageTitle(record)} | BoardPeFocus`,
     description: getManifestMetaDescription(record),
-    pathname: record.normalizedPath,
+    pathname: getManifestRoutePath(record),
     noIndex: !isIndexableManifestPage(record),
   };
 }
@@ -442,7 +472,12 @@ function resolveManifestLink(value: string | null) {
     return "/faqs";
   }
 
-  if (getManifestPage(normalized) || isExistingExactRoute(normalized)) {
+  const manifestRecord = getManifestPage(normalized);
+  if (manifestRecord) {
+    return getManifestRoutePath(manifestRecord);
+  }
+
+  if (isExistingExactRoute(normalized)) {
     return normalized;
   }
 
@@ -460,7 +495,7 @@ function makeLinkTitle(pathname: string) {
 }
 
 function makeLinkDescription(record: ManifestPageRecord, pathname: string) {
-  if (pathname === record.normalizedPath) {
+  if (pathname === getManifestRoutePath(record)) {
     return "Current page";
   }
 
@@ -475,9 +510,10 @@ function makeLinkDescription(record: ManifestPageRecord, pathname: string) {
 export function getManifestInternalLinks(record: ManifestPageRecord) {
   const rawLinks = [record.parentHub, ...record.links].map(resolveManifestLink);
   const deduped = Array.from(new Set(rawLinks.filter(Boolean))) as string[];
+  const currentPath = getManifestRoutePath(record);
 
   return deduped
-    .filter((href) => href !== record.normalizedPath)
+    .filter((href) => href !== currentPath)
     .slice(0, 6)
     .map((href) => ({
       title: makeLinkTitle(href),
@@ -513,7 +549,7 @@ function findRelatedManifestPages(record: ManifestPageRecord) {
 
   return matches.slice(0, 4).map((candidate) => ({
     title: getManifestPageTitle(candidate),
-    href: candidate.normalizedPath,
+    href: getManifestRoutePath(candidate),
     description: buildPrimaryDescription(candidate),
   }));
 }
@@ -689,7 +725,7 @@ export function getManifestEyebrow(record: ManifestPageRecord) {
 }
 
 export function getManifestBreadcrumbs(record: ManifestPageRecord) {
-  const segments = getSegments(record.normalizedPath);
+  const segments = getSegments(getManifestRoutePath(record));
   const crumbs: Array<{ label: string; href?: string }> = [{ label: "Home", href: "/" }];
 
   if (!segments.length) {
@@ -718,7 +754,7 @@ export function buildManifestJsonLd(record: ManifestPageRecord) {
     name: title,
     headline: title,
     description,
-    url: absoluteUrl(record.normalizedPath),
+    url: absoluteUrl(getManifestRoutePath(record)),
   };
 
   if (schema === "service") {

@@ -1,5 +1,5 @@
 import { mockBoards, mockTutors, mockSubjects } from "@/data/mock";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { TutorCard } from "@/components/cards/TutorCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildGeneratedMetadata,
   getGurugramFallbackParams,
+  getManifestRedirectTarget,
   getManifestPage,
 } from "@/lib/generated-pages";
 
@@ -42,10 +43,16 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function BoardPage({ params }: PageProps) {
   const { board: boardSlug } = await params;
   const board = mockBoards.find(b => b.slug === boardSlug);
-  const generatedPage = getManifestPage(`/gurugram/${boardSlug}`);
+  const pathname = `/gurugram/${boardSlug}`;
+  const generatedPage = getManifestPage(pathname);
 
   if (!board && !generatedPage) notFound();
   if (!board) {
+    const redirectTarget = getManifestRedirectTarget(pathname);
+    if (redirectTarget) {
+      redirect(redirectTarget);
+    }
+
     return <GeneratedManifestPage record={generatedPage!} />;
   }
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Compass, LifeBuoy, MessageCircle, PhoneCall, Sparkles } from "lucide-react";
+import { FAQ } from "@/components/faq/FAQ";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,8 +9,17 @@ import {
   absoluteUrl,
   constructMetadata,
   generateBreadcrumbJsonLd,
+  generateFaqJsonLd,
   generateOrganizationJsonLd,
 } from "@/lib/seo";
+import { getLiveContentItem, getLiveFaqs } from "@/lib/live-content";
+
+interface LiveSupportContent {
+  slug: string;
+  title: string;
+  summary?: string | null;
+  body?: string | null;
+}
 
 const supportChannels = [
   {
@@ -87,17 +97,23 @@ export const metadata = constructMetadata({
   pathname: "/support",
 });
 
-export default function SupportPage() {
+export default async function SupportPage() {
+  const [liveSupport, liveFaqs] = await Promise.all([
+    getLiveContentItem<LiveSupportContent>("/content/process-content/support"),
+    getLiveFaqs({ pageSlug: "support" }),
+  ]);
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Support", url: absoluteUrl("/support") },
   ]);
   const organizationJsonLd = generateOrganizationJsonLd();
+  const faqJsonLd = liveFaqs.length > 0 ? generateFaqJsonLd(liveFaqs) : null;
 
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={organizationJsonLd} />
+      {faqJsonLd ? <JsonLd data={faqJsonLd} /> : null}
 
       <section className="pt-32">
         <div className="container mx-auto max-w-7xl px-4">
@@ -122,10 +138,11 @@ export default function SupportPage() {
                   Help, guidance, and next steps
                 </Badge>
                 <h1 className="mt-6 text-4xl font-extrabold tracking-tight md:text-6xl">
-                  Support hub for Gurgaon families using BoardPeFocus
+                  {liveSupport?.title ?? "Support hub for Gurgaon families using BoardPeFocus"}
                 </h1>
                 <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">
-                  This page connects FAQs, process guidance, contact routes, and the right board, class, school, area, tutor, and results pages without making the journey feel cluttered.
+                  {liveSupport?.summary ??
+                    "This page connects FAQs, process guidance, contact routes, and the right board, class, school, area, tutor, and results pages without making the journey feel cluttered."}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link
@@ -167,6 +184,12 @@ export default function SupportPage() {
           </section>
 
           <div className="space-y-24 py-24">
+            {liveSupport?.body ? (
+              <section className="rounded-[2rem] border border-border/60 bg-white p-8 shadow-sm">
+                <div className="whitespace-pre-line text-base leading-8 text-foreground">{liveSupport.body}</div>
+              </section>
+            ) : null}
+
             <section className="grid gap-10 xl:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
               <div className="space-y-6">
                 <div className="max-w-3xl">
@@ -219,6 +242,15 @@ export default function SupportPage() {
                 />
               </div>
             </section>
+
+            {liveFaqs.length > 0 ? (
+              <FAQ
+                items={liveFaqs}
+                title="Support FAQs"
+                subtitle="These FAQs are assigned from the admin panel and published live on the support route."
+                columns={2}
+              />
+            ) : null}
           </div>
         </div>
       </section>

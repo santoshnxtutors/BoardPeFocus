@@ -1,14 +1,21 @@
 import { MetadataRoute } from "next";
-import { getAllBoardParams, getAllClassParams, getAllSubjectParams } from "@/app/boards/_data/boards";
+import {
+  getAllBoardParams,
+  getAllClassParams,
+  getAllSubjectParams,
+  getBoardClassPath,
+  getBoardPath,
+  getBoardSubjectPath,
+} from "@/app/boards/_data/boards";
 import { absoluteUrl } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "/boards",
-    ...getAllBoardParams().map(({ board }) => `/boards/${board}`),
-    ...getAllClassParams().map(({ board, classLevel }) => `/boards/${board}/${classLevel}`),
-    ...getAllSubjectParams().map(
-      ({ board, classLevel, subjectSlug }) => `/boards/${board}/${classLevel}/${subjectSlug}`,
+    ...getAllBoardParams().map(({ board }) => getBoardPath(board)),
+    ...getAllClassParams().map(({ board, classLevel }) => getBoardClassPath(board, classLevel)),
+    ...getAllSubjectParams().map(({ board, classLevel, subjectSlug }) =>
+      getBoardSubjectPath(board, classLevel, subjectSlug),
     ),
   ];
 

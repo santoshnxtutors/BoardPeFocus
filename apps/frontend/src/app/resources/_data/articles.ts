@@ -91,12 +91,12 @@ const supportLinks = {
   },
   class10: {
     title: "Class 10 Hub",
-    href: "/classes/class-10",
+    href: "/classes/class-10/home-tutors",
     description: "Use the Class 10 hub when revision stage matters more than the board label alone.",
   },
   class12: {
     title: "Class 12 Hub",
-    href: "/classes/class-12",
+    href: "/classes/class-12/home-tutors",
     description: "Useful for families moving into senior-board preparation across PCM, PCB, commerce, or international routes.",
   },
   schoolsHub: {
@@ -176,9 +176,9 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["Class 10", "Revision plan", "Gurgaon"],
     contextualLinks: [
-      link("Class 10 Hub", "/classes/class-10"),
-      link("CBSE Class 10", "/boards/cbse/class-10"),
-      link("ICSE Class 10", "/boards/icse/class-10"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
+      link("CBSE Class 10", "/boards/cbse/class-10/home-tutors"),
+      link("ICSE Class 10", "/boards/icse/class-10/home-tutors"),
       link("Maths tutor", "/boards/cbse/class-10/maths-home-tutor-gurgaon"),
     ],
     sections: [
@@ -210,7 +210,7 @@ export const resourceArticles: ResourceArticle[] = [
         title: "When tutoring helps most in Class 10",
         paragraphs: [
           "One-to-one tutoring helps most when the student is studying but still not converting that effort into cleaner scoring. That usually shows up as repeated step errors, rushed answers, weak retention, or unstable pre-board confidence.",
-          "The right tutor does not just explain chapters again. The useful shift is better sequencing, better correction, and better board-format execution tied to the student’s actual school rhythm.",
+          "The right tutor does not just explain chapters again. The useful shift is better sequencing, better correction, and better board-format execution tied to the studentâ€™s actual school rhythm.",
         ],
         bullets: [
           "Use subject-specific support if only Maths or Science is unstable.",
@@ -221,7 +221,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     midCta: {
       title: "Need a cleaner Class 10 revision path?",
-      description: "Tell us the board, school, and weak subjects, and we’ll help you move from planning into the right one-to-one support path in Gurgaon.",
+      description: "Tell us the board, school, and weak subjects, and weâ€™ll help you move from planning into the right one-to-one support path in Gurgaon.",
     },
     moneyPageLinks: [moneyPages.cbseClass10Maths, moneyPages.cbseClass10Science, moneyPages.icseClass10English],
     continueLinks: [supportLinks.class10, supportLinks.boardsHub, supportLinks.schoolsHub, supportLinks.contact],
@@ -269,7 +269,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["Class 10", "Maths", "Board exams"],
     contextualLinks: [
-      link("Class 10 Hub", "/classes/class-10"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
       link("CBSE Maths tutor", "/boards/cbse/class-10/maths-home-tutor-gurgaon"),
       link("IGCSE Maths tutor", "/boards/igcse/class-10/maths-home-tutor-gurgaon"),
       link("Boards Hub", "/boards"),
@@ -363,9 +363,9 @@ export const resourceArticles: ResourceArticle[] = [
     tags: ["Class 10", "Science", "Revision"],
     contextualLinks: [
       link("Science tutor", "/boards/cbse/class-10/science-home-tutor-gurgaon"),
-      link("Class 10 Hub", "/classes/class-10"),
-      link("CBSE Class 10", "/boards/cbse/class-10"),
-      link("ICSE Class 10", "/boards/icse/class-10"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
+      link("CBSE Class 10", "/boards/cbse/class-10/home-tutors"),
+      link("ICSE Class 10", "/boards/icse/class-10/home-tutors"),
     ],
     sections: [
       {
@@ -455,7 +455,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["Class 12", "PCM", "Board blueprint"],
     contextualLinks: [
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Physics tutor", "/boards/cbse/class-12/physics-home-tutor-gurgaon"),
       link("Chemistry tutor", "/boards/cbse/class-12/chemistry-home-tutor-gurgaon"),
       link("Maths tutor", "/boards/cbse/class-12/maths-home-tutor-gurgaon"),
@@ -494,7 +494,7 @@ export const resourceArticles: ResourceArticle[] = [
         bullets: [
           "Use specialist Physics and Chemistry support if those subjects are creating the real scoring risk.",
           "Keep tutoring output measurable through chapter closure, test quality, and reduction in repeated errors.",
-          "Tie the schedule to the student’s real school pace so the blueprint stays realistic.",
+          "Tie the schedule to the studentâ€™s real school pace so the blueprint stays realistic.",
         ],
       },
     ],
@@ -548,7 +548,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["Class 12", "PCB", "Biology"],
     contextualLinks: [
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Biology tutor", "/boards/cbse/class-12/biology-home-tutor-gurgaon"),
       link("Chemistry tutor", "/boards/cbse/class-12/chemistry-home-tutor-gurgaon"),
       link("Physics tutor", "/boards/cbse/class-12/physics-home-tutor-gurgaon"),
@@ -582,7 +582,7 @@ export const resourceArticles: ResourceArticle[] = [
         title: "How tutoring helps PCB families",
         paragraphs: [
           "Tutoring helps most when the student needs subject-specific correction and a more stable revision system. It is especially useful when the family wants one-to-one support that feels calmer and more reliable than generic batch teaching.",
-          "In Gurgaon, this often means aligning the plan with school pace, test timing, and the family’s preferred study rhythm rather than forcing every subject into one template.",
+          "In Gurgaon, this often means aligning the plan with school pace, test timing, and the familyâ€™s preferred study rhythm rather than forcing every subject into one template.",
         ],
         bullets: [
           "Use Biology support when writing quality, recall, or diagrams are slipping.",
@@ -641,7 +641,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["Class 12", "Commerce", "Accountancy"],
     contextualLinks: [
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Accountancy tutor", "/boards/cbse/class-12/accountancy-home-tutor-gurgaon"),
       link("Economics tutor", "/boards/isc/class-12/economics-home-tutor-gurgaon"),
       link("Boards Hub", "/boards"),
@@ -726,7 +726,7 @@ export const resourceArticles: ResourceArticle[] = [
     featured: true,
     heroEyebrow: "IB strategy guide",
     answerFirst:
-      "AA is usually better for students who are stronger with symbolic reasoning, abstract methods, and traditional mathematical fluency. AI is often the better fit when the student is more comfortable with applied problem solving, interpretation, and context-driven work. The real decision should be based on confidence pattern, workload, and school pathway — not only perception.",
+      "AA is usually better for students who are stronger with symbolic reasoning, abstract methods, and traditional mathematical fluency. AI is often the better fit when the student is more comfortable with applied problem solving, interpretation, and context-driven work. The real decision should be based on confidence pattern, workload, and school pathway â€” not only perception.",
     keyTakeaways: [
       "AA and AI are different styles, not simply easy versus hard.",
       "Tutoring should be matched to the exact paper style and topic profile the student is actually taking.",
@@ -734,7 +734,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["IB", "Maths AA", "Maths AI"],
     contextualLinks: [
-      link("IB Hub", "/boards/ib"),
+      link("IB Hub", "/boards/ib/home-tutors"),
       link("IB Maths tutor", "/boards/ib/class-12/maths-home-tutor-gurgaon"),
       link("Pathways World School", "/schools/pathways-world-school"),
       link("Schools Hub", "/schools"),
@@ -743,11 +743,11 @@ export const resourceArticles: ResourceArticle[] = [
       {
         title: "How AA and AI differ in practice",
         paragraphs: [
-          "Families often ask whether AA or AI is more difficult, but that question is too broad. The more useful question is which style matches the student’s natural confidence pattern and future plan.",
+          "Families often ask whether AA or AI is more difficult, but that question is too broad. The more useful question is which style matches the studentâ€™s natural confidence pattern and future plan.",
           "Some students perform better when the work is abstract and method-heavy. Others do better when mathematics is placed in applied, interpreted contexts. That difference matters before tutoring even begins.",
         ],
         bullets: [
-          "Do not choose only by reputation if the student’s natural style points another way.",
+          "Do not choose only by reputation if the studentâ€™s natural style points another way.",
           "Do not assume that stronger school grades automatically mean the student is in the better IB track.",
           "Do not separate the decision from school pacing and broader IB workload.",
         ],
@@ -787,7 +787,7 @@ export const resourceArticles: ResourceArticle[] = [
       {
         question: "Is AA always harder than AI?",
         answer:
-          "Not in a simplistic way. AA is often more method-heavy and abstract, while AI can become difficult in different ways depending on the student’s comfort with applied interpretation and mixed-question formats.",
+          "Not in a simplistic way. AA is often more method-heavy and abstract, while AI can become difficult in different ways depending on the studentâ€™s comfort with applied interpretation and mixed-question formats.",
       },
       {
         question: "Should tutoring start only after the track is final?",
@@ -822,12 +822,12 @@ export const resourceArticles: ResourceArticle[] = [
       "IB Physics HL improves fastest when students stop trying to solve it through volume alone. The subject usually needs better conceptual framing, a clearer question approach, and regular correction on where reasoning breaks down under paper pressure.",
     keyTakeaways: [
       "Paper confidence often drops because reasoning quality is weaker than classroom familiarity.",
-      "HL support should be matched to the student’s exact paper and topic pressure.",
+      "HL support should be matched to the studentâ€™s exact paper and topic pressure.",
       "One-to-one tutoring is strongest when it improves how the student thinks through the problem, not just how many questions they attempt.",
     ],
     tags: ["IB", "Physics HL", "Strategy"],
     contextualLinks: [
-      link("IB Hub", "/boards/ib"),
+      link("IB Hub", "/boards/ib/home-tutors"),
       link("IB Physics tutor", "/boards/ib/class-12/physics-home-tutor-gurgaon"),
       link("Pathways World School", "/schools/pathways-world-school"),
       link("Scottish High", "/schools/scottish-high-international-school"),
@@ -920,7 +920,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["IB", "Chemistry HL", "Exam strategy"],
     contextualLinks: [
-      link("IB Hub", "/boards/ib"),
+      link("IB Hub", "/boards/ib/home-tutors"),
       link("IB Chemistry tutor", "/boards/ib/class-12/chemistry-home-tutor-gurgaon"),
       link("Pathways World School", "/schools/pathways-world-school"),
       link("Schools Hub", "/schools"),
@@ -953,7 +953,7 @@ export const resourceArticles: ResourceArticle[] = [
       {
         title: "When one-to-one tutoring helps most",
         paragraphs: [
-          "One-to-one support helps most when the student knows large parts of the syllabus but still feels disorganized and under-confident in real papers. The tutor’s value is usually in sequencing, correction, and calmer execution.",
+          "One-to-one support helps most when the student knows large parts of the syllabus but still feels disorganized and under-confident in real papers. The tutorâ€™s value is usually in sequencing, correction, and calmer execution.",
           "That makes the resource especially relevant to premium Gurgaon school families who want more order without adding more noise.",
         ],
         bullets: [
@@ -1013,9 +1013,9 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["IGCSE", "Maths", "Exam pattern"],
     contextualLinks: [
-      link("IGCSE Hub", "/boards/igcse"),
+      link("IGCSE Hub", "/boards/igcse/home-tutors"),
       link("IGCSE Maths tutor", "/boards/igcse/class-10/maths-home-tutor-gurgaon"),
-      link("Class 10 Hub", "/classes/class-10"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
       link("Schools Hub", "/schools"),
     ],
     sections: [
@@ -1047,11 +1047,11 @@ export const resourceArticles: ResourceArticle[] = [
         title: "How one-to-one tutoring helps",
         paragraphs: [
           "One-to-one IGCSE Maths support is most useful when the student needs sharper question interpretation and more stable application, not simply more explanation.",
-          "That is especially relevant for international-school families who want subject support that feels premium, efficient, and tied to the student’s actual paper behaviour.",
+          "That is especially relevant for international-school families who want subject support that feels premium, efficient, and tied to the studentâ€™s actual paper behaviour.",
         ],
         bullets: [
           "Use tutoring when paper behaviour is weaker than chapter understanding.",
-          "Keep the sessions close to the student’s actual exam pattern and school pace.",
+          "Keep the sessions close to the studentâ€™s actual exam pattern and school pace.",
           "Make progress visible through error-type reduction and faster method recognition.",
         ],
       },
@@ -1106,7 +1106,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["IGCSE", "Science", "Exam prep"],
     contextualLinks: [
-      link("IGCSE Hub", "/boards/igcse"),
+      link("IGCSE Hub", "/boards/igcse/home-tutors"),
       link("Class 10 Science tutor", "/boards/cbse/class-10/science-home-tutor-gurgaon"),
       link("Schools Hub", "/schools"),
       link("Pathways World School", "/schools/pathways-world-school"),
@@ -1200,8 +1200,8 @@ export const resourceArticles: ResourceArticle[] = [
     tags: ["Pre-boards", "Board exams", "Transition"],
     contextualLinks: [
       link("Boards Hub", "/boards"),
-      link("Class 10 Hub", "/classes/class-10"),
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Contact", "/contact"),
     ],
     sections: [
@@ -1293,8 +1293,8 @@ export const resourceArticles: ResourceArticle[] = [
     tags: ["Parents", "Tutor timing", "Board prep"],
     contextualLinks: [
       link("Boards Hub", "/boards"),
-      link("Class 10 Hub", "/classes/class-10"),
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Contact", "/contact"),
     ],
     sections: [
@@ -1317,7 +1317,7 @@ export const resourceArticles: ResourceArticle[] = [
           "That means timing decisions are often school-aware as well as board-aware.",
         ],
         bullets: [
-          "Use school context if the student’s workload is already heavy but revision is still weak.",
+          "Use school context if the studentâ€™s workload is already heavy but revision is still weak.",
           "Do not wait for low marks alone if the student already looks academically stretched.",
           "Choose tutoring timing that still leaves enough runway for correction and not just emergency support.",
         ],
@@ -1331,13 +1331,13 @@ export const resourceArticles: ResourceArticle[] = [
         bullets: [
           "Use tutoring early enough to shape habits, not just final revision.",
           "Match the tutor to the subject if one area is clearly driving the pressure.",
-          "Keep the family’s schedule realistic so the plan actually holds.",
+          "Keep the familyâ€™s schedule realistic so the plan actually holds.",
         ],
       },
     ],
     midCta: {
       title: "Not sure whether now is the right time to start?",
-      description: "Tell us the board, class, school, subject, and Gurgaon area, and we’ll help you judge whether the student needs concept-building or board-execution support first.",
+      description: "Tell us the board, class, school, subject, and Gurgaon area, and weâ€™ll help you judge whether the student needs concept-building or board-execution support first.",
     },
     moneyPageLinks: [supportLinks.class10, supportLinks.class12, supportLinks.boardsHub],
     continueLinks: [supportLinks.schoolsHub, supportLinks.areasHub, supportLinks.contact, supportLinks.search],
@@ -1385,8 +1385,8 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["Parents", "Session planning", "Board prep"],
     contextualLinks: [
-      link("Class 10 Hub", "/classes/class-10"),
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Boards Hub", "/boards"),
       link("Contact", "/contact"),
     ],
@@ -1443,7 +1443,7 @@ export const resourceArticles: ResourceArticle[] = [
       {
         question: "Do Class 12 students usually need more sessions than Class 10?",
         answer:
-          "Often yes in high-pressure streams, but the right number still depends on the student’s subject mix and current stability.",
+          "Often yes in high-pressure streams, but the right number still depends on the studentâ€™s subject mix and current stability.",
       },
       {
         question: "Can the session count change during the year?",
@@ -1478,8 +1478,8 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["Parents", "Test practice", "Revision phases"],
     contextualLinks: [
-      link("Class 10 Hub", "/classes/class-10"),
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Sample paper guide", "/resources/sample-paper-and-exam-strategy-guides/sample-paper-strategy-for-class-10-and-class-12"),
       link("Contact", "/contact"),
     ],
@@ -1488,7 +1488,7 @@ export const resourceArticles: ResourceArticle[] = [
         title: "Signs the student is ready to shift",
         paragraphs: [
           "Students are usually ready when they can get through most chapter-level work with reasonable confidence and the repeated mistakes are now happening under pressure rather than in basic learning.",
-          "That means the work should now expose time use, writing quality, sequencing, and confidence — not just chapter familiarity.",
+          "That means the work should now expose time use, writing quality, sequencing, and confidence â€” not just chapter familiarity.",
         ],
         bullets: [
           "The student can explain the chapter but still loses marks in structured tests.",
@@ -1516,7 +1516,7 @@ export const resourceArticles: ResourceArticle[] = [
         ],
         bullets: [
           "Use tutoring when the family needs cleaner diagnosis before increasing test load.",
-          "Keep test practice tied to the student’s actual board and subject path.",
+          "Keep test practice tied to the studentâ€™s actual board and subject path.",
           "Review whether the student is improving in execution, not just effort.",
         ],
       },
@@ -1573,7 +1573,7 @@ export const resourceArticles: ResourceArticle[] = [
     contextualLinks: [
       link("Pathways World School", "/schools/pathways-world-school"),
       link("Scottish High", "/schools/scottish-high-international-school"),
-      link("IB Hub", "/boards/ib"),
+      link("IB Hub", "/boards/ib/home-tutors"),
       link("Gurgaon Areas Hub", "/gurgaon-area"),
     ],
     sections: [
@@ -1604,7 +1604,7 @@ export const resourceArticles: ResourceArticle[] = [
       {
         title: "How to move from school context into action",
         paragraphs: [
-          "Once the school context is clear, the next step is usually a board, class, or subject page — not a vague tuition directory. That keeps the decision more specific and commercially useful.",
+          "Once the school context is clear, the next step is usually a board, class, or subject page â€” not a vague tuition directory. That keeps the decision more specific and commercially useful.",
           "This is where connected school, board, class, and area pages create a cleaner family journey.",
         ],
         bullets: [
@@ -1624,7 +1624,7 @@ export const resourceArticles: ResourceArticle[] = [
       {
         question: "Does school-aware tutoring imply school affiliation?",
         answer:
-          "No. It simply means the tutoring is planned with the family’s school context, curriculum mix, and schedule in mind.",
+          "No. It simply means the tutoring is planned with the familyâ€™s school context, curriculum mix, and schedule in mind.",
       },
       {
         question: "Should school-season support be broad or subject-specific?",
@@ -1664,8 +1664,8 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     tags: ["Sample papers", "Exam strategy", "Board prep"],
     contextualLinks: [
-      link("Class 10 Hub", "/classes/class-10"),
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 10 Hub", "/classes/class-10/home-tutors"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Pre-board guide", "/resources/pre-board-to-board-transition-guides/pre-board-to-board-transition-guide-gurgaon"),
       link("Boards Hub", "/boards"),
     ],
@@ -1709,7 +1709,7 @@ export const resourceArticles: ResourceArticle[] = [
     ],
     midCta: {
       title: "Need better sample paper strategy, not just more papers?",
-      description: "We can help you match the right sample-paper phase to the student’s board, class, subject, school, and Gurgaon context.",
+      description: "We can help you match the right sample-paper phase to the studentâ€™s board, class, subject, school, and Gurgaon context.",
     },
     moneyPageLinks: [supportLinks.class10, supportLinks.class12, supportLinks.boardsHub],
     continueLinks: [supportLinks.schoolsHub, supportLinks.areasHub, supportLinks.search, supportLinks.contact],
@@ -1749,7 +1749,7 @@ export const resourceArticles: ResourceArticle[] = [
     featured: true,
     heroEyebrow: "Local support guide",
     answerFirst:
-      "Golf Course Road families usually need tutoring that is premium, school-aware, and efficient in practice. The strongest route is often to start with the board or subject pressure, then connect it to the corridor’s school context, sectors, and timing expectations rather than browsing a generic tutor list.",
+      "Golf Course Road families usually need tutoring that is premium, school-aware, and efficient in practice. The strongest route is often to start with the board or subject pressure, then connect it to the corridorâ€™s school context, sectors, and timing expectations rather than browsing a generic tutor list.",
     keyTakeaways: [
       "Locality-led searches usually still need a cleaner board or subject page next.",
       "Golf Course Road demand often overlaps with premium school and senior-board pathways.",
@@ -1759,7 +1759,7 @@ export const resourceArticles: ResourceArticle[] = [
     contextualLinks: [
       link("Golf Course Road area", "/gurgaon-area/golf-course-road"),
       link("Schools Hub", "/schools"),
-      link("IB Hub", "/boards/ib"),
+      link("IB Hub", "/boards/ib/home-tutors"),
       link("Maths tutor", "/boards/cbse/class-10/maths-home-tutor-gurgaon"),
     ],
     sections: [
@@ -1842,7 +1842,7 @@ export const resourceArticles: ResourceArticle[] = [
     featured: false,
     heroEyebrow: "Local support guide",
     answerFirst:
-      "DLF Phase 5 families usually get the best result when they match tutoring to the real science bottleneck first — Physics, Chemistry, Biology, or Maths — and then use the area and school context to make the plan practical. This keeps the journey premium and commercially useful instead of generic.",
+      "DLF Phase 5 families usually get the best result when they match tutoring to the real science bottleneck first â€” Physics, Chemistry, Biology, or Maths â€” and then use the area and school context to make the plan practical. This keeps the journey premium and commercially useful instead of generic.",
     keyTakeaways: [
       "Class 12 science support should usually start with subject priority, not broad \"PCM\" or \"PCB\" language alone.",
       "DLF Phase 5 works best with tutoring that feels punctual, polished, and board-aware.",
@@ -1851,7 +1851,7 @@ export const resourceArticles: ResourceArticle[] = [
     tags: ["DLF Phase 5", "Class 12", "Science"],
     contextualLinks: [
       link("DLF Phases area", "/gurgaon-area/dlf-phases"),
-      link("Class 12 Hub", "/classes/class-12"),
+      link("Class 12 Hub", "/classes/class-12/home-tutors"),
       link("Physics tutor", "/boards/cbse/class-12/physics-home-tutor-gurgaon"),
       link("Chemistry tutor", "/boards/cbse/class-12/chemistry-home-tutor-gurgaon"),
     ],

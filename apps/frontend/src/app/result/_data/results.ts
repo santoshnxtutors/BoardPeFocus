@@ -1,3 +1,6 @@
+import { getBoardPath } from "@/app/boards/_data/boards";
+import { getTutorPath } from "@/lib/tutor-paths";
+
 export interface ResultFaqItem {
   question: string;
   answer: string;
@@ -52,17 +55,17 @@ export const resultBoardLinks: ResultLinkCard[] = [
   {
     title: "CBSE support stories",
     description: "See how CBSE journeys connect from board planning into Class 10, Class 12, and subject-specific tutoring paths.",
-    href: "/boards/cbse",
+    href: getBoardPath("cbse"),
   },
   {
     title: "ICSE and ISC proof paths",
     description: "Useful for families who want written-quality support, calmer revision, and senior-board subject depth.",
-    href: "/boards/icse",
+    href: getBoardPath("icse"),
   },
   {
     title: "IB and IGCSE progress routes",
     description: "Explore international-board pages, school-aware pathways, and premium one-to-one subject support.",
-    href: "/boards/ib",
+    href: getBoardPath("ib"),
   },
 ];
 
@@ -88,17 +91,17 @@ export const resultTutorLinks: ResultLinkCard[] = [
   {
     title: "Dharambir Prasad",
     description: "A strong Class 10 and 12 Mathematics profile for families looking for structured board-focused support across CBSE, ICSE, and IB.",
-    href: "/tutors/dharambir-prasad-maths",
+    href: getTutorPath("dharambir-prasad-maths"),
   },
   {
     title: "C. K. Gourav",
     description: "Useful for senior-school families who want stronger Mathematics support across board preparation and JEE-oriented problem solving.",
-    href: "/tutors/c-k-gourav",
+    href: getTutorPath("c-k-gourav"),
   },
   {
     title: "Priyanka Kumari",
     description: "A practical fit for families looking for Mathematics and Accountancy support with cleaner written structure and calmer board preparation.",
-    href: "/tutors/priyanka-kumari",
+    href: getTutorPath("priyanka-kumari"),
   },
 ];
 

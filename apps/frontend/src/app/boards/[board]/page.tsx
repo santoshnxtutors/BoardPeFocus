@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { GraduationCap, MapPin, School } from "lucide-react";
 import { FAQ } from "@/components/faq/FAQ";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +11,14 @@ import { BoardsCtaBlock } from "@/app/boards/_components/BoardsCtaBlock";
 import { BoardsRelatedLinks } from "@/app/boards/_components/BoardsRelatedLinks";
 import { BoardsSection } from "@/app/boards/_components/BoardsSection";
 import { BoardsTutorLinks } from "@/app/boards/_components/BoardsTutorLinks";
+import { fetchBackend } from "@/lib/backend-api";
+import { getLiveFaqs } from "@/lib/live-content";
 import {
   getAreaDetails,
   getBoardConfig,
+  getBoardClassPath,
   getBoardPath,
+  getBoardSubjectPath,
   getBoardTutors,
   getSchoolDetails,
   getAllBoardParams,
@@ -25,15 +29,42 @@ interface PageProps {
   params: Promise<{ board: string }>;
 }
 
+interface LiveBoard {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  shortDescription?: string | null;
+  longDescription?: string | null;
+  seoTitle?: string | null;
+  metaDescription?: string | null;
+}
+
+async function getLiveBoard(slug: string) {
+  const response = await fetchBackend(`/content/boards/${encodeURIComponent(slug)}`);
+  if (!response.ok) return null;
+  return (await response.json()) as LiveBoard;
+}
+
 export async function generateStaticParams() {
   return getAllBoardParams();
 }
 
-export async function generateMetadata({ params }: PageProps) {
-  const { board: boardSlug } = await params;
+export async function getBoardPageMetadata(boardSlug: string) {
+  const liveBoard = await getLiveBoard(boardSlug);
+  if (liveBoard) {
+    return constructMetadata({
+      title: liveBoard.seoTitle ?? `${liveBoard.name} Home Tutors in Gurgaon | BoardPeFocus`,
+      description: liveBoard.metaDescription ?? liveBoard.shortDescription ?? liveBoard.description ?? undefined,
+      pathname: getBoardPath(liveBoard.slug),
+    });
+  }
+
   const board = getBoardConfig(boardSlug);
 
-  if (!board) return constructMetadata({ title: "Board Not Found", noIndex: true });
+  if (!board) {
+    return constructMetadata({ title: "Board Not Found", noIndex: true });
+  }
 
   return constructMetadata({
     title: `${board.name} Home Tutors in Gurgaon | BoardPeFocus`,
@@ -42,17 +73,42 @@ export async function generateMetadata({ params }: PageProps) {
   });
 }
 
-export default async function BoardPage({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps) {
   const { board: boardSlug } = await params;
+  return getBoardPageMetadata(boardSlug);
+}
+
+export async function renderBoardPage(boardSlug: string) {
+  const liveBoard = await getLiveBoard(boardSlug);
   const board = getBoardConfig(boardSlug);
-  if (!board) notFound();
+  if (!board) {
+    if (!liveBoard) notFound();
+    return (
+      <LiveEntityPage
+        title={`${liveBoard.name} Home Tutors in Gurgaon`}
+        eyebrow="Board"
+        description={liveBoard.longDescription ?? liveBoard.description ?? liveBoard.shortDescription ?? ""}
+        pathname={getBoardPath(liveBoard.slug)}
+        parent={{ label: "Boards", href: "/boards" }}
+      />
+    );
+  }
+
+  const liveFaqs =
+    liveBoard?.id ? await getLiveFaqs({ entityType: "BOARD", entityId: liveBoard.id }) : [];
+  const faqItems = liveFaqs.length > 0 ? liveFaqs : board.faq;
+  const heroDescription =
+    liveBoard?.longDescription ??
+    liveBoard?.description ??
+    liveBoard?.shortDescription ??
+    board.heroDescription;
 
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Boards", url: absoluteUrl("/boards") },
     { name: board.name, url: absoluteUrl(getBoardPath(board.slug)) },
   ]);
-  const faqJsonLd = generateFaqJsonLd(board.faq);
+  const faqJsonLd = generateFaqJsonLd(faqItems);
   const boardTutors = getBoardTutors(board);
   const allSubjects = board.classes.flatMap((classConfig) =>
     classConfig.subjects.map((subject) => ({
@@ -87,7 +143,7 @@ export default async function BoardPage({ params }: PageProps) {
                   {board.name} Board Hub
                 </Badge>
                 <h1 className="mt-6 text-4xl font-extrabold text-primary md:text-6xl">{`${board.name} Home Tutors in Gurgaon`}</h1>
-                <p className="mt-6 text-lg leading-8 text-muted-foreground md:text-xl">{board.heroDescription}</p>
+                <p className="mt-6 text-lg leading-8 text-muted-foreground md:text-xl">{heroDescription}</p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20board-specific%20tutoring%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                     <Button className="rounded-xl px-6">Talk on WhatsApp</Button>
@@ -124,7 +180,7 @@ export default async function BoardPage({ params }: PageProps) {
                 {board.classes.map((classConfig) => (
                   <Link
                     key={classConfig.slug}
-                    href={`${getBoardPath(board.slug)}/${classConfig.slug}`}
+                    href={getBoardClassPath(board.slug, classConfig.slug)}
                     className="rounded-[2rem] border border-border/60 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                   >
                     <div className="flex items-center gap-3 text-primary">
@@ -146,7 +202,7 @@ export default async function BoardPage({ params }: PageProps) {
                 {allSubjects.map((subject) => (
                   <Link
                     key={`${subject.classSlug}-${subject.slug}`}
-                    href={`${getBoardPath(board.slug)}/${subject.classSlug}/${subject.slug}`}
+                    href={getBoardSubjectPath(board.slug, subject.classSlug, subject.slug)}
                     className="rounded-[1.75rem] border border-border/60 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                   >
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">{subject.classLabel}</p>
@@ -245,7 +301,7 @@ export default async function BoardPage({ params }: PageProps) {
               />
             </BoardsSection>
 
-            <FAQ title={`${board.name} FAQs`} subtitle={`Useful parent questions about ${board.name} tutoring in Gurgaon.`} items={board.faq} columns={2} />
+            <FAQ title={`${board.name} FAQs`} subtitle={`Useful parent questions about ${board.name} tutoring in Gurgaon.`} items={faqItems} columns={2} />
 
             <BoardsRelatedLinks
               links={[
@@ -256,7 +312,7 @@ export default async function BoardPage({ params }: PageProps) {
                 },
                 ...board.classes.map((classConfig) => ({
                   title: `${board.name} ${classConfig.label}`,
-                  href: `${getBoardPath(board.slug)}/${classConfig.slug}`,
+                  href: getBoardClassPath(board.slug, classConfig.slug),
                   description: `Continue into the ${classConfig.label} page for class-specific subject and revision pathways.`,
                 })),
                 {
@@ -271,6 +327,54 @@ export default async function BoardPage({ params }: PageProps) {
               title={`Want the right ${board.name} tutoring path for your child?`}
               description={`Tell us the class, subject, school, and Gurgaon area, and we will help you move into a premium ${board.name}-specific tutor match.`}
             />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export default async function BoardPage({ params }: PageProps) {
+  const { board: boardSlug } = await params;
+  redirect(getBoardPath(boardSlug));
+}
+
+function LiveEntityPage({
+  title,
+  eyebrow,
+  description,
+  pathname,
+  parent,
+}: {
+  title: string;
+  eyebrow: string;
+  description: string;
+  pathname: string;
+  parent: { label: string; href: string };
+}) {
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: parent.label, url: absoluteUrl(parent.href) },
+    { name: title, url: absoluteUrl(pathname) },
+  ]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <JsonLd data={breadcrumbJsonLd} />
+      <section className="pt-32">
+        <div className="container mx-auto max-w-4xl px-4">
+          <div className="rounded-[2rem] border border-border/60 bg-white p-8 shadow-sm md:p-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">{eyebrow}</p>
+            <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-primary md:text-6xl">{title}</h1>
+            {description ? <p className="mt-6 text-lg leading-8 text-muted-foreground">{description}</p> : null}
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link href={parent.href}>
+                <Button variant="outline" className="rounded-xl px-6">Back to {parent.label}</Button>
+              </Link>
+              <Link href="/contact">
+                <Button className="rounded-xl px-6">Request Callback</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

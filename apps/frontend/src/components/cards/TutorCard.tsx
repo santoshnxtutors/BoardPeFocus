@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Star, Clock, GraduationCap, ChevronRight, MapPin, BookOpen } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { getTutorPath } from "@/lib/tutor-paths";
 
 interface TutorCardProps {
   tutor: Tutor;
@@ -77,7 +78,7 @@ export function TutorCard({ tutor }: TutorCardProps) {
       </div>
 
       <CardFooter className="p-0 mt-auto">
-        <Link href={`/tutors/${tutor.slug}`} className="w-full">
+        <Link href={getTutorPath(tutor.slug)} className="w-full">
           <Button variant="ghost" className="w-full h-14 rounded-none rounded-b-3xl border-t border-border/50 group-hover:bg-primary group-hover:text-white transition-all duration-300 text-primary font-bold">
             View Full Profile
             <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />

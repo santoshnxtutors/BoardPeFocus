@@ -25,17 +25,20 @@ import { cn } from "@/lib/utils";
 
 const getCategoryId = (category: string) => category.toLowerCase().replace(/\s+/g, "-");
 
-export function FAQPageClient() {
-  const [activeCategory, setActiveCategory] = useState(categorizedFaqs[0].category);
+type FaqCategory = typeof categorizedFaqs[number];
+
+export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCategory[] }) {
+  const categories = initialCategories?.length ? initialCategories : categorizedFaqs;
+  const [activeCategory, setActiveCategory] = useState(categories[0]?.category ?? "General Information");
   const [searchQuery, setSearchQuery] = useState("");
 
   const visibleCategories = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
     if (!normalizedQuery) {
-      return categorizedFaqs;
+      return categories;
     }
 
-    return categorizedFaqs
+    return categories
       .map((category) => ({
         ...category,
         items: category.items.filter((item) =>
@@ -43,7 +46,7 @@ export function FAQPageClient() {
         ),
       }))
       .filter((category) => category.items.length > 0);
-  }, [searchQuery]);
+  }, [categories, searchQuery]);
 
   const displayedActiveCategory = visibleCategories.some(
     (category) => category.category === activeCategory

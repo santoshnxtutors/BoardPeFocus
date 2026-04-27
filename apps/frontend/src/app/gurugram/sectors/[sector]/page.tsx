@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, GraduationCap, MapPin } from "lucide-react";
+import { FAQ } from "@/components/faq/FAQ";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { TutorCard } from "@/components/cards/TutorCard";
 import { AreaBreadcrumbs } from "@/components/areas/AreaBreadcrumbs";
@@ -12,18 +13,50 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getAreaCluster, getSectorDetail } from "@/data/areas";
 import { mockSchools, mockTutors } from "@/data/mock";
+import { getBoardPath } from "@/app/boards/_data/boards";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { getSchoolHubLink } from "@/app/schools/_data/linking";
+import { fetchBackend } from "@/lib/backend-api";
+import { getLiveFaqs } from "@/lib/live-content";
 
 interface PageProps {
   params: Promise<{ sector: string }>;
 }
 
+interface LiveSector {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  city?: string | null;
+  corridor?: string | null;
+  seoTitle?: string | null;
+  metaDescription?: string | null;
+  societies?: Array<{ id: string; slug: string; name: string; description?: string | null }>;
+}
+
+async function getLiveSector(slug: string) {
+  const response = await fetchBackend(`/content/sectors/${encodeURIComponent(slug)}`);
+  if (!response.ok) return null;
+  return (await response.json()) as LiveSector;
+}
+
 export async function generateMetadata({ params }: PageProps) {
   const { sector: sectorSlug } = await params;
+  const liveSector = await getLiveSector(sectorSlug);
+  if (liveSector) {
+    return constructMetadata({
+      title: liveSector.seoTitle ?? `Premium Home Tutors in ${liveSector.name}, Gurugram | BoardPeFocus`,
+      description: liveSector.metaDescription ?? liveSector.description ?? undefined,
+      pathname: `/gurugram/sectors/${liveSector.slug}`,
+    });
+  }
+
   const sector = getSectorDetail(sectorSlug);
 
-  if (!sector) return constructMetadata({ title: "Sector Not Found", noIndex: true });
+  if (!sector) {
+    return constructMetadata({ title: "Sector Not Found", noIndex: true });
+  }
 
   return constructMetadata({
     title: `Premium Home Tutors in ${sector.name}, Gurugram | BoardPeFocus`,
@@ -34,9 +67,17 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function SectorPage({ params }: PageProps) {
   const { sector: sectorSlug } = await params;
+  const liveSector = await getLiveSector(sectorSlug);
   const sector = getSectorDetail(sectorSlug);
 
-  if (!sector) notFound();
+  if (!sector) {
+    if (!liveSector) notFound();
+    return <LiveSectorPage sector={liveSector} />;
+  }
+
+  const liveFaqs =
+    liveSector?.id ? await getLiveFaqs({ entityType: "SECTOR", entityId: liveSector.id }) : [];
+  const heroDescription = liveSector?.description ?? sector.positioning;
 
   const cluster = getAreaCluster(sector.clusterSlug);
   const relatedTutors = mockTutors.filter((tutor) =>
@@ -76,7 +117,7 @@ export default async function SectorPage({ params }: PageProps) {
                 Sector Page
               </Badge>
               <h1 className="mt-6 text-4xl font-extrabold text-primary md:text-6xl">{`Home Tutors in ${sector.name}`}</h1>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">{sector.positioning}</p>
+              <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">{heroDescription}</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 {sector.boardFocus.map((board) => (
                   <Badge key={board} variant="outline" className="rounded-full border-border/80 bg-white px-4 py-2 text-foreground">
@@ -191,7 +232,7 @@ export default async function SectorPage({ params }: PageProps) {
                 {
                   title: "CBSE tutors in Gurgaon",
                   description: "Useful for families narrowing by board after choosing the right sector.",
-                  href: "/boards/cbse",
+                  href: getBoardPath("cbse"),
                 },
                 {
                   title: `${sector.subjectDemand[0]} support`,
@@ -211,8 +252,17 @@ export default async function SectorPage({ params }: PageProps) {
                                 ? "/boards/cbse/class-12/economics-home-tutor-gurgaon"
                                 : "/boards/cbse/class-10/science-home-tutor-gurgaon",
                 },
-              ]}
-            />
+                ]}
+              />
+
+              {liveFaqs.length > 0 ? (
+                <FAQ
+                  items={liveFaqs}
+                  title={`${sector.name} FAQs`}
+                  subtitle="These FAQs are assigned from the admin panel and published live on this sector route."
+                  columns={2}
+                />
+              ) : null}
             </div>
 
             <div className="space-y-6">
@@ -238,6 +288,54 @@ export default async function SectorPage({ params }: PageProps) {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function LiveSectorPage({ sector }: { sector: LiveSector }) {
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Gurugram", url: absoluteUrl("/gurugram") },
+    { name: sector.name, url: absoluteUrl(`/gurugram/sectors/${sector.slug}`) },
+  ]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <JsonLd data={breadcrumbJsonLd} />
+      <section className="pt-32">
+        <div className="container mx-auto max-w-5xl px-4">
+          <AreaBreadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Gurugram", href: "/gurugram" },
+              { label: sector.name },
+            ]}
+          />
+          <div className="rounded-[2rem] border border-border/60 bg-white p-8 shadow-sm md:p-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">
+              {sector.corridor ?? sector.city ?? "Sector"}
+            </p>
+            <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-primary md:text-6xl">
+              Home Tutors in {sector.name}
+            </h1>
+            {sector.description ? <p className="mt-6 text-lg leading-8 text-muted-foreground">{sector.description}</p> : null}
+            {sector.societies?.length ? (
+              <div className="mt-8 grid gap-4 md:grid-cols-2">
+                {sector.societies.map((society) => (
+                  <Link
+                    key={society.id}
+                    href={`/gurugram/sectors/${sector.slug}/${society.slug}`}
+                    className="rounded-[1.5rem] border border-primary/10 bg-primary/5 p-5 transition-all hover:bg-white hover:shadow-sm"
+                  >
+                    <h2 className="text-lg font-bold text-primary">{society.name}</h2>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{society.description ?? "Explore society-level tutoring support."}</p>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
       </section>

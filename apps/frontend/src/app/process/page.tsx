@@ -14,6 +14,15 @@ import { ProcessBreadcrumbs } from "@/app/process/_components/ProcessBreadcrumbs
 import { ProcessCtaBlock } from "@/app/process/_components/ProcessCtaBlock";
 import { ProcessSection } from "@/app/process/_components/ProcessSection";
 import { processHubFaqs, processPages } from "@/app/process/_data/process";
+import { getLiveContent, getLiveFaqs } from "@/lib/live-content";
+
+interface LiveProcessContent {
+  id: string;
+  slug: string;
+  title: string;
+  summary?: string | null;
+  body?: string | null;
+}
 
 export const metadata = constructMetadata({
   title: "How BoardPeFocus Works | Consultation, Matching, Demo, and Support",
@@ -22,12 +31,17 @@ export const metadata = constructMetadata({
   pathname: "/process",
 });
 
-export default function ProcessHubPage() {
+export default async function ProcessHubPage() {
+  const [liveProcessPages, liveFaqs] = await Promise.all([
+    getLiveContent<LiveProcessContent>("/content/process-content"),
+    getLiveFaqs({ pageSlug: "process" }),
+  ]);
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Process", url: absoluteUrl("/process") },
   ]);
-  const faqJsonLd = generateFaqJsonLd(processHubFaqs);
+  const faqItems = liveFaqs.length > 0 ? liveFaqs : processHubFaqs;
+  const faqJsonLd = generateFaqJsonLd(faqItems);
 
   return (
     <div className="min-h-screen bg-background">
@@ -110,6 +124,7 @@ export default function ProcessHubPage() {
             >
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {processPages.map((page) => (
+                  liveProcessPages.length > 0 ? null : (
                   <Link
                     key={page.slug}
                     href={`/process/${page.slug}`}
@@ -119,6 +134,21 @@ export default function ProcessHubPage() {
                     <h2 className="mt-3 text-2xl font-bold text-primary">{page.label}</h2>
                     <p className="mt-3 text-sm leading-7 text-muted-foreground">{page.summary}</p>
                     <p className="mt-5 text-sm font-medium text-primary/80">{page.audience}</p>
+                  </Link>
+                  )
+                ))}
+                {liveProcessPages.map((page) => (
+                  <Link
+                    key={page.id}
+                    href={`/process/${page.slug}`}
+                    className="rounded-[1.75rem] border border-border/60 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">Live Content</p>
+                    <h2 className="mt-3 text-2xl font-bold text-primary">{page.title}</h2>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                      {page.summary ?? page.body ?? "Open this step to review the current published process guidance."}
+                    </p>
+                    <p className="mt-5 text-sm font-medium text-primary/80">Published from admin content</p>
                   </Link>
                 ))}
               </div>
@@ -199,7 +229,7 @@ export default function ProcessHubPage() {
             </ProcessSection>
 
             <FAQ
-              items={processHubFaqs}
+              items={faqItems}
               title="Process FAQs"
               subtitle="Visible answers to the questions families usually ask before they move deeper into the service."
               columns={2}

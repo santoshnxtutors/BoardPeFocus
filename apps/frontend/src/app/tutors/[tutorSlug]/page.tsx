@@ -1,5 +1,5 @@
 import { mockSchools, mockTutors } from "@/data/mock";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJs
 import { TutorProfileViewModel } from "@/types/tutor-profile";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { fetchBackend } from "@/lib/backend-api";
+import { getTutorPath } from "@/lib/tutor-paths";
 
 // New high-fidelity components
 import { TutorHero } from "@/components/sections/tutor/TutorHero";
@@ -31,8 +32,7 @@ export function generateStaticParams() {
   return mockTutors.map((tutor) => ({ tutorSlug: tutor.slug }));
 }
 
-export async function generateMetadata({ params }: PageProps) {
-  const { tutorSlug } = await params;
+export async function getTutorPageMetadata(tutorSlug: string) {
   const tutor = await getPublishedTutor(tutorSlug);
   
   if (!tutor) return constructMetadata({ title: "Tutor Not Found", noIndex: true });
@@ -44,12 +44,16 @@ export async function generateMetadata({ params }: PageProps) {
     title: `${tutor.name} | ${subjectNames} Tutor in Gurugram for ${boardNames}`,
     description: `${tutor.name} is an experienced ${subjectNames} home tutor in Gurugram for ${boardNames}. ${tutor.tagline}`,
     image: tutor.photoUrl,
-    pathname: `/tutors/${tutor.slug}`,
+    pathname: getTutorPath(tutor.slug ?? tutorSlug),
   });
 }
 
-export default async function TutorProfilePage({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps) {
   const { tutorSlug } = await params;
+  return getTutorPageMetadata(tutorSlug);
+}
+
+export async function renderTutorProfilePage(tutorSlug: string) {
   const tutorData = await getPublishedTutor(tutorSlug);
 
   if (!tutorData) {
@@ -79,7 +83,7 @@ export default async function TutorProfilePage({ params }: PageProps) {
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Gurugram", url: absoluteUrl("/gurugram") },
-    { name: tutor.name, url: absoluteUrl(`/tutors/${tutor.slug}`) },
+    { name: tutor.name, url: absoluteUrl(getTutorPath(tutor.slug ?? tutorSlug)) },
   ]);
   const tutorBoards = tutor.boards.map((board) =>
     typeof board === "string" ? board : (board.board?.name ?? ""),
@@ -334,6 +338,11 @@ export default async function TutorProfilePage({ params }: PageProps) {
       <TutorStickyCTA tutor={tutor} />
     </div>
   );
+}
+
+export default async function TutorProfilePage({ params }: PageProps) {
+  const { tutorSlug } = await params;
+  permanentRedirect(getTutorPath(tutorSlug));
 }
 
 async function getPublishedTutor(slug: string) {

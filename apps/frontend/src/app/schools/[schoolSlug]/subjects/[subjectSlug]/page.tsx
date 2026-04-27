@@ -5,6 +5,7 @@ import { FAQ } from "@/components/faq/FAQ";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getClassHubPath } from "@/app/classes/_data/classes";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/seo";
 import { SchoolsBreadcrumbs } from "@/app/schools/_components/SchoolsBreadcrumbs";
 import { SchoolsCtaBlock } from "@/app/schools/_components/SchoolsCtaBlock";
@@ -217,12 +218,12 @@ export default async function SchoolSubjectPage({ params }: PageProps) {
                 },
                 {
                   title: "Class 10 Hub",
-                  href: "/classes/class-10",
+                  href: getClassHubPath("class-10"),
                   description: "Use the Class 10 hub where the current need is still early board-stage discovery.",
                 },
                 {
                   title: "Class 12 Hub",
-                  href: "/classes/class-12",
+                  href: getClassHubPath("class-12"),
                   description: "Use the Class 12 hub for senior subject and revision pathways.",
                 },
                 {

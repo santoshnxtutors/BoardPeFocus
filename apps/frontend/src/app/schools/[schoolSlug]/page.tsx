@@ -12,9 +12,29 @@ import { SchoolsRelatedLinks } from "@/app/schools/_components/SchoolsRelatedLin
 import { SchoolsSection } from "@/app/schools/_components/SchoolsSection";
 import { SchoolTutorLinks } from "@/app/schools/_components/SchoolTutorLinks";
 import { getSchoolConfig, getAllSchoolParams, getSchoolTutorProfiles } from "@/app/schools/_data/schools";
+import { fetchBackend } from "@/lib/backend-api";
+import { getLiveFaqs } from "@/lib/live-content";
 
 interface PageProps {
   params: Promise<{ schoolSlug: string }>;
+}
+
+interface LiveSchool {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  safeSupportWording?: string | null;
+  locality?: string | null;
+  curriculumMix?: string | null;
+  seoTitle?: string | null;
+  metaDescription?: string | null;
+}
+
+async function getLiveSchool(slug: string) {
+  const response = await fetchBackend(`/content/schools/${encodeURIComponent(slug)}`);
+  if (!response.ok) return null;
+  return (await response.json()) as LiveSchool;
 }
 
 export async function generateStaticParams() {
@@ -23,9 +43,20 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps) {
   const { schoolSlug } = await params;
+  const liveSchool = await getLiveSchool(schoolSlug);
+  if (liveSchool) {
+    return constructMetadata({
+      title: liveSchool.seoTitle ?? `${liveSchool.name} Home Tutors in Gurgaon | BoardPeFocus`,
+      description: liveSchool.metaDescription ?? liveSchool.safeSupportWording ?? liveSchool.description ?? undefined,
+      pathname: `/schools/${liveSchool.slug}`,
+    });
+  }
+
   const school = getSchoolConfig(schoolSlug);
 
-  if (!school) return constructMetadata({ title: "School Not Found", noIndex: true });
+  if (!school) {
+    return constructMetadata({ title: "School Not Found", noIndex: true });
+  }
 
   return constructMetadata({
     title: `${school.name} Home Tutors in Gurgaon | BoardPeFocus`,
@@ -36,16 +67,25 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function SchoolOverviewPage({ params }: PageProps) {
   const { schoolSlug } = await params;
+  const liveSchool = await getLiveSchool(schoolSlug);
   const school = getSchoolConfig(schoolSlug);
-  if (!school) notFound();
+  if (!school) {
+    if (!liveSchool) notFound();
+    return <LiveSchoolPage school={liveSchool} />;
+  }
 
+  const liveFaqs =
+    liveSchool?.id ? await getLiveFaqs({ entityType: "SCHOOL", entityId: liveSchool.id }) : [];
+  const faqItems = liveFaqs.length > 0 ? liveFaqs : school.faq;
+  const heroDescription =
+    liveSchool?.safeSupportWording ?? liveSchool?.description ?? school.heroDescription;
   const tutors = getSchoolTutorProfiles(school);
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Schools", url: absoluteUrl("/schools") },
     { name: school.name, url: absoluteUrl(`/schools/${school.slug}`) },
   ]);
-  const faqJsonLd = generateFaqJsonLd(school.faq);
+  const faqJsonLd = generateFaqJsonLd(faqItems);
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,7 +112,7 @@ export default async function SchoolOverviewPage({ params }: PageProps) {
                 <h1 className="mt-6 text-4xl font-extrabold tracking-tight md:text-6xl">
                   Home tutors for students studying in {school.name}
                 </h1>
-                <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">{school.heroDescription}</p>
+                <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">{heroDescription}</p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20this%20school-aware%20tutoring%20path%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                     <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
@@ -243,7 +283,7 @@ export default async function SchoolOverviewPage({ params }: PageProps) {
             <FAQ
               title={`${school.name} FAQs`}
               subtitle="Visible answers for parents exploring school-aware tutoring in Gurgaon."
-              items={school.faq}
+              items={faqItems}
               columns={2}
             />
 
@@ -271,6 +311,50 @@ export default async function SchoolOverviewPage({ params }: PageProps) {
               title={`Need the right tutoring path for ${school.name}?`}
               description={`Tell us the board, class, subject, school, and Gurgaon area, and we will help you move into the most relevant one-to-one tutor match.`}
             />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function LiveSchoolPage({ school }: { school: LiveSchool }) {
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Schools", url: absoluteUrl("/schools") },
+    { name: school.name, url: absoluteUrl(`/schools/${school.slug}`) },
+  ]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <JsonLd data={breadcrumbJsonLd} />
+      <section className="pt-32">
+        <div className="container mx-auto max-w-4xl px-4">
+          <SchoolsBreadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Schools", href: "/schools" },
+              { label: school.name },
+            ]}
+          />
+          <div className="rounded-[2rem] border border-border/60 bg-white p-8 shadow-sm md:p-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">
+              {school.curriculumMix ?? school.locality ?? "School"}
+            </p>
+            <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-primary md:text-6xl">
+              Home tutors for students studying in {school.name}
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">
+              {school.safeSupportWording ?? school.description ?? "Explore school-aware tutoring support for this Gurgaon school."}
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link href="/schools">
+                <Button variant="outline" className="rounded-xl px-6">Back to Schools</Button>
+              </Link>
+              <Link href="/contact">
+                <Button className="rounded-xl px-6">Request Callback</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

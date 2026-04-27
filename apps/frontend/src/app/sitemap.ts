@@ -1,6 +1,13 @@
 import { MetadataRoute } from 'next';
-import { getAllBoardParams, getAllClassParams, getAllSubjectParams } from '@/app/boards/_data/boards';
-import { getAllClassHubParams } from '@/app/classes/_data/classes';
+import {
+  getAllBoardParams,
+  getAllClassParams,
+  getAllSubjectParams,
+  getBoardClassPath,
+  getBoardPath,
+  getBoardSubjectPath,
+} from '@/app/boards/_data/boards';
+import { getAllClassHubParams, getClassHubPath } from '@/app/classes/_data/classes';
 import { getAllFaqTopicParams } from '@/app/faqs/_data/topics';
 import { getAllProcessParams } from '@/app/process/_data/process';
 import { getAllResourceArticleParams } from '@/app/resources/_data/articles';
@@ -13,6 +20,7 @@ import {
   getAllSchoolSubjectParams,
 } from '@/app/schools/_data/schools';
 import { siteConfig } from '@/lib/seo';
+import { getTutorPath } from '@/lib/tutor-paths';
 import { areaClusters } from '@/data/areas';
 import { mockBoards, mockSchools, mockSectors, mockSubjects, mockTutors } from '@/data/mock';
 import { getGeneratedSitemapRoutes } from '@/lib/generated-pages';
@@ -78,8 +86,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tutorSeoInventory = mockTutors;
 
   const boardRoutes = liveBoards.map((board) => `/gurugram/${board.slug}`);
-  const boardsHubRoutes = getAllBoardParams().map(({ board }) => `/boards/${board}`);
-  const classHubRoutes = getAllClassHubParams().map(({ classLevel }) => `/classes/${classLevel}`);
+  const boardsHubRoutes = getAllBoardParams().map(({ board }) => getBoardPath(board));
+  const classHubRoutes = getAllClassHubParams().map(({ classLevel }) => getClassHubPath(classLevel));
   const faqTopicRoutes = getAllFaqTopicParams().map(({ topic }) => `/faqs/${topic}`);
   const processRoutes = getAllProcessParams().map(({ slug }) => `/process/${slug}`);
   const schoolHubRoutes = getAllSchoolParams().map(({ schoolSlug }) => `/schools/${schoolSlug}`);
@@ -100,11 +108,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const resourceArticleRoutes = getAllResourceArticleParams().map(
     ({ category, slug }) => `/resources/${category}/${slug}`,
   );
-  const boardsClassRoutes = getAllClassParams().map(
-    ({ board, classLevel }) => `/boards/${board}/${classLevel}`,
+  const boardsClassRoutes = getAllClassParams().map(({ board, classLevel }) =>
+    getBoardClassPath(board, classLevel),
   );
-  const boardsSubjectRoutes = getAllSubjectParams().map(
-    ({ board, classLevel, subjectSlug }) => `/boards/${board}/${classLevel}/${subjectSlug}`,
+  const boardsSubjectRoutes = getAllSubjectParams().map(({ board, classLevel, subjectSlug }) =>
+    getBoardSubjectPath(board, classLevel, subjectSlug),
   );
   const boardSubjectRoutes = boardSeoInventory.flatMap((board) =>
     liveSubjects
@@ -161,7 +169,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       (society) => `/gurugram/sectors/${sector.slug}/${society.toLowerCase().replace(/\s+/g, '-')}`,
     ),
   );
-  const tutorRoutes = liveTutors.map((tutor) => `/tutors/${tutor.slug}`);
+  const tutorRoutes = liveTutors.map((tutor) => getTutorPath(tutor.slug));
   const manifestRoutes = getGeneratedSitemapRoutes();
 
   const allRoutes = Array.from(

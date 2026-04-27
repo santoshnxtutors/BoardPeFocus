@@ -1,5 +1,5 @@
 import { mockSchools, mockBoards, mockTutors } from "@/data/mock";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { TutorCard } from "@/components/cards/TutorCard";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, BookOpen } from "lucide-react";
@@ -11,6 +11,7 @@ import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd } from "@/lib/
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildGeneratedMetadata,
+  getManifestRedirectTarget,
   getManifestPage,
   getSchoolServiceFallbackParams,
 } from "@/lib/generated-pages";
@@ -48,10 +49,16 @@ export default async function SchoolBoardPage({ params }: PageProps) {
   const { schoolSlug, board: boardSlug } = await params;
   const school = mockSchools.find(s => s.slug === schoolSlug);
   const board = mockBoards.find(b => b.slug === boardSlug);
-  const generatedPage = getManifestPage(`/gurugram/schools/${schoolSlug}/${boardSlug}`);
+  const pathname = `/gurugram/schools/${schoolSlug}/${boardSlug}`;
+  const generatedPage = getManifestPage(pathname);
 
   if (!school || !board) {
     if (generatedPage) {
+      const redirectTarget = getManifestRedirectTarget(pathname);
+      if (redirectTarget) {
+        redirect(redirectTarget);
+      }
+
       return <GeneratedManifestPage record={generatedPage} />;
     }
 

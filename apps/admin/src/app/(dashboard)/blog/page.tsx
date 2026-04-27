@@ -24,12 +24,12 @@ export default function BlogManagementPage() {
         { name: "ogImage", label: "OG Image URL" },
       ]}
       relationFields={[
-        { name: "boardIds", label: "Related Boards", lookupKey: "boards" },
-        { name: "classLevelIds", label: "Related Classes", lookupKey: "classes" },
-        { name: "subjectIds", label: "Related Subjects", lookupKey: "subjects" },
-        { name: "schoolIds", label: "Related Schools", lookupKey: "schools" },
-        { name: "sectorIds", label: "Related Sectors", lookupKey: "sectors" },
-        { name: "societyIds", label: "Related Societies", lookupKey: "societies" },
+        { name: "boardIds", label: "Related Boards", lookupKey: "boards", relationKey: "mappings", childKey: "entityId", entityType: "BOARD" },
+        { name: "classLevelIds", label: "Related Classes", lookupKey: "classes", relationKey: "mappings", childKey: "entityId", entityType: "CLASS" },
+        { name: "subjectIds", label: "Related Subjects", lookupKey: "subjects", relationKey: "mappings", childKey: "entityId", entityType: "SUBJECT" },
+        { name: "schoolIds", label: "Related Schools", lookupKey: "schools", relationKey: "mappings", childKey: "entityId", entityType: "SCHOOL" },
+        { name: "sectorIds", label: "Related Sectors", lookupKey: "sectors", relationKey: "mappings", childKey: "entityId", entityType: "SECTOR" },
+        { name: "societyIds", label: "Related Societies", lookupKey: "societies", relationKey: "mappings", childKey: "entityId", entityType: "SOCIETY" },
       ]}
     />
   );

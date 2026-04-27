@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { MapPin, School } from "lucide-react";
 import { FAQ } from "@/components/faq/FAQ";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ import {
   getBoardClassConfig,
   getBoardClassPath,
   getBoardConfig,
+  getBoardPath,
   getSchoolDetails,
   getBoardSubjectPath,
 } from "@/app/boards/_data/boards";
@@ -29,8 +30,7 @@ export async function generateStaticParams() {
   return getAllClassParams();
 }
 
-export async function generateMetadata({ params }: PageProps) {
-  const { board: boardSlug, classLevel } = await params;
+export async function getBoardClassPageMetadata(boardSlug: string, classLevel: string) {
   const board = getBoardConfig(boardSlug);
   const classConfig = getBoardClassConfig(boardSlug, classLevel);
 
@@ -43,8 +43,12 @@ export async function generateMetadata({ params }: PageProps) {
   });
 }
 
-export default async function BoardClassPage({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps) {
   const { board: boardSlug, classLevel } = await params;
+  return getBoardClassPageMetadata(boardSlug, classLevel);
+}
+
+export async function renderBoardClassPage(boardSlug: string, classLevel: string) {
   const board = getBoardConfig(boardSlug);
   const classConfig = getBoardClassConfig(boardSlug, classLevel);
 
@@ -56,7 +60,7 @@ export default async function BoardClassPage({ params }: PageProps) {
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Boards", url: absoluteUrl("/boards") },
-    { name: board.name, url: absoluteUrl(`/boards/${board.slug}`) },
+    { name: board.name, url: absoluteUrl(getBoardPath(board.slug)) },
     { name: classConfig.label, url: absoluteUrl(getBoardClassPath(board.slug, classConfig.slug)) },
   ]);
   const faqJsonLd = generateFaqJsonLd(classConfig.faq);
@@ -72,7 +76,7 @@ export default async function BoardClassPage({ params }: PageProps) {
             items={[
               { label: "Home", href: "/" },
               { label: "Boards", href: "/boards" },
-              { label: board.name, href: `/boards/${board.slug}` },
+              { label: board.name, href: getBoardPath(board.slug) },
               { label: classConfig.label },
             ]}
           />
@@ -210,7 +214,7 @@ export default async function BoardClassPage({ params }: PageProps) {
               links={[
                 {
                   title: `${board.name} board hub`,
-                  href: `/boards/${board.slug}`,
+                  href: getBoardPath(board.slug),
                   description: `Move up one level to compare classes, schools, areas, and subject routes within ${board.name}.`,
                 },
                 ...classConfig.subjects.slice(0, 2).map((subject) => ({
@@ -235,4 +239,9 @@ export default async function BoardClassPage({ params }: PageProps) {
       </section>
     </div>
   );
+}
+
+export default async function BoardClassPage({ params }: PageProps) {
+  const { board: boardSlug, classLevel } = await params;
+  redirect(getBoardClassPath(boardSlug, classLevel));
 }

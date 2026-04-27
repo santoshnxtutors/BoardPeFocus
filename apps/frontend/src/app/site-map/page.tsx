@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import { areaClusters } from "@/data/areas";
-import { getAllBoardParams } from "@/app/boards/_data/boards";
-import { getAllClassHubParams } from "@/app/classes/_data/classes";
+import { getAllBoardParams, getBoardPath } from "@/app/boards/_data/boards";
+import { getAllClassHubParams, getClassHubPath } from "@/app/classes/_data/classes";
 import { getAllSchoolParams } from "@/app/schools/_data/schools";
 import { getAllResourceCategoryParams } from "@/app/resources/_data/catalog";
 import { faqTopics } from "@/app/faqs/_data/topics";
@@ -12,12 +12,12 @@ import { JsonLd } from "@/components/seo/JsonLd";
 
 const boardLinks = getAllBoardParams().map(({ board }) => ({
   title: board.toUpperCase(),
-  href: `/boards/${board}`,
+  href: getBoardPath(board),
 }));
 
 const classLinks = getAllClassHubParams().map(({ classLevel }) => ({
   title: classLevel.replace("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
-  href: `/classes/${classLevel}`,
+  href: getClassHubPath(classLevel),
 }));
 
 const schoolLinks = getAllSchoolParams().slice(0, 10).map(({ schoolSlug }) => ({
