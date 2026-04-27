@@ -24,7 +24,7 @@ export interface Location {
   id: string;
   name: string;
   slug: string;
-  type: 'sector' | 'society';
+  type: "sector" | "society";
   parentId?: string;
 }
 
@@ -69,4 +69,47 @@ export interface Lead {
   preferredMode?: string;
   preferredTimeSlot?: string;
   message?: string;
+}
+
+export interface TutorApplicationPayload {
+  fullName: string;
+  phone: string;
+  email: string;
+  city: string;
+  currentLocation: string;
+  gender?: string;
+  experienceYears: number;
+  highestQualification: string;
+  universityInstitution: string;
+  subjectsHandled: string[];
+  boardsHandled: string[];
+  classesHandled: string[];
+  preferredTeachingMode: string;
+  areasWillingToServe: string[];
+  schoolsFamiliarWith?: string[];
+  professionalBio: string;
+  teachingApproach: string;
+  availability: string;
+  expectedFeeMin?: number;
+  expectedFeeMax?: number;
+  demoClassWilling?: boolean;
+  boardExamSpecialization?: string;
+  languageFluency?: string[];
+  priorResults?: string;
+  portfolioLinks?: string[];
+  referenceDetails?: string;
+  resumeUrl?: string;
+  profilePhotoUrl?: string;
+  supportingDocumentUrls?: string[];
+  consentAccepted: boolean;
+  contactConsent: boolean;
+  source?: string;
+  pageUrl?: string;
+  campaignParams?: Record<string, string>;
+}
+
+export interface TutorApplicationSubmissionResponse {
+  success: boolean;
+  id: string;
+  status: string;
 }

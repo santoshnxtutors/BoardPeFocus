@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,17 +12,17 @@ datasource db {
 // ==========================================
 
 model User {
-  id            String     @id @default(cuid())
-  email         String     @unique
-  passwordHash  String
-  name          String
-  isActive      Boolean    @default(true)
-  lastLogin     DateTime?
-  roles         UserRole[]
-  auditLogs     AuditLog[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  deletedAt     DateTime?  // Soft delete
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  isActive     Boolean    @default(true)
+  lastLogin    DateTime?
+  roles        UserRole[]
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime? // Soft delete
 }
 
 model Role {
@@ -48,14 +47,16 @@ model RolePermission {
   permissionId String
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
   @@id([roleId, permissionId])
 }
 
 model UserRole {
   userId String
   roleId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
   @@id([userId, roleId])
 }
 
@@ -64,58 +65,60 @@ model UserRole {
 // ==========================================
 
 model Tutor {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  name            String
-  displayName     String?
-  email           String?  @unique
-  phone           String?
-  photoUrl        String?
-  videoUrl        String?
-  tagline         String?
-  bio             String?  @db.Text
-  about           String?  @db.Text
-  methodology     String?  @db.Text
-  teachingMethod  String?  @db.Text
-  experienceYrs   Int      @default(0)
-  studentsTaught  Int      @default(0)
-  hourlyRateMin   Int?
-  hourlyRateMax   Int?
-  
+  id             String  @id @default(cuid())
+  slug           String  @unique
+  name           String
+  displayName    String?
+  email          String? @unique
+  phone          String?
+  photoUrl       String?
+  videoUrl       String?
+  tagline        String?
+  bio            String? @db.Text
+  about          String? @db.Text
+  methodology    String? @db.Text
+  teachingMethod String? @db.Text
+  experienceYrs  Int     @default(0)
+  studentsTaught Int     @default(0)
+  hourlyRateMin  Int?
+  hourlyRateMax  Int?
+
   // Stats & Ranking
-  rating          Float    @default(0.0)
-  reviewsCount    Int      @default(0)
-  priority        Int      @default(0) // For sorting
-  
+  rating       Float @default(0.0)
+  reviewsCount Int   @default(0)
+  priority     Int   @default(0) // For sorting
+
   // Status
-  isFeatured      Boolean  @default(false)
-  isVerified      Boolean  @default(false)
-  status          TutorStatus @default(DRAFT)
-  seoTitle        String?
-  metaDescription String?
-  canonical       String?
-  ogTitle         String?
-  ogDescription   String?
-  ogImage         String?
-  schemaData      Json?
-  
+  isFeatured          Boolean     @default(false)
+  isVerified          Boolean     @default(false)
+  status              TutorStatus @default(DRAFT)
+  seoTitle            String?
+  metaDescription     String?
+  canonical           String?
+  ogTitle             String?
+  ogDescription       String?
+  ogImage             String?
+  schemaData          Json?
+  sourceApplicationId String?     @unique
+
   // Relations
-  qualifications  TutorQualification[]
-  achievements    TutorAchievement[]
-  boards          TutorBoard[]
-  subjects        TutorSubject[]
-  classes         TutorClass[]
-  schools         TutorSchool[]
-  locations       TutorLocationCoverage[]
-  media           TutorMedia[]
-  faqs            TutorFaq[]
-  reviews         TutorReview[]
-  resultStories   ResultStory[]
-  claimProofs     ClaimProof[]
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  deletedAt       DateTime?
+  sourceApplication TutorApplication?       @relation("TutorProfileSource", fields: [sourceApplicationId], references: [id], onDelete: SetNull)
+  qualifications    TutorQualification[]
+  achievements      TutorAchievement[]
+  boards            TutorBoard[]
+  subjects          TutorSubject[]
+  classes           TutorClass[]
+  schools           TutorSchool[]
+  locations         TutorLocationCoverage[]
+  media             TutorMedia[]
+  faqs              TutorFaq[]
+  reviews           TutorReview[]
+  resultStories     ResultStory[]
+  claimProofs       ClaimProof[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 enum TutorStatus {
@@ -123,6 +126,71 @@ enum TutorStatus {
   PENDING_REVIEW
   PUBLISHED
   ARCHIVED
+}
+
+model TutorApplication {
+  id                      String                 @id @default(cuid())
+  fullName                String
+  phone                   String
+  email                   String
+  city                    String
+  currentLocation         String
+  gender                  String?
+  experienceYears         Int
+  highestQualification    String
+  universityInstitution   String
+  subjectsHandled         String[]               @default([])
+  boardsHandled           String[]               @default([])
+  classesHandled          String[]               @default([])
+  preferredTeachingMode   String
+  areasWillingToServe     String[]               @default([])
+  schoolsFamiliarWith     String[]               @default([])
+  professionalBio         String                 @db.Text
+  teachingApproach        String                 @db.Text
+  availability            String                 @db.Text
+  expectedFeeMin          Int?
+  expectedFeeMax          Int?
+  demoClassWilling        Boolean                @default(false)
+  boardExamSpecialization String?                @db.Text
+  languageFluency         String[]               @default([])
+  priorResults            String?                @db.Text
+  portfolioLinks          String[]               @default([])
+  referenceDetails        String?                @db.Text
+  resumeUrl               String?
+  profilePhotoUrl         String?
+  supportingDocumentUrls  String[]               @default([])
+  consentAccepted         Boolean
+  contactConsent          Boolean
+  source                  String?                @default("public_tutor_application")
+  pageUrl                 String?
+  campaignParams          Json?
+  status                  TutorApplicationStatus @default(NEW)
+  adminNotes              String?                @db.Text
+  mappedBoardIds          String[]               @default([])
+  mappedSubjectIds        String[]               @default([])
+  mappedClassLevelIds     String[]               @default([])
+  mappedSchoolIds         String[]               @default([])
+  mappedSectorIds         String[]               @default([])
+  mappedSocietyIds        String[]               @default([])
+  publishedTutor          Tutor?                 @relation("TutorProfileSource")
+  reviewedAt              DateTime?
+  publishedAt             DateTime?
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+  @@index([phone])
+}
+
+enum TutorApplicationStatus {
+  NEW
+  UNDER_REVIEW
+  SHORTLISTED
+  APPROVED
+  REJECTED
+  ARCHIVED
+  PUBLISHED
 }
 
 model TutorQualification {
@@ -135,19 +203,20 @@ model TutorQualification {
 }
 
 model TutorAchievement {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   tutorId     String
   title       String
   description String?
   year        Int?
-  tutor       Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  tutor       Tutor   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 }
 
 model TutorBoard {
   tutorId String
   boardId String
-  tutor   Tutor @relation(fields: [tutorId], references: [id], onDelete: Cascade)
-  board   Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tutor   Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
   @@id([tutorId, boardId])
 }
 
@@ -156,6 +225,7 @@ model TutorSubject {
   subjectId String
   tutor     Tutor   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
   @@id([tutorId, subjectId])
 }
 
@@ -164,48 +234,49 @@ model TutorSchool {
   schoolId String
   tutor    Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
   @@id([tutorId, schoolId])
 }
 
 model TutorLocationCoverage {
-  id          String @id @default(cuid())
-  tutorId     String
-  sectorId    String?
-  societyId   String?
-  tutor       Tutor   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
-  sector      Sector? @relation(fields: [sectorId], references: [id])
-  society     Society? @relation(fields: [societyId], references: [id])
+  id        String   @id @default(cuid())
+  tutorId   String
+  sectorId  String?
+  societyId String?
+  tutor     Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  sector    Sector?  @relation(fields: [sectorId], references: [id])
+  society   Society? @relation(fields: [societyId], references: [id])
 }
 
 model TutorMedia {
-  id        String @id @default(cuid())
-  tutorId   String
-  mediaId   String
-  type      String // e.g., 'CERTIFICATE', 'PROFILE_VIDEO', 'ACTION_SHOT'
-  tutor     Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
-  media     MediaAsset @relation(fields: [mediaId], references: [id])
+  id      String     @id @default(cuid())
+  tutorId String
+  mediaId String
+  type    String // e.g., 'CERTIFICATE', 'PROFILE_VIDEO', 'ACTION_SHOT'
+  tutor   Tutor      @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  media   MediaAsset @relation(fields: [mediaId], references: [id])
 }
 
 model TutorFaq {
-  id        String @id @default(cuid())
-  tutorId   String
-  question  String
-  answer    String
-  order     Int    @default(0)
-  tutor     Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  tutorId  String
+  question String
+  answer   String
+  order    Int    @default(0)
+  tutor    Tutor  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 }
 
 model TutorReview {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   tutorId     String
   parentName  String
   studentName String?
-  rating      Int      @default(5)
-  comment     String   @db.Text
-  isVerified  Boolean  @default(true)
+  rating      Int          @default(5)
+  comment     String       @db.Text
+  isVerified  Boolean      @default(true)
   status      ReviewStatus @default(PENDING)
-  createdAt   DateTime @default(now())
-  tutor       Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  tutor       Tutor        @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 }
 
 enum ReviewStatus {
@@ -219,91 +290,92 @@ enum ReviewStatus {
 // ==========================================
 
 model Board {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  shortName   String?
-  description String?  @db.Text
-  shortDescription String? @db.Text
-  longDescription  String? @db.Text
-  status      PageStatus @default(DRAFT)
-  seoTitle    String?
-  metaDescription String?
-  canonical   String?
-  ogTitle     String?
-  ogDescription String?
-  ogImage     String?
-  schemaData  Json?
-  relatedLinks Json?
-  tutors      TutorBoard[]
-  subjects    BoardSubject[]
-  classes     BoardClass[]
-  schools     SchoolBoard[]
-  sectors     SectorBoard[]
-  societies   SocietyBoard[]
-  resultStories ResultStory[]
-  pageRecords PageRecord[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String         @id @default(cuid())
+  slug             String         @unique
+  name             String
+  shortName        String?
+  description      String?        @db.Text
+  shortDescription String?        @db.Text
+  longDescription  String?        @db.Text
+  status           PageStatus     @default(DRAFT)
+  seoTitle         String?
+  metaDescription  String?
+  canonical        String?
+  ogTitle          String?
+  ogDescription    String?
+  ogImage          String?
+  schemaData       Json?
+  relatedLinks     Json?
+  tutors           TutorBoard[]
+  subjects         BoardSubject[]
+  classes          BoardClass[]
+  schools          SchoolBoard[]
+  sectors          SectorBoard[]
+  societies        SocietyBoard[]
+  resultStories    ResultStory[]
+  pageRecords      PageRecord[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 }
 
 model Subject {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  description String?  @db.Text
-  shortDescription String? @db.Text
-  longDescription  String? @db.Text
-  status      PageStatus @default(DRAFT)
-  seoTitle    String?
-  metaDescription String?
-  canonical   String?
-  ogTitle     String?
-  ogDescription String?
-  ogImage     String?
-  schemaData  Json?
-  relatedLinks Json?
-  tutors      TutorSubject[]
-  boards      BoardSubject[]
-  classes     SubjectClass[]
-  schools     SchoolSubject[]
-  sectors     SectorSubject[]
-  societies   SocietySubject[]
-  resultStories ResultStory[]
-  pageRecords PageRecord[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String           @id @default(cuid())
+  slug             String           @unique
+  name             String
+  description      String?          @db.Text
+  shortDescription String?          @db.Text
+  longDescription  String?          @db.Text
+  status           PageStatus       @default(DRAFT)
+  seoTitle         String?
+  metaDescription  String?
+  canonical        String?
+  ogTitle          String?
+  ogDescription    String?
+  ogImage          String?
+  schemaData       Json?
+  relatedLinks     Json?
+  tutors           TutorSubject[]
+  boards           BoardSubject[]
+  classes          SubjectClass[]
+  schools          SchoolSubject[]
+  sectors          SectorSubject[]
+  societies        SocietySubject[]
+  resultStories    ResultStory[]
+  pageRecords      PageRecord[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 }
 
 model ClassLevel {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  level       Int?
-  description String?  @db.Text
-  status      PageStatus @default(DRAFT)
-  seoTitle    String?
+  id              String         @id @default(cuid())
+  slug            String         @unique
+  name            String
+  level           Int?
+  description     String?        @db.Text
+  status          PageStatus     @default(DRAFT)
+  seoTitle        String?
   metaDescription String?
-  canonical   String?
-  ogTitle     String?
-  ogDescription String?
-  ogImage     String?
-  schemaData  Json?
-  boards      BoardClass[]
-  subjects    SubjectClass[]
-  tutors      TutorClass[]
-  resultStories ResultStory[]
-  pageRecords PageRecord[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  canonical       String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  schemaData      Json?
+  boards          BoardClass[]
+  subjects        SubjectClass[]
+  tutors          TutorClass[]
+  resultStories   ResultStory[]
+  pageRecords     PageRecord[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 model BoardSubject {
-  id        String @id @default(cuid())
+  id        String  @id @default(cuid())
   boardId   String
   subjectId String
   board     Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
   @@unique([boardId, subjectId])
 }
 
@@ -312,6 +384,7 @@ model BoardClass {
   classLevelId String
   board        Board      @relation(fields: [boardId], references: [id], onDelete: Cascade)
   classLevel   ClassLevel @relation(fields: [classLevelId], references: [id], onDelete: Cascade)
+
   @@id([boardId, classLevelId])
 }
 
@@ -320,6 +393,7 @@ model SubjectClass {
   classLevelId String
   subject      Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   classLevel   ClassLevel @relation(fields: [classLevelId], references: [id], onDelete: Cascade)
+
   @@id([subjectId, classLevelId])
 }
 
@@ -328,37 +402,38 @@ model TutorClass {
   classLevelId String
   tutor        Tutor      @relation(fields: [tutorId], references: [id], onDelete: Cascade)
   classLevel   ClassLevel @relation(fields: [classLevelId], references: [id], onDelete: Cascade)
+
   @@id([tutorId, classLevelId])
 }
 
 model School {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  description String?  @db.Text
-  address     String?
-  website     String?
-  locality    String?
-  curriculumMix String?
-  safeSupportWording String? @db.Text
-  contentBlocks Json?
-  status      PageStatus @default(DRAFT)
-  seoTitle    String?
-  metaDescription String?
-  canonical   String?
-  ogTitle     String?
-  ogDescription String?
-  ogImage     String?
-  schemaData  Json?
-  boards      SchoolBoard[]
-  subjects    SchoolSubject[]
-  sectors     SchoolSector[]
-  societies   SchoolSociety[]
-  tutors      TutorSchool[]
-  resultStories ResultStory[]
-  pageRecords PageRecord[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String          @id @default(cuid())
+  slug               String          @unique
+  name               String
+  description        String?         @db.Text
+  address            String?
+  website            String?
+  locality           String?
+  curriculumMix      String?
+  safeSupportWording String?         @db.Text
+  contentBlocks      Json?
+  status             PageStatus      @default(DRAFT)
+  seoTitle           String?
+  metaDescription    String?
+  canonical          String?
+  ogTitle            String?
+  ogDescription      String?
+  ogImage            String?
+  schemaData         Json?
+  boards             SchoolBoard[]
+  subjects           SchoolSubject[]
+  sectors            SchoolSector[]
+  societies          SchoolSociety[]
+  tutors             TutorSchool[]
+  resultStories      ResultStory[]
+  pageRecords        PageRecord[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 }
 
 model SchoolBoard {
@@ -366,6 +441,7 @@ model SchoolBoard {
   boardId  String
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   board    Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
   @@id([schoolId, boardId])
 }
 
@@ -374,6 +450,7 @@ model SchoolSubject {
   subjectId String
   school    School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
   @@id([schoolId, subjectId])
 }
 
@@ -382,6 +459,7 @@ model SchoolSector {
   sectorId String
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   sector   Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+
   @@id([schoolId, sectorId])
 }
 
@@ -390,60 +468,61 @@ model SchoolSociety {
   societyId String
   school    School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   society   Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
+
   @@id([schoolId, societyId])
 }
 
 model Sector {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  description String?
-  city        String?
-  corridor    String?
-  contentBlocks Json?
-  status      PageStatus @default(DRAFT)
-  seoTitle    String?
+  id              String                  @id @default(cuid())
+  slug            String                  @unique
+  name            String
+  description     String?
+  city            String?
+  corridor        String?
+  contentBlocks   Json?
+  status          PageStatus              @default(DRAFT)
+  seoTitle        String?
   metaDescription String?
-  canonical   String?
-  ogTitle     String?
-  ogDescription String?
-  ogImage     String?
-  schemaData  Json?
-  societies   Society[]
-  schools     SchoolSector[]
-  boards      SectorBoard[]
-  subjects    SectorSubject[]
-  tutors      TutorLocationCoverage[]
-  resultStories ResultStory[]
-  pageRecords PageRecord[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  canonical       String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  schemaData      Json?
+  societies       Society[]
+  schools         SchoolSector[]
+  boards          SectorBoard[]
+  subjects        SectorSubject[]
+  tutors          TutorLocationCoverage[]
+  resultStories   ResultStory[]
+  pageRecords     PageRecord[]
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
 }
 
 model Society {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  sectorId    String
-  description String? @db.Text
-  contentBlocks Json?
-  status      PageStatus @default(DRAFT)
-  seoTitle    String?
+  id              String                  @id @default(cuid())
+  slug            String                  @unique
+  name            String
+  sectorId        String
+  description     String?                 @db.Text
+  contentBlocks   Json?
+  status          PageStatus              @default(DRAFT)
+  seoTitle        String?
   metaDescription String?
-  canonical   String?
-  ogTitle     String?
-  ogDescription String?
-  ogImage     String?
-  schemaData  Json?
-  sector      Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
-  schools     SchoolSociety[]
-  boards      SocietyBoard[]
-  subjects    SocietySubject[]
-  tutors      TutorLocationCoverage[]
-  resultStories ResultStory[]
-  pageRecords PageRecord[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  canonical       String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  schemaData      Json?
+  sector          Sector                  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  schools         SchoolSociety[]
+  boards          SocietyBoard[]
+  subjects        SocietySubject[]
+  tutors          TutorLocationCoverage[]
+  resultStories   ResultStory[]
+  pageRecords     PageRecord[]
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
 }
 
 model SectorBoard {
@@ -451,6 +530,7 @@ model SectorBoard {
   boardId  String
   sector   Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade)
   board    Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
   @@id([sectorId, boardId])
 }
 
@@ -459,6 +539,7 @@ model SectorSubject {
   subjectId String
   sector    Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
   @@id([sectorId, subjectId])
 }
 
@@ -467,6 +548,7 @@ model SocietyBoard {
   boardId   String
   society   Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
   board     Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
   @@id([societyId, boardId])
 }
 
@@ -475,6 +557,7 @@ model SocietySubject {
   subjectId String
   society   Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
   @@id([societyId, subjectId])
 }
 
@@ -483,47 +566,47 @@ model SocietySubject {
 // ==========================================
 
 model PageTemplate {
-  id          String       @id @default(cuid())
-  name        String       @unique // e.g., 'TUTOR_BY_BOARD_SUBJECT'
-  layout      String       // JSON structure for components
-  pages       PageRecord[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id        String       @id @default(cuid())
+  name      String       @unique // e.g., 'TUTOR_BY_BOARD_SUBJECT'
+  layout    String // JSON structure for components
+  pages     PageRecord[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
 
 model PageRecord {
-  id             String    @id @default(cuid())
-  slug           String    @unique
-  title          String
-  status         PageStatus @default(DRAFT)
-  templateId     String?
-  template       PageTemplate? @relation(fields: [templateId], references: [id])
-  
+  id         String        @id @default(cuid())
+  slug       String        @unique
+  title      String
+  status     PageStatus    @default(DRAFT)
+  templateId String?
+  template   PageTemplate? @relation(fields: [templateId], references: [id])
+
   // Relations to dynamic entities
-  boardId        String?
-  board          Board?    @relation(fields: [boardId], references: [id])
-  classLevelId   String?
-  classLevel     ClassLevel? @relation(fields: [classLevelId], references: [id])
-  subjectId      String?
-  subject        Subject?  @relation(fields: [subjectId], references: [id])
-  schoolId       String?
-  school         School?   @relation(fields: [schoolId], references: [id])
-  sectorId       String?
-  sector         Sector?   @relation(fields: [sectorId], references: [id])
-  societyId      String?
-  society        Society?  @relation(fields: [societyId], references: [id])
-  
+  boardId      String?
+  board        Board?      @relation(fields: [boardId], references: [id])
+  classLevelId String?
+  classLevel   ClassLevel? @relation(fields: [classLevelId], references: [id])
+  subjectId    String?
+  subject      Subject?    @relation(fields: [subjectId], references: [id])
+  schoolId     String?
+  school       School?     @relation(fields: [schoolId], references: [id])
+  sectorId     String?
+  sector       Sector?     @relation(fields: [sectorId], references: [id])
+  societyId    String?
+  society      Society?    @relation(fields: [societyId], references: [id])
+
   // Content
-  blocks         ContentBlock[]
-  seo            SeoMeta?
-  versions       PageVersion[]
+  blocks          ContentBlock[]
+  seo             SeoMeta?
+  versions        PageVersion[]
   entityRelations PageEntityRelation[]
-  internalLinks  InternalLinkRecord[]
-  
-  contentHash    String?   // For duplication detection
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  deletedAt      DateTime?
+  internalLinks   InternalLinkRecord[]
+
+  contentHash String? // For duplication detection
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
   @@index([slug])
   @@index([status])
@@ -538,7 +621,7 @@ enum PageStatus {
 model ContentBlock {
   id           String     @id @default(cuid())
   pageRecordId String
-  type         String     // e.g., 'HERO', 'TUTOR_GRID', 'TEXT_BLOCK'
+  type         String // e.g., 'HERO', 'TUTOR_GRID', 'TEXT_BLOCK'
   content      Json
   order        Int        @default(0)
   pageRecord   PageRecord @relation(fields: [pageRecordId], references: [id], onDelete: Cascade)
@@ -547,7 +630,7 @@ model ContentBlock {
 model PageVersion {
   id           String     @id @default(cuid())
   pageRecordId String
-  content      Json       // Snapshot of blocks and SEO
+  content      Json // Snapshot of blocks and SEO
   authorId     String?
   createdAt    DateTime   @default(now())
   pageRecord   PageRecord @relation(fields: [pageRecordId], references: [id], onDelete: Cascade)
@@ -556,9 +639,10 @@ model PageVersion {
 model PageEntityRelation {
   id           String     @id @default(cuid())
   pageRecordId String
-  entityType   String     // e.g., 'TUTOR', 'SCHOOL'
+  entityType   String // e.g., 'TUTOR', 'SCHOOL'
   entityId     String
   pageRecord   PageRecord @relation(fields: [pageRecordId], references: [id], onDelete: Cascade)
+
   @@unique([pageRecordId, entityType, entityId])
 }
 
@@ -575,12 +659,12 @@ model SeoMeta {
 }
 
 model Redirect {
-  id           String   @id @default(cuid())
-  from         String   @unique
-  to           String
-  code         Int      @default(301) // 301 or 302
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  id        String   @id @default(cuid())
+  from      String   @unique
+  to        String
+  code      Int      @default(301) // 301 or 302
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
 // ==========================================
@@ -588,12 +672,12 @@ model Redirect {
 // ==========================================
 
 model InternalLinkRule {
-  id           String   @id @default(cuid())
-  keyword      String   @unique
-  targetUrl    String
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  records      InternalLinkRecord[]
+  id        String               @id @default(cuid())
+  keyword   String               @unique
+  targetUrl String
+  isActive  Boolean              @default(true)
+  createdAt DateTime             @default(now())
+  records   InternalLinkRecord[]
 }
 
 model InternalLinkRecord {
@@ -610,56 +694,56 @@ model InternalLinkRecord {
 // ==========================================
 
 model Faq {
-  id          String     @id @default(cuid())
+  id          String          @id @default(cuid())
   question    String
-  answer      String     @db.Text
+  answer      String          @db.Text
   category    String?
-  status      PageStatus @default(DRAFT)
-  visibility  Boolean    @default(true)
-  order       Int        @default(0)
+  status      PageStatus      @default(DRAFT)
+  visibility  Boolean         @default(true)
+  order       Int             @default(0)
   assignments FaqAssignment[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   deletedAt   DateTime?
 }
 
 model FaqAssignment {
-  id         String @id @default(cuid())
+  id         String  @id @default(cuid())
   faqId      String
   entityType String
   entityId   String?
   pageSlug   String?
-  faq        Faq    @relation(fields: [faqId], references: [id], onDelete: Cascade)
+  faq        Faq     @relation(fields: [faqId], references: [id], onDelete: Cascade)
 
   @@index([entityType, entityId])
   @@index([pageSlug])
 }
 
 model ResourceArticle {
-  id          String     @id @default(cuid())
-  slug        String     @unique
-  title       String
-  category    String?
-  summary     String?    @db.Text
-  body        String?    @db.Text
-  bodyBlocks  Json?
-  status      PageStatus @default(DRAFT)
-  seoTitle    String?
+  id              String                   @id @default(cuid())
+  slug            String                   @unique
+  title           String
+  category        String?
+  summary         String?                  @db.Text
+  body            String?                  @db.Text
+  bodyBlocks      Json?
+  status          PageStatus               @default(DRAFT)
+  seoTitle        String?
   metaDescription String?
-  canonical   String?
-  ogTitle     String?
-  ogDescription String?
-  ogImage     String?
-  schemaData  Json?
-  internalLinks Json?
-  mappings    ResourceArticleMapping[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  deletedAt   DateTime?
+  canonical       String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  schemaData      Json?
+  internalLinks   Json?
+  mappings        ResourceArticleMapping[]
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  deletedAt       DateTime?
 }
 
 model ResourceArticleMapping {
-  id         String @id @default(cuid())
+  id         String          @id @default(cuid())
   resourceId String
   entityType String
   entityId   String
@@ -670,56 +754,56 @@ model ResourceArticleMapping {
 }
 
 model ProcessContent {
-  id          String     @id @default(cuid())
-  slug        String     @unique
-  title       String
-  summary     String?    @db.Text
-  body        String?    @db.Text
-  contentBlocks Json?
-  status      PageStatus @default(DRAFT)
-  seoTitle    String?
+  id              String     @id @default(cuid())
+  slug            String     @unique
+  title           String
+  summary         String?    @db.Text
+  body            String?    @db.Text
+  contentBlocks   Json?
+  status          PageStatus @default(DRAFT)
+  seoTitle        String?
   metaDescription String?
-  canonical   String?
-  ogTitle     String?
-  ogDescription String?
-  ogImage     String?
-  schemaData  Json?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  deletedAt   DateTime?
+  canonical       String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  schemaData      Json?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  deletedAt       DateTime?
 }
 
 model ResultStory {
-  id          String       @id @default(cuid())
-  slug        String       @unique
-  kind        String       @default("TESTIMONIAL")
-  title       String
-  parentName  String?
-  studentName String?
-  context     String?
-  story       String       @db.Text
-  rating      Int?
-  scoreLabel  String?
+  id              String       @id @default(cuid())
+  slug            String       @unique
+  kind            String       @default("TESTIMONIAL")
+  title           String
+  parentName      String?
+  studentName     String?
+  context         String?
+  story           String       @db.Text
+  rating          Int?
+  scoreLabel      String?
   displayControls Json?
-  status      ReviewStatus @default(PENDING)
-  visibility  Boolean      @default(false)
-  boardId     String?
-  classLevelId String?
-  subjectId   String?
-  schoolId    String?
-  sectorId    String?
-  societyId   String?
-  tutorId     String?
-  board       Board?       @relation(fields: [boardId], references: [id], onDelete: SetNull)
-  classLevel  ClassLevel?  @relation(fields: [classLevelId], references: [id], onDelete: SetNull)
-  subject     Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  school      School?      @relation(fields: [schoolId], references: [id], onDelete: SetNull)
-  sector      Sector?      @relation(fields: [sectorId], references: [id], onDelete: SetNull)
-  society     Society?     @relation(fields: [societyId], references: [id], onDelete: SetNull)
-  tutor       Tutor?       @relation(fields: [tutorId], references: [id], onDelete: SetNull)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deletedAt   DateTime?
+  status          ReviewStatus @default(PENDING)
+  visibility      Boolean      @default(false)
+  boardId         String?
+  classLevelId    String?
+  subjectId       String?
+  schoolId        String?
+  sectorId        String?
+  societyId       String?
+  tutorId         String?
+  board           Board?       @relation(fields: [boardId], references: [id], onDelete: SetNull)
+  classLevel      ClassLevel?  @relation(fields: [classLevelId], references: [id], onDelete: SetNull)
+  subject         Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  school          School?      @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  sector          Sector?      @relation(fields: [sectorId], references: [id], onDelete: SetNull)
+  society         Society?     @relation(fields: [societyId], references: [id], onDelete: SetNull)
+  tutor           Tutor?       @relation(fields: [tutorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  deletedAt       DateTime?
 
   @@index([status, visibility])
   @@index([boardId])
@@ -736,20 +820,20 @@ model ResultStory {
 // ==========================================
 
 model MediaAsset {
-  id          String   @id @default(cuid())
-  filename    String
+  id           String       @id @default(cuid())
+  filename     String
   originalName String
-  mimeType    String
-  size        Int
-  url         String   // CDN URL or S3 URL
-  provider    String   @default("S3") // S3, Cloudinary, etc.
-  bucket      String?
-  key         String?  // S3 Key
-  altText     String?
-  metadata    Json?
-  tutorMedia  TutorMedia[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  mimeType     String
+  size         Int
+  url          String // CDN URL or S3 URL
+  provider     String       @default("S3") // S3, Cloudinary, etc.
+  bucket       String?
+  key          String? // S3 Key
+  altText      String?
+  metadata     Json?
+  tutorMedia   TutorMedia[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 // ==========================================
@@ -757,25 +841,25 @@ model MediaAsset {
 // ==========================================
 
 model Lead {
-  id              String   @id @default(cuid())
-  name            String
-  phone           String
-  email           String?
-  class           String?
-  subject         String?
-  board           String?
-  school          String?
-  location        String?
-  preferredMode   String?
+  id                String      @id @default(cuid())
+  name              String
+  phone             String
+  email             String?
+  class             String?
+  subject           String?
+  board             String?
+  school            String?
+  location          String?
+  preferredMode     String?
   preferredTimeSlot String?
-  message         String?  @db.Text
-  source          String?  @default("direct")
-  pageUrl         String?
-  campaignParams  Json?
-  status          LeadStatus @default(NEW)
-  events          LeadEvent[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  message           String?     @db.Text
+  source            String?     @default("direct")
+  pageUrl           String?
+  campaignParams    Json?
+  status            LeadStatus  @default(NEW)
+  events            LeadEvent[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 }
 
 enum LeadStatus {
@@ -790,7 +874,7 @@ enum LeadStatus {
 model LeadEvent {
   id        String   @id @default(cuid())
   leadId    String
-  type      String   // e.g., 'STATUS_CHANGE', 'NOTE', 'CALL_LOG'
+  type      String // e.g., 'STATUS_CHANGE', 'NOTE', 'CALL_LOG'
   content   String?  @db.Text
   metadata  Json?
   lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
@@ -802,16 +886,16 @@ model LeadEvent {
 // ==========================================
 
 model NotificationDelivery {
-  id        String   @id @default(cuid())
-  type      String   // e.g., 'EMAIL', 'WHATSAPP', 'SMS'
-  recipient String
-  subject   String?
-  content   String?  @db.Text
-  status    DeliveryStatus @default(PENDING)
-  error     String?
-  retryCount Int     @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String         @id @default(cuid())
+  type       String // e.g., 'EMAIL', 'WHATSAPP', 'SMS'
+  recipient  String
+  subject    String?
+  content    String?        @db.Text
+  status     DeliveryStatus @default(PENDING)
+  error      String?
+  retryCount Int            @default(0)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 }
 
 enum DeliveryStatus {
@@ -829,8 +913,8 @@ model AuditLog {
   id        String   @id @default(cuid())
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
-  action    String   // e.g., 'CREATE', 'UPDATE', 'DELETE'
-  entity    String   // e.g., 'TUTOR', 'PAGE'
+  action    String // e.g., 'CREATE', 'UPDATE', 'DELETE'
+  entity    String // e.g., 'TUTOR', 'PAGE'
   entityId  String?
   oldData   Json?
   newData   Json?
@@ -840,16 +924,16 @@ model AuditLog {
 }
 
 model GenerationJob {
-  id          String   @id @default(cuid())
-  type        String   // e.g., 'SITEMAP', 'BULK_PAGES'
-  status      JobStatus @default(QUEUED)
-  progress    Int      @default(0)
+  id          String            @id @default(cuid())
+  type        String // e.g., 'SITEMAP', 'BULK_PAGES'
+  status      JobStatus         @default(QUEUED)
+  progress    Int               @default(0)
   config      Json?
   results     Json?
   issues      GenerationIssue[]
   startedAt   DateTime?
   completedAt DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime          @default(now())
 }
 
 enum JobStatus {
@@ -860,22 +944,23 @@ enum JobStatus {
 }
 
 model GenerationIssue {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   jobId     String
-  level     String   // 'INFO', 'WARN', 'ERROR'
+  level     String // 'INFO', 'WARN', 'ERROR'
   message   String
   details   Json?
   job       GenerationJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  createdAt DateTime      @default(now())
 }
 
 model ClaimProof {
-  id          String   @id @default(cuid())
-  tutorId     String
-  claimType   String   // e.g., 'SCORE', 'EXPERIENCE', 'AWARD'
-  claimValue  String
-  mediaId     String?
-  verifiedAt  DateTime?
-  tutor       Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  id         String    @id @default(cuid())
+  tutorId    String
+  claimType  String // e.g., 'SCORE', 'EXPERIENCE', 'AWARD'
+  claimValue String
+  mediaId    String?
+  verifiedAt DateTime?
+  tutor      Tutor     @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+
   @@index([tutorId])
 }

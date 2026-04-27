@@ -1,7 +1,14 @@
-import { 
-  Tutor, Board, Subject, School, Sector, Society, 
-  Lead, PageRecord
-} from '@boardpefocus/types';
+import {
+  Tutor,
+  Board,
+  Subject,
+  School,
+  Sector,
+  Society,
+  Lead,
+  PageRecord,
+  TutorApplication,
+} from "@boardpefocus/types";
 
 export interface AdminUser {
   id: string;
@@ -90,65 +97,65 @@ export interface LookupCatalog {
 function resolveApiBaseUrl() {
   const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
 
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     if (configuredApiBaseUrl) {
       return configuredApiBaseUrl;
     }
 
-    return '/api';
+    return "/api";
   }
 
   if (configuredApiBaseUrl) {
     return configuredApiBaseUrl;
   }
 
-  return 'http://127.0.0.1:3001/api';
+  return "http://127.0.0.1:3001/api";
 }
 
 class ApiClient {
   private getAuthToken() {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return null;
     }
 
-    return window.localStorage.getItem('auth_token');
+    return window.localStorage.getItem("auth_token");
   }
 
   private async fetcher<T>(path: string, options?: RequestInit): Promise<T> {
     const token = this.getAuthToken();
     const rawApiBaseUrl = resolveApiBaseUrl();
-    const apiBaseUrl = rawApiBaseUrl.endsWith('/v1')
+    const apiBaseUrl = rawApiBaseUrl.endsWith("/v1")
       ? rawApiBaseUrl
-      : `${rawApiBaseUrl.replace(/\/$/, '')}/v1`;
+      : `${rawApiBaseUrl.replace(/\/$/, "")}/v1`;
     let response: Response;
     try {
       response = await fetch(`${apiBaseUrl}${path}`, {
         ...options,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...options?.headers,
         },
       });
     } catch {
       throw new Error(
-        'Unable to reach the admin API. Make sure the backend service is running.',
+        "Unable to reach the admin API. Make sure the backend service is running.",
       );
     }
 
     if (!response.ok) {
-      if (response.status === 401 && typeof window !== 'undefined') {
-        window.localStorage.removeItem('auth_token');
-        window.localStorage.removeItem('auth_user');
+      if (response.status === 401 && typeof window !== "undefined") {
+        window.localStorage.removeItem("auth_token");
+        window.localStorage.removeItem("auth_user");
       }
 
       const error = await response
         .json()
-        .catch(() => ({ message: 'An unknown error occurred' }));
+        .catch(() => ({ message: "An unknown error occurred" }));
       const message = Array.isArray(error.message)
-        ? error.message.join(', ')
+        ? error.message.join(", ")
         : error.message;
-      throw new Error(message || 'API request failed');
+      throw new Error(message || "API request failed");
     }
 
     if (response.status === 204) {
@@ -159,7 +166,7 @@ class ApiClient {
   }
 
   get<T>(path: string, options?: RequestInit) {
-    return this.fetcher<T>(path, { method: 'GET', ...options });
+    return this.fetcher<T>(path, { method: "GET", ...options });
   }
 
   auth = {
@@ -167,42 +174,63 @@ class ApiClient {
       this.fetcher<{
         accessToken: string;
         user: { id: string; email: string; name: string; role: string };
-      }>('/auth/login', {
-        method: 'POST',
+      }>("/auth/login", {
+        method: "POST",
         body: JSON.stringify({ email, password }),
       }),
     me: () =>
       this.fetcher<{ id: string; email: string; name: string; role: string }>(
-        '/auth/me',
+        "/auth/me",
       ),
   };
 
   // Tutors
   tutors = {
-    list: () => this.fetcher<Tutor[]>('/admin/tutors', { method: 'GET' }),
+    list: () => this.fetcher<Tutor[]>("/admin/tutors", { method: "GET" }),
     get: (id: string) => this.fetcher<Tutor>(`/admin/tutors/${id}`),
-    create: (data: Partial<Tutor>) => this.fetcher<Tutor>('/admin/tutors', { method: 'POST', body: JSON.stringify(data) }),
-    update: (id: string, data: Partial<Tutor>) => this.fetcher<Tutor>(`/admin/tutors/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    delete: (id: string) => this.fetcher<void>(`/admin/tutors/${id}`, { method: 'DELETE' }),
-    
+    create: (data: Partial<Tutor>) =>
+      this.fetcher<Tutor>("/admin/tutors", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: Partial<Tutor>) =>
+      this.fetcher<Tutor>(`/admin/tutors/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    delete: (id: string) =>
+      this.fetcher<void>(`/admin/tutors/${id}`, { method: "DELETE" }),
+
     // Nested relations CRUD
-    addReview: (id: string, data: any) => this.fetcher<any>(`/tutors/${id}/reviews`, { method: 'POST', body: JSON.stringify(data) }),
-    addFaq: (id: string, data: any) => this.fetcher<any>(`/tutors/${id}/faqs`, { method: 'POST', body: JSON.stringify(data) }),
+    addReview: (id: string, data: any) =>
+      this.fetcher<any>(`/tutors/${id}/reviews`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    addFaq: (id: string, data: any) =>
+      this.fetcher<any>(`/tutors/${id}/faqs`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
   };
 
   // Boards
   boards = {
-    list: () => this.fetcher<Board[]>('/admin/content/boards'),
+    list: () => this.fetcher<Board[]>("/admin/content/boards"),
     get: (id: string) => this.fetcher<Board>(`/admin/content/boards/${id}`),
-    create: (data: any) => this.fetcher<Board>('/admin/content/boards', { method: 'POST', body: JSON.stringify(data) }),
+    create: (data: any) =>
+      this.fetcher<Board>("/admin/content/boards", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
   };
 
   schools = {
-    list: () => this.fetcher<School[]>('/admin/content/schools'),
+    list: () => this.fetcher<School[]>("/admin/content/schools"),
   };
 
   lookups = {
-    list: () => this.fetcher<LookupCatalog>('/admin/lookups'),
+    list: () => this.fetcher<LookupCatalog>("/admin/lookups"),
   };
 
   content = {
@@ -212,7 +240,7 @@ class ApiClient {
       this.fetcher<T>(`/admin/content/${entity}/${id}`),
     create: <T = any>(entity: string, data: Record<string, unknown>) =>
       this.fetcher<T>(`/admin/content/${entity}`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(data),
       }),
     update: <T = any>(
@@ -221,106 +249,149 @@ class ApiClient {
       data: Record<string, unknown>,
     ) =>
       this.fetcher<T>(`/admin/content/${entity}/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify(data),
       }),
     archive: <T = any>(entity: string, id: string) =>
       this.fetcher<T>(`/admin/content/${entity}/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       }),
   };
 
   // Leads
   leads = {
-    list: () => this.fetcher<Lead[]>('/admin/leads'),
-    updateStatus: (id: string, status: string) => this.fetcher<Lead>(`/admin/leads/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+    list: () => this.fetcher<Lead[]>("/admin/leads"),
+    updateStatus: (id: string, status: string) =>
+      this.fetcher<Lead>(`/admin/leads/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      }),
+  };
+
+  tutorApplications = {
+    list: (status?: string) =>
+      this.fetcher<TutorApplication[]>(
+        `/admin/tutor-applications${status ? `?status=${encodeURIComponent(status)}` : ""}`,
+      ),
+    get: (id: string) =>
+      this.fetcher<TutorApplication>(`/admin/tutor-applications/${id}`),
+    update: (id: string, data: Record<string, unknown>) =>
+      this.fetcher<TutorApplication>(`/admin/tutor-applications/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    convert: (id: string, tutorStatus: string) =>
+      this.fetcher<TutorApplication>(
+        `/admin/tutor-applications/${id}/convert`,
+        {
+          method: "POST",
+          body: JSON.stringify({ tutorStatus }),
+        },
+      ),
   };
 
   // Admin Users
   adminUsers = {
-    list: () => this.fetcher<AdminUser[]>('/admin/users'),
+    list: () => this.fetcher<AdminUser[]>("/admin/users"),
     create: (data: AdminUserPayload) =>
-      this.fetcher<AdminUser>('/admin/users', {
-        method: 'POST',
+      this.fetcher<AdminUser>("/admin/users", {
+        method: "POST",
         body: JSON.stringify(data),
       }),
     update: (id: string, data: Partial<AdminUserPayload>) =>
       this.fetcher<AdminUser>(`/admin/users/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify(data),
       }),
     delete: (id: string) =>
-      this.fetcher<AdminUser>(`/admin/users/${id}`, { method: 'DELETE' }),
+      this.fetcher<AdminUser>(`/admin/users/${id}`, { method: "DELETE" }),
   };
 
   // Pages
   pages = {
-    list: () => this.fetcher<PageRecord[]>('/admin/pages'),
+    list: () => this.fetcher<PageRecord[]>("/admin/pages"),
     get: (id: string) => this.fetcher<PageRecord>(`/admin/pages/${id}`),
-    create: (data: any) => this.fetcher<PageRecord>('/admin/pages', { method: 'POST', body: JSON.stringify(data) }),
-    update: (id: string, data: any) => this.fetcher<PageRecord>(`/admin/pages/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    delete: (id: string) => this.fetcher<PageRecord>(`/admin/pages/${id}`, { method: 'DELETE' }),
+    create: (data: any) =>
+      this.fetcher<PageRecord>("/admin/pages", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: any) =>
+      this.fetcher<PageRecord>(`/admin/pages/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    delete: (id: string) =>
+      this.fetcher<PageRecord>(`/admin/pages/${id}`, { method: "DELETE" }),
   };
 
   seo = {
-    list: () => this.fetcher<SeoMetadataTarget[]>('/admin/seo'),
+    list: () => this.fetcher<SeoMetadataTarget[]>("/admin/seo"),
     update: (targetType: string, id: string, data: Record<string, unknown>) =>
       this.fetcher<any>(`/admin/seo/${targetType}/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify(data),
       }),
   };
 
   redirects = {
-    list: () => this.fetcher<RedirectRule[]>('/admin/redirects'),
+    list: () => this.fetcher<RedirectRule[]>("/admin/redirects"),
     create: (data: Record<string, unknown>) =>
-      this.fetcher<RedirectRule>('/admin/redirects', {
-        method: 'POST',
+      this.fetcher<RedirectRule>("/admin/redirects", {
+        method: "POST",
         body: JSON.stringify(data),
       }),
     update: (id: string, data: Record<string, unknown>) =>
       this.fetcher<RedirectRule>(`/admin/redirects/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify(data),
       }),
     delete: (id: string) =>
       this.fetcher<RedirectRule>(`/admin/redirects/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       }),
   };
 
   media = {
     list: (query?: string) =>
       this.fetcher<MediaAssetRecord[]>(
-        `/admin/media${query ? `?q=${encodeURIComponent(query)}` : ''}`,
+        `/admin/media${query ? `?q=${encodeURIComponent(query)}` : ""}`,
       ),
     create: (data: Record<string, unknown>) =>
-      this.fetcher<MediaAssetRecord>('/admin/media', {
-        method: 'POST',
+      this.fetcher<MediaAssetRecord>("/admin/media", {
+        method: "POST",
         body: JSON.stringify(data),
       }),
     update: (id: string, data: Record<string, unknown>) =>
       this.fetcher<MediaAssetRecord>(`/admin/media/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify(data),
       }),
     delete: (id: string) =>
       this.fetcher<MediaAssetRecord>(`/admin/media/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       }),
   };
 
   // Stats
   stats = {
-    overview: () => this.fetcher<any>('/admin/stats/overview'),
+    overview: () => this.fetcher<any>("/admin/stats/overview"),
   };
 
   // Page Generator
   pageGenerator = {
-    trigger: (type: string) => this.fetcher<any>('/admin/page-generator/trigger', { method: 'POST', body: JSON.stringify({ type }) }),
-    getJobs: () => this.fetcher<any[]>('/admin/page-generator/jobs'),
-    getThresholds: () => this.fetcher<any>('/admin/page-generator/thresholds'),
-    updateThresholds: (data: any) => this.fetcher<any>('/admin/page-generator/thresholds', { method: 'PATCH', body: JSON.stringify(data) }),
+    trigger: (type: string) =>
+      this.fetcher<any>("/admin/page-generator/trigger", {
+        method: "POST",
+        body: JSON.stringify({ type }),
+      }),
+    getJobs: () => this.fetcher<any[]>("/admin/page-generator/jobs"),
+    getThresholds: () => this.fetcher<any>("/admin/page-generator/thresholds"),
+    updateThresholds: (data: any) =>
+      this.fetcher<any>("/admin/page-generator/thresholds", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
   };
 }
 

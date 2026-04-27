@@ -47,23 +47,23 @@ export function Navbar() {
   ];
 
   return (
-    <header 
+    <header
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
-        scrolled 
-          ? "bg-white/95 backdrop-blur-md shadow-lg py-2 md:py-3" 
-          : "bg-white/60 backdrop-blur-sm py-3 md:py-5 border-b border-black/[0.03]"
+        scrolled
+          ? "bg-white/95 backdrop-blur-md shadow-lg py-2 md:py-3"
+          : "bg-white/60 backdrop-blur-sm py-3 md:py-5 border-b border-black/[0.03]",
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Logo className="scale-[0.85] md:scale-100 origin-left" />
- 
+
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-8 items-center">
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href} 
+            <Link
+              key={link.name}
+              href={link.href}
               className="group relative text-sm font-bold text-primary/80 transition-colors hover:text-accent"
             >
               {link.name}
@@ -71,19 +71,21 @@ export function Navbar() {
             </Link>
           ))}
         </nav>
- 
+
         <div className="flex items-center gap-4">
-          <Link href="/contact" className="hidden sm:block">
+          <Link href="/become-our-tutor" className="hidden sm:block">
             <Button className="bg-primary text-white hover:bg-primary/90 shadow-lg rounded-xl px-6 font-bold">
-              Find a Tutor
+              Become Our Tutor
             </Button>
           </Link>
-          
+
           {/* Mobile Toggle */}
-          <button 
+          <button
             className="md:hidden p-2 rounded-lg text-primary hover:bg-black/5 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              isOpen ? "Close navigation menu" : "Open navigation menu"
+            }
             aria-expanded={isOpen}
             aria-controls="mobile-navigation"
           >
@@ -93,15 +95,17 @@ export function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <div className={cn(
-        "md:hidden absolute top-full left-0 w-full bg-white shadow-2xl transition-all duration-300 overflow-hidden",
-        isOpen ? "max-h-96 opacity-100 border-t" : "max-h-0 opacity-0"
-      )}>
+      <div
+        className={cn(
+          "md:hidden absolute top-full left-0 w-full bg-white shadow-2xl transition-all duration-300 overflow-hidden",
+          isOpen ? "max-h-96 opacity-100 border-t" : "max-h-0 opacity-0",
+        )}
+      >
         <nav id="mobile-navigation" className="flex flex-col p-6 gap-4">
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href} 
+            <Link
+              key={link.name}
+              href={link.href}
               className="text-lg font-bold text-primary hover:text-accent transition-colors py-2 border-b border-border/50"
               onClick={() => setIsOpen(false)}
             >
@@ -109,8 +113,10 @@ export function Navbar() {
             </Link>
           ))}
           <div className="pt-4">
-            <Link href="/contact" onClick={() => setIsOpen(false)}>
-              <Button className="w-full bg-primary h-14 text-lg rounded-xl">Get Started</Button>
+            <Link href="/become-our-tutor" onClick={() => setIsOpen(false)}>
+              <Button className="w-full bg-primary h-14 text-lg rounded-xl">
+                Become Our Tutor
+              </Button>
             </Link>
           </div>
         </nav>

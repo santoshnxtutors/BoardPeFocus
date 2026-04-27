@@ -1,10 +1,23 @@
-
-export type TutorStatus = 'DRAFT' | 'PENDING_REVIEW' | 'PUBLISHED' | 'ARCHIVED';
-export type PageStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CONVERTED' | 'CLOSED' | 'SPAM';
-export type JobStatus = 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED';
-export type DeliveryStatus = 'PENDING' | 'SENT' | 'FAILED' | 'DELIVERED';
-export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type TutorStatus = "DRAFT" | "PENDING_REVIEW" | "PUBLISHED" | "ARCHIVED";
+export type TutorApplicationStatus =
+  | "NEW"
+  | "UNDER_REVIEW"
+  | "SHORTLISTED"
+  | "APPROVED"
+  | "REJECTED"
+  | "ARCHIVED"
+  | "PUBLISHED";
+export type PageStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
+export type LeadStatus =
+  | "NEW"
+  | "CONTACTED"
+  | "QUALIFIED"
+  | "CONVERTED"
+  | "CLOSED"
+  | "SPAM";
+export type JobStatus = "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED";
+export type DeliveryStatus = "PENDING" | "SENT" | "FAILED" | "DELIVERED";
+export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface User {
   id: string;
@@ -120,6 +133,58 @@ export interface Tutor {
   isFeatured: boolean;
   isVerified: boolean;
   status: TutorStatus;
+  sourceApplicationId?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TutorApplication {
+  id: string;
+  fullName: string;
+  phone: string;
+  email: string;
+  city: string;
+  currentLocation: string;
+  gender?: string | null;
+  experienceYears: number;
+  highestQualification: string;
+  universityInstitution: string;
+  subjectsHandled: string[];
+  boardsHandled: string[];
+  classesHandled: string[];
+  preferredTeachingMode: string;
+  areasWillingToServe: string[];
+  schoolsFamiliarWith: string[];
+  professionalBio: string;
+  teachingApproach: string;
+  availability: string;
+  expectedFeeMin?: number | null;
+  expectedFeeMax?: number | null;
+  demoClassWilling: boolean;
+  boardExamSpecialization?: string | null;
+  languageFluency: string[];
+  priorResults?: string | null;
+  portfolioLinks: string[];
+  referenceDetails?: string | null;
+  resumeUrl?: string | null;
+  profilePhotoUrl?: string | null;
+  supportingDocumentUrls: string[];
+  consentAccepted: boolean;
+  contactConsent: boolean;
+  source?: string | null;
+  pageUrl?: string | null;
+  campaignParams?: Record<string, string> | null;
+  status: TutorApplicationStatus;
+  adminNotes?: string | null;
+  mappedBoardIds: string[];
+  mappedSubjectIds: string[];
+  mappedClassLevelIds: string[];
+  mappedSchoolIds: string[];
+  mappedSectorIds: string[];
+  mappedSocietyIds: string[];
+  reviewedAt?: Date | null;
+  publishedAt?: Date | null;
+  publishedTutor?: Tutor | null;
   createdAt: Date;
   updatedAt: Date;
 }

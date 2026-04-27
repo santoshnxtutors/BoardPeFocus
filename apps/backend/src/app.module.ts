@@ -15,6 +15,7 @@ import { PublicLeadsController } from './modules/leads/controllers/public-leads.
 
 // Tutors
 import { TutorsModule } from './modules/tutors/tutors.module';
+import { TutorApplicationsModule } from './modules/tutor-applications/tutor-applications.module';
 
 // Search
 import { SearchService } from './modules/search/search.service';
@@ -38,6 +39,7 @@ import { PublicBoardsController } from './modules/boards/public-boards.controlle
     ContentModule,
     FaqsModule,
     TutorsModule,
+    TutorApplicationsModule,
   ],
   controllers: [
     HealthController,

@@ -1,22 +1,37 @@
-import { Board, School, Location, Subject, Tutor, Lead } from '@/types';
+import {
+  Board,
+  School,
+  Location,
+  Subject,
+  Tutor,
+  Lead,
+  TutorApplicationPayload,
+  TutorApplicationSubmissionResponse,
+} from "@/types";
 
 const rawApiBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-const API_BASE_URL = rawApiBaseUrl.endsWith('/v1')
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+const API_BASE_URL = rawApiBaseUrl.endsWith("/v1")
   ? rawApiBaseUrl
-  : `${rawApiBaseUrl.replace(/\/$/, '')}/v1`;
+  : `${rawApiBaseUrl.replace(/\/$/, "")}/v1`;
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options?.headers,
     },
   });
 
   if (!response.ok) {
-    throw new Error(`API error: ${response.statusText}`);
+    const errorPayload = await response
+      .json()
+      .catch(() => ({ message: response.statusText || "Request failed" }));
+    const message = Array.isArray(errorPayload?.message)
+      ? errorPayload.message.join(", ")
+      : errorPayload?.message;
+    throw new Error(message || `API error: ${response.statusText}`);
   }
 
   return response.json();
@@ -24,13 +39,14 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   content: {
-    getBoards: () => fetcher<Board[]>('/public/boards'),
+    getBoards: () => fetcher<Board[]>("/public/boards"),
     getBoard: (slug: string) => fetcher<Board>(`/public/boards/${slug}`),
-    getSchools: () => fetcher<School[]>('/content/schools'),
+    getSchools: () => fetcher<School[]>("/content/schools"),
     getSchool: (slug: string) => fetcher<School>(`/content/schools/${slug}`),
-    getLocations: () => fetcher<Location[]>('/content/locations'),
-    getLocation: (slug: string) => fetcher<Location>(`/content/locations/${slug}`),
-    getSubjects: () => fetcher<Subject[]>('/content/subjects'),
+    getLocations: () => fetcher<Location[]>("/content/locations"),
+    getLocation: (slug: string) =>
+      fetcher<Location>(`/content/locations/${slug}`),
+    getSubjects: () => fetcher<Subject[]>("/content/subjects"),
   },
   tutors: {
     search: (params: Record<string, string>) => {
@@ -41,9 +57,19 @@ export const api = {
   },
   leads: {
     submit: (data: Lead) =>
-      fetcher<{ success: boolean; id: string }>('/public/leads', {
-        method: 'POST',
+      fetcher<{ success: boolean; id: string }>("/public/leads", {
+        method: "POST",
         body: JSON.stringify(data),
       }),
+  },
+  tutorApplications: {
+    submit: (data: TutorApplicationPayload) =>
+      fetcher<TutorApplicationSubmissionResponse>(
+        "/public/tutor-applications",
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+        },
+      ),
   },
 };
