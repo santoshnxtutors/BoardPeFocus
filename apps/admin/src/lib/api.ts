@@ -95,13 +95,11 @@ export interface LookupCatalog {
 }
 
 function resolveApiBaseUrl() {
-  const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  const configuredApiBaseUrl =
+    process.env.BACKEND_API_URL?.trim() ||
+    process.env.NEXT_PUBLIC_API_URL?.trim();
 
   if (typeof window !== "undefined") {
-    if (configuredApiBaseUrl) {
-      return configuredApiBaseUrl;
-    }
-
     return "/api";
   }
 

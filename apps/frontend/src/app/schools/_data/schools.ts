@@ -429,7 +429,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Yes. The school flow is connected to nearby Gurgaon corridors where home tutoring is practical and commercially relevant.",
       },
     ],
-    relatedTutorSlugs: ["dharambir-prasad-maths", "c-k-gourav"],
+    relatedTutorSlugs: ["dharambir-prasad-maths", "c-k-gaurav"],
   },
   {
     slug: "the-heritage-school",
@@ -571,7 +571,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Yes. The page is intentionally connected to nearby Gurgaon corridors where home tutoring is practical and commercially relevant.",
       },
     ],
-    relatedTutorSlugs: ["dharambir-prasad-maths", "c-k-gourav"],
+    relatedTutorSlugs: ["dharambir-prasad-maths", "c-k-gaurav"],
   },
   {
     slug: "pathways-school-gurgaon",
@@ -695,7 +695,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Yes. The school support path is linked to nearby Gurgaon corridors where premium home tutoring remains practical.",
       },
     ],
-    relatedTutorSlugs: ["c-k-gourav"],
+    relatedTutorSlugs: ["c-k-gaurav"],
   },
   {
     slug: "pathways-world-school",
@@ -819,7 +819,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Yes. The page is intentionally connected to southern Gurgaon corridors where premium home tutoring remains practical.",
       },
     ],
-    relatedTutorSlugs: ["c-k-gourav"],
+    relatedTutorSlugs: ["c-k-gaurav"],
   },
   {
     slug: "gd-goenka-world-school",
@@ -950,7 +950,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Yes. The page is connected to nearby Gurgaon corridors where home tutoring and premium residential scheduling remain practical.",
       },
     ],
-    relatedTutorSlugs: ["c-k-gourav"],
+    relatedTutorSlugs: ["c-k-gaurav"],
   },
   {
     slug: "dps-international-gurugram",
@@ -1074,7 +1074,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Yes. The page is connected to nearby Gurgaon corridors where home tutoring remains practical and commercially relevant.",
       },
     ],
-    relatedTutorSlugs: ["c-k-gourav", "dharambir-prasad-maths"],
+    relatedTutorSlugs: ["c-k-gaurav", "dharambir-prasad-maths"],
   },
   {
     slug: "scottish-high-international-school",
@@ -1219,7 +1219,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Yes. The school page is directly connected to nearby Gurgaon corridors where premium home tutoring is practical.",
       },
     ],
-    relatedTutorSlugs: ["c-k-gourav", "dharambir-prasad-maths"],
+    relatedTutorSlugs: ["c-k-gaurav", "dharambir-prasad-maths"],
   },
   {
     slug: "lancers-international",
@@ -1350,7 +1350,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Those are among the strongest demand clusters, especially when families want premium one-to-one subject specialists rather than broad tutoring.",
       },
     ],
-    relatedTutorSlugs: ["c-k-gourav"],
+    relatedTutorSlugs: ["c-k-gaurav"],
   },
   {
     slug: "shiv-nadar-school",
@@ -1488,7 +1488,7 @@ export const schoolConfigs: SchoolConfig[] = [
           "Yes. The page is connected to nearby Gurgaon corridors where premium home tutoring is practical and frequently requested.",
       },
     ],
-    relatedTutorSlugs: ["dharambir-prasad-maths", "c-k-gourav"],
+    relatedTutorSlugs: ["dharambir-prasad-maths", "c-k-gaurav"],
   },
 ];
 

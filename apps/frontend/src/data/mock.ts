@@ -77,10 +77,10 @@ export const mockTutors: MockTutorRecord[] = [
     },
   },
   {
-    id: "c-k-gourav",
-    slug: "c-k-gourav",
-    name: "C. K. Gourav",
-    photoUrl: "/tutors/tutor%20images/gourav.jpg",
+    id: "c-k-gaurav",
+    slug: "c-k-gaurav",
+    name: "C. K. Gaurav",
+    photoUrl: "/tutors/tutor%20images/gaurav.jpg",
     tagline: "Mathematics specialist for Class 11, 12, and JEE preparation across CBSE, ISC, IGCSE, and IB pathways.",
     boards: ["CBSE", "ISC", "IGCSE", "IB"],
     subjects: ["Mathematics"],
@@ -89,7 +89,7 @@ export const mockTutors: MockTutorRecord[] = [
     rating: 4.9,
     reviewsCount: 3,
     about:
-      "C. K. Gourav supports senior-school Mathematics journeys where board preparation and competitive-exam discipline need to work together. With 15 years of experience, he is especially relevant for Class 11 and 12 students who need sharper problem selection, stronger conceptual command, and a cleaner bridge between school exams, boards, and JEE-style thinking. His profile suits families looking for advanced Maths support without losing structure or consistency.",
+      "C. K. Gaurav supports senior-school Mathematics journeys where board preparation and competitive-exam discipline need to work together. With 15 years of experience, he is especially relevant for Class 11 and 12 students who need sharper problem selection, stronger conceptual command, and a cleaner bridge between school exams, boards, and JEE-style thinking. His profile suits families looking for advanced Maths support without losing structure or consistency.",
     methodology:
       "His sessions combine concept layering, problem buckets by difficulty, and timed paper strategy. Students move from chapter mastery into mixed-sheet practice so that school tests, boards, and entrance-oriented numericals can be handled with a more controlled method.",
     teachingPhilosophy:

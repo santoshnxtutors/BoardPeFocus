@@ -3,19 +3,21 @@
 import React, { useEffect, useState } from "react";
 import { StatsCard } from "@/components/shared/stats-card";
 import { 
-  Users, 
   Inbox, 
   GraduationCap, 
   FileCode, 
   CheckCircle2, 
   AlertCircle,
-  ArrowUpRight,
-  Clock
+  Clock,
+  FileText,
+  Mail,
+  Phone
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { TutorApplication } from "@boardpefocus/types";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
@@ -27,13 +29,15 @@ export default function DashboardPage() {
   const [recentLeads, setRecentLeads] = useState([
     { id: "fallback-1", name: "Lead queue unavailable", subject: "Pending sync", time: "Just now", status: "NEW" },
   ]);
+  const [recentApplications, setRecentApplications] = useState<TutorApplication[]>([]);
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const [overview, leads] = await Promise.all([
+        const [overview, leads, applications] = await Promise.all([
           api.stats.overview(),
           api.leads.list(),
+          api.tutorApplications.list(),
         ]);
         setStats(overview);
         setRecentLeads(
@@ -45,6 +49,7 @@ export default function DashboardPage() {
             status: lead.status,
           })),
         );
+        setRecentApplications(applications.slice(0, 3));
       } catch (error) {
         console.error("Failed to load dashboard overview:", error);
       }
@@ -94,7 +99,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-3">
         <Card className="shadow-sm border-slate-200">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
@@ -121,6 +126,56 @@ export default function DashboardPage() {
                 </div>
               </Link>
             ))}
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" /> Tutor Applications
+            </CardTitle>
+            <Link href="/dashboard/tutor-applications">
+              <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100 font-bold hover:bg-blue-100 cursor-pointer transition-colors">View All</Badge>
+            </Link>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {recentApplications.length > 0 ? (
+              recentApplications.map((application) => (
+                <Link
+                  key={application.id}
+                  href={`/dashboard/tutor-applications/${application.id}`}
+                  className="block"
+                >
+                  <div className="rounded-xl border border-transparent p-3 transition-colors hover:border-slate-100 hover:bg-slate-50">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold text-slate-900">
+                          {application.fullName}
+                        </p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                          {application.subjectsHandled.slice(0, 2).join(", ") || "Tutor application"}
+                        </p>
+                      </div>
+                      <Badge className={application.status === "NEW" ? "bg-rose-500" : "bg-slate-500"}>
+                        {application.status.replaceAll("_", " ")}
+                      </Badge>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <Phone className="h-3 w-3" /> {application.phone}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Mail className="h-3 w-3" /> {application.email}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="rounded-xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+                New tutor applications will appear here as soon as the website form is submitted.
+              </div>
+            )}
           </CardContent>
         </Card>
 

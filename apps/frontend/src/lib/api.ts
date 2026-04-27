@@ -9,20 +9,38 @@ import {
   TutorApplicationSubmissionResponse,
 } from "@/types";
 
-const rawApiBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
-const API_BASE_URL = rawApiBaseUrl.endsWith("/v1")
-  ? rawApiBaseUrl
-  : `${rawApiBaseUrl.replace(/\/$/, "")}/v1`;
+function resolveApiBaseUrl() {
+  if (typeof window !== "undefined") {
+    return "/api";
+  }
+
+  const rawApiBaseUrl =
+    process.env.BACKEND_API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://127.0.0.1:3001/api";
+
+  return rawApiBaseUrl.endsWith("/v1")
+    ? rawApiBaseUrl
+    : `${rawApiBaseUrl.replace(/\/$/, "")}/v1`;
+}
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
+  const apiBaseUrl = resolveApiBaseUrl();
+  let response: Response;
+
+  try {
+    response = await fetch(`${apiBaseUrl}${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+      },
+    });
+  } catch {
+    throw new Error(
+      "Unable to reach the application service right now. Please try again.",
+    );
+  }
 
   if (!response.ok) {
     const errorPayload = await response

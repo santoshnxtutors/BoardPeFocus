@@ -94,9 +94,9 @@ export const resultTutorLinks: ResultLinkCard[] = [
     href: getTutorPath("dharambir-prasad-maths"),
   },
   {
-    title: "C. K. Gourav",
+    title: "C. K. Gaurav",
     description: "Useful for senior-school families who want stronger Mathematics support across board preparation and JEE-oriented problem solving.",
-    href: getTutorPath("c-k-gourav"),
+    href: getTutorPath("c-k-gaurav"),
   },
   {
     title: "Priyanka Kumari",
