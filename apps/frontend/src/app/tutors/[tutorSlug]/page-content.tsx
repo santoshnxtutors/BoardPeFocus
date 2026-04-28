@@ -350,8 +350,12 @@ async function getPublishedTutor(slug: string): Promise<TutorPageModel | null> {
       const rawTutor = (await response.json()) as BackendTutorPayload;
       return normalizeBackendTutor(rawTutor);
     }
+
+    // The backend responded and did not find a published tutor for this slug.
+    // Do not revive archived tutors from the static mock catalog in this case.
+    return null;
   } catch {
-    // Fall through to the backend miss below.
+    // Fall back to static mock data only when the backend cannot be reached.
   }
 
   const mockTutor = mockTutors.find((item) => item.slug === slug);

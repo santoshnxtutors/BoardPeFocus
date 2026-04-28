@@ -280,9 +280,7 @@ async function main() {
           reviewsCount: tutorInput.reviewsCount,
           isFeatured: index < 3,
           isVerified: true,
-          status: TutorStatus.PUBLISHED,
           priority: tutors.length - index,
-          deletedAt: null,
         },
         create: {
           id: tutorInput.id,

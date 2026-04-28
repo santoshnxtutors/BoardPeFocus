@@ -129,6 +129,13 @@ export async function getLiveTutorCards() {
 
 export async function getPublicTutorCards() {
   const liveTutors = await getLiveTutorCards();
+
+  // Treat mock tutors as an outage fallback only. If live tutor data exists,
+  // do not merge static records back in because archived tutors would reappear.
+  if (liveTutors.length > 0) {
+    return liveTutors;
+  }
+
   return mergeTutors(liveTutors, mockTutors.map(normalizeMockTutor));
 }
 

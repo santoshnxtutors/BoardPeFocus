@@ -77,41 +77,6 @@ export const mockTutors: MockTutorRecord[] = [
     },
   },
   {
-    id: "c-k-gaurav",
-    slug: "c-k-gaurav",
-    name: "C. K. Gaurav",
-    photoUrl: "/tutors/tutor%20images/gaurav.jpg",
-    tagline: "Mathematics specialist for Class 11, 12, and JEE preparation across CBSE, ISC, IGCSE, and IB pathways.",
-    boards: ["CBSE", "ISC", "IGCSE", "IB"],
-    subjects: ["Mathematics"],
-    experienceYrs: 15,
-    studentsTaught: 1200,
-    rating: 4.9,
-    reviewsCount: 3,
-    about:
-      "C. K. Gaurav supports senior-school Mathematics journeys where board preparation and competitive-exam discipline need to work together. With 15 years of experience, he is especially relevant for Class 11 and 12 students who need sharper problem selection, stronger conceptual command, and a cleaner bridge between school exams, boards, and JEE-style thinking. His profile suits families looking for advanced Maths support without losing structure or consistency.",
-    methodology:
-      "His sessions combine concept layering, problem buckets by difficulty, and timed paper strategy. Students move from chapter mastery into mixed-sheet practice so that school tests, boards, and entrance-oriented numericals can be handled with a more controlled method.",
-    teachingPhilosophy:
-      "Advanced Mathematics becomes easier when the student learns how to think through a problem, not just how to repeat one.",
-    schools: [
-      "Amity International School",
-      "Scottish High International School",
-      "DPS International School",
-      "Manav Rachna International School",
-    ],
-    locations: citywideLocations,
-    results: [
-      { label: "Experience", value: "15 Years" },
-      { label: "Academic Stage", value: "Class 11, 12 and JEE" },
-      { label: "Boards", value: "CBSE, ISC, IGCSE, IB" },
-    ],
-    coverage: {
-      sectors: ["Sector 42", "Sector 43", "Sector 53", "Sector 54", "Sector 57", "Sector 65"],
-      societies: ["DLF Aralias", "DLF Magnolias", "M3M Golfestate", "The Belaire"],
-    },
-  },
-  {
     id: "priyanka-kumari",
     slug: "priyanka-kumari",
     name: "Priyanka Kumari",
