@@ -103,7 +103,6 @@ export function Footer() {
               <li><Link href="/process" className="hover:text-accent transition-colors">How It Works</Link></li>
               <li><Link href="/faqs" className="hover:text-accent transition-colors">FAQs</Link></li>
               <li><Link href="/support" className="hover:text-accent transition-colors">Support</Link></li>
-              <li><Link href="/site-map" className="hover:text-accent transition-colors">HTML Sitemap</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-accent transition-colors">Privacy</Link></li>
               <li><Link href="/terms" className="hover:text-accent transition-colors">Terms</Link></li>
             </ul>

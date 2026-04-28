@@ -1,6 +1,6 @@
 import { FadeIn } from "@/lib/animations";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Target, Users, BookOpen, MapPin, Linkedin } from "lucide-react";
+import { ShieldCheck, Target, Users, BookOpen, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { constructMetadata } from "@/lib/seo";
@@ -98,68 +98,6 @@ export default function AboutPage() {
                 <Target className="w-12 h-12 text-secondary mx-auto mb-6" />
                 <h3 className="text-2xl font-bold text-primary mb-4">Result Oriented</h3>
                 <p className="text-muted-foreground">Our methodology is designed for high performance. We focus on past paper practice, rubric mastery, and time management.</p>
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      <section className="bg-muted/20 pb-14">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <FadeIn>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="group relative overflow-hidden rounded-[2.5rem] border border-border/50 bg-white/50 p-8 text-left shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-sm transition-all duration-500 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] md:p-10">
-                <div className="absolute -right-8 -top-8 opacity-[0.03] transition-transform duration-500 group-hover:scale-110 group-hover:opacity-[0.05]">
-                  <Linkedin className="h-48 w-48 text-primary" />
-                </div>
-                <div className="relative z-10 flex h-full flex-col justify-between gap-8">
-                  <div>
-                    <div className="mb-4 inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 border border-primary/20">
-                      <span className="text-sm font-extrabold uppercase tracking-[0.2em] text-primary">
-                        Founder
-                      </span>
-                    </div>
-                    <h3 className="font-heading text-3xl font-extrabold text-primary">
-                      Ajay Vatsyayan
-                    </h3>
-                  </div>
-                  <Link
-                    href="https://www.linkedin.com/in/ajay-vatsyayan-91738b11a/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex w-fit items-center gap-2.5 rounded-2xl bg-[#0A66C2]/10 px-5 py-3 text-sm font-bold text-[#0A66C2] transition-all duration-300 hover:bg-[#0A66C2] hover:text-white"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                    <span>Connect on LinkedIn</span>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="group relative overflow-hidden rounded-[2.5rem] border border-border/50 bg-white/50 p-8 text-left shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-sm transition-all duration-500 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] md:p-10">
-                <div className="absolute -right-8 -top-8 opacity-[0.03] transition-transform duration-500 group-hover:scale-110 group-hover:opacity-[0.05]">
-                  <Linkedin className="h-48 w-48 text-primary" />
-                </div>
-                <div className="relative z-10 flex h-full flex-col justify-between gap-8">
-                  <div>
-                    <div className="mb-4 inline-flex items-center rounded-full bg-muted px-4 py-1.5 border border-border">
-                      <span className="text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                        Design & Developed By
-                      </span>
-                    </div>
-                    <h3 className="font-heading text-3xl font-bold text-primary">
-                      Santosh Sharma
-                    </h3>
-                  </div>
-                  <Link
-                    href="https://www.linkedin.com/in/santosh-sharma-a57026220/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex w-fit items-center gap-2.5 rounded-2xl bg-[#0A66C2]/10 px-5 py-3 text-sm font-bold text-[#0A66C2] transition-all duration-300 hover:bg-[#0A66C2] hover:text-white"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                    <span>Connect on LinkedIn</span>
-                  </Link>
-                </div>
               </div>
             </div>
           </FadeIn>
