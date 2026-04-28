@@ -2,7 +2,7 @@ import {
   generateStaticParams,
   getClassHubPageMetadata,
   renderClassHubDetailPage,
-} from "../page";
+} from "../page-content";
 
 interface PageProps {
   params: Promise<{ classLevel: string }>;

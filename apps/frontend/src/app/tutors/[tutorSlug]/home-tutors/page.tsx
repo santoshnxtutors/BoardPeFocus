@@ -2,7 +2,7 @@ import {
   generateStaticParams,
   getTutorPageMetadata,
   renderTutorProfilePage,
-} from "../page";
+} from "../page-content";
 
 interface PageProps {
   params: Promise<{ tutorSlug: string }>;

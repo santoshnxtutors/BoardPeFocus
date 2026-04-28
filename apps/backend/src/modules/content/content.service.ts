@@ -1,5 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/database/prisma.service';
+import {
+  publishedBoardInclude,
+  publishedClassLevelInclude,
+  publishedSchoolInclude,
+  publishedSectorInclude,
+  publishedSocietyInclude,
+  publishedSubjectInclude,
+} from './public-relations';
 
 @Injectable()
 export class ContentService {
@@ -8,13 +16,7 @@ export class ContentService {
   listBoards() {
     return (this.prisma as any).board.findMany({
       where: { status: 'PUBLISHED' },
-      include: {
-        subjects: { include: { subject: true } },
-        classes: { include: { classLevel: true } },
-        schools: { include: { school: true } },
-        sectors: { include: { sector: true } },
-        societies: { include: { society: true } },
-      },
+      include: publishedBoardInclude,
       orderBy: { name: 'asc' },
     });
   }
@@ -22,13 +24,7 @@ export class ContentService {
   async getBoard(slug: string) {
     const board = await (this.prisma as any).board.findFirst({
       where: { slug, status: 'PUBLISHED' },
-      include: {
-        subjects: { include: { subject: true } },
-        classes: { include: { classLevel: true } },
-        schools: { include: { school: true } },
-        sectors: { include: { sector: true } },
-        societies: { include: { society: true } },
-      },
+      include: publishedBoardInclude,
     });
 
     if (!board) {
@@ -41,10 +37,7 @@ export class ContentService {
   listClasses() {
     return (this.prisma as any).classLevel.findMany({
       where: { status: 'PUBLISHED' },
-      include: {
-        boards: { include: { board: true } },
-        subjects: { include: { subject: true } },
-      },
+      include: publishedClassLevelInclude,
       orderBy: [{ level: 'asc' }, { name: 'asc' }],
     });
   }
@@ -52,10 +45,7 @@ export class ContentService {
   async getClass(slug: string) {
     const classLevel = await (this.prisma as any).classLevel.findFirst({
       where: { slug, status: 'PUBLISHED' },
-      include: {
-        boards: { include: { board: true } },
-        subjects: { include: { subject: true } },
-      },
+      include: publishedClassLevelInclude,
     });
 
     if (!classLevel) {
@@ -68,16 +58,7 @@ export class ContentService {
   listSchools() {
     return (this.prisma as any).school.findMany({
       where: { status: 'PUBLISHED' },
-      include: {
-        boards: {
-          include: {
-            board: true,
-          },
-        },
-        subjects: { include: { subject: true } },
-        sectors: { include: { sector: true } },
-        societies: { include: { society: true } },
-      },
+      include: publishedSchoolInclude,
       orderBy: { name: 'asc' },
     });
   }
@@ -85,16 +66,7 @@ export class ContentService {
   async getSchool(slug: string) {
     const school = await (this.prisma as any).school.findFirst({
       where: { slug, status: 'PUBLISHED' },
-      include: {
-        boards: {
-          include: {
-            board: true,
-          },
-        },
-        subjects: { include: { subject: true } },
-        sectors: { include: { sector: true } },
-        societies: { include: { society: true } },
-      },
+      include: publishedSchoolInclude,
     });
 
     if (!school) {
@@ -111,7 +83,10 @@ export class ContentService {
         orderBy: { name: 'asc' },
       }),
       (this.prisma as any).society.findMany({
-        where: { status: 'PUBLISHED' },
+        where: {
+          status: 'PUBLISHED',
+          sector: { is: { status: 'PUBLISHED' } },
+        },
         orderBy: { name: 'asc' },
       }),
     ]);
@@ -149,7 +124,11 @@ export class ContentService {
     }
 
     const society = await (this.prisma as any).society.findFirst({
-      where: { slug, status: 'PUBLISHED' },
+      where: {
+        slug,
+        status: 'PUBLISHED',
+        sector: { is: { status: 'PUBLISHED' } },
+      },
     });
     if (society) {
       return {
@@ -167,13 +146,7 @@ export class ContentService {
   listSubjects() {
     return (this.prisma as any).subject.findMany({
       where: { status: 'PUBLISHED' },
-      include: {
-        boards: { include: { board: true } },
-        classes: { include: { classLevel: true } },
-        schools: { include: { school: true } },
-        sectors: { include: { sector: true } },
-        societies: { include: { society: true } },
-      },
+      include: publishedSubjectInclude,
       orderBy: { name: 'asc' },
     });
   }
@@ -181,13 +154,7 @@ export class ContentService {
   async getSubject(slug: string) {
     const subject = await (this.prisma as any).subject.findFirst({
       where: { slug, status: 'PUBLISHED' },
-      include: {
-        boards: { include: { board: true } },
-        classes: { include: { classLevel: true } },
-        schools: { include: { school: true } },
-        sectors: { include: { sector: true } },
-        societies: { include: { society: true } },
-      },
+      include: publishedSubjectInclude,
     });
 
     if (!subject) {
@@ -200,15 +167,7 @@ export class ContentService {
   listSectors() {
     return (this.prisma as any).sector.findMany({
       where: { status: 'PUBLISHED' },
-      include: {
-        societies: {
-          where: { status: 'PUBLISHED' },
-          orderBy: { name: 'asc' },
-        },
-        schools: { include: { school: true } },
-        boards: { include: { board: true } },
-        subjects: { include: { subject: true } },
-      },
+      include: publishedSectorInclude,
       orderBy: { name: 'asc' },
     });
   }
@@ -216,15 +175,7 @@ export class ContentService {
   async getSector(slug: string) {
     const sector = await (this.prisma as any).sector.findFirst({
       where: { slug, status: 'PUBLISHED' },
-      include: {
-        societies: {
-          where: { status: 'PUBLISHED' },
-          orderBy: { name: 'asc' },
-        },
-        schools: { include: { school: true } },
-        boards: { include: { board: true } },
-        subjects: { include: { subject: true } },
-      },
+      include: publishedSectorInclude,
     });
 
     if (!sector) {
@@ -236,26 +187,23 @@ export class ContentService {
 
   listSocieties() {
     return (this.prisma as any).society.findMany({
-      where: { status: 'PUBLISHED' },
-      include: {
-        sector: true,
-        schools: { include: { school: true } },
-        boards: { include: { board: true } },
-        subjects: { include: { subject: true } },
+      where: {
+        status: 'PUBLISHED',
+        sector: { is: { status: 'PUBLISHED' } },
       },
+      include: publishedSocietyInclude,
       orderBy: { name: 'asc' },
     });
   }
 
   async getSociety(slug: string) {
     const society = await (this.prisma as any).society.findFirst({
-      where: { slug, status: 'PUBLISHED' },
-      include: {
-        sector: true,
-        schools: { include: { school: true } },
-        boards: { include: { board: true } },
-        subjects: { include: { subject: true } },
+      where: {
+        slug,
+        status: 'PUBLISHED',
+        sector: { is: { status: 'PUBLISHED' } },
       },
+      include: publishedSocietyInclude,
     });
 
     if (!society) {

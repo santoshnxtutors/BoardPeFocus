@@ -4,9 +4,9 @@ import { getTutorPath } from '@/lib/tutor-paths';
 
 export const siteConfig = {
   name: 'BoardPeFocus',
-  url: 'https://boardpefocus.com',
+  url: 'https://www.boardpefocus.in',
   description: 'Specialized home tutoring for CBSE, ICSE, IGCSE, and IB boards in Gurugram. We aim to help students target 95%+.',
-  ogImage: 'https://boardpefocus.com/og.jpg',
+  ogImage: 'https://www.boardpefocus.in/og.jpg',
   contact: {
     phone: '+91 87963 67754',
     email: 'boardpefocus@gmail.com',

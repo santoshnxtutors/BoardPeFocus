@@ -62,7 +62,9 @@ function preloadEnvironment() {
 
     const parsed = parseEnvFile(readFileSync(filePath, 'utf8'));
     for (const [key, value] of Object.entries(parsed)) {
-      process.env[key] = value;
+      if (process.env[key] === undefined) {
+        process.env[key] = value;
+      }
     }
   }
 

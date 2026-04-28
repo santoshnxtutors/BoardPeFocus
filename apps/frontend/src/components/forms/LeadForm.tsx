@@ -123,6 +123,8 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
     };
 
     try {
+      await api.leads.submit(payload);
+
       const whatsappUrl = buildWhatsAppUrl(data);
 
       const whatsappWindow = window.open(
@@ -134,10 +136,6 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
       if (!whatsappWindow) {
         window.open(whatsappUrl, "_self");
       }
-
-      void api.leads.submit(payload).catch((submissionError) => {
-        console.error("Lead save failed after WhatsApp redirect", submissionError);
-      });
 
       trackEvent("lead_submit", {
         board: payload.board,

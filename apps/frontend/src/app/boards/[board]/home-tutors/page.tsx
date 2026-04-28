@@ -1,4 +1,8 @@
-import { generateStaticParams, getBoardPageMetadata, renderBoardPage } from "../page";
+import {
+  generateStaticParams,
+  getBoardPageMetadata,
+  renderBoardPage,
+} from "../page-content";
 
 interface PageProps {
   params: Promise<{ board: string }>;

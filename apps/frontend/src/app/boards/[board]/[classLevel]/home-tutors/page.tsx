@@ -2,7 +2,7 @@ import {
   generateStaticParams,
   getBoardClassPageMetadata,
   renderBoardClassPage,
-} from "../page";
+} from "../page-content";
 
 interface PageProps {
   params: Promise<{ board: string; classLevel: string }>;

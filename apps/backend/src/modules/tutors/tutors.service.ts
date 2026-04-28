@@ -8,6 +8,10 @@ import { Prisma, TutorStatus } from '@boardpefocus/database';
 import { PrismaService } from '../../common/database/prisma.service';
 import { CreateTutorDto } from './dto/create-tutor.dto';
 import { UpdateTutorDto } from './dto/update-tutor.dto';
+import {
+  publishedTutorDetailInclude,
+  publishedTutorListInclude,
+} from '../content/public-relations';
 
 interface TutorPublicFilters {
   board?: string;
@@ -341,26 +345,43 @@ export class TutorsService {
       where: {
         deletedAt: null,
         status: 'PUBLISHED',
-        ...(board && { boards: { some: { board: { slug: board } } } }),
-        ...(subject && { subjects: { some: { subject: { slug: subject } } } }),
+        ...(board && {
+          boards: {
+            some: { board: { is: { slug: board, status: 'PUBLISHED' } } },
+          },
+        }),
+        ...(subject && {
+          subjects: {
+            some: {
+              subject: { is: { slug: subject, status: 'PUBLISHED' } },
+            },
+          },
+        }),
         ...(location && {
           locations: {
             some: {
               OR: [
-                { sector: { slug: location } },
-                { society: { slug: location } },
+                { sector: { is: { slug: location, status: 'PUBLISHED' } } },
+                {
+                  society: {
+                    is: {
+                      slug: location,
+                      status: 'PUBLISHED',
+                      sector: { is: { status: 'PUBLISHED' } },
+                    },
+                  },
+                },
               ],
             },
           },
         }),
-        ...(school && { schools: { some: { school: { slug: school } } } }),
+        ...(school && {
+          schools: {
+            some: { school: { is: { slug: school, status: 'PUBLISHED' } } },
+          },
+        }),
       },
-      include: {
-        boards: { include: { board: true } },
-        subjects: { include: { subject: true } },
-        classes: { include: { classLevel: true } },
-        locations: { include: { sector: true, society: true } },
-      },
+      include: publishedTutorListInclude,
       orderBy: { priority: 'desc' },
     });
   }
@@ -388,21 +409,7 @@ export class TutorsService {
         deletedAt: null,
         status: 'PUBLISHED',
       },
-      include: {
-        boards: { include: { board: true } },
-        subjects: { include: { subject: true } },
-        classes: { include: { classLevel: true } },
-        schools: { include: { school: true } },
-        locations: { include: { sector: true, society: true } },
-        reviews: {
-          where: { status: 'APPROVED' },
-          orderBy: { createdAt: 'desc' },
-        },
-        faqs: { orderBy: { order: 'asc' } },
-        qualifications: true,
-        achievements: true,
-        claimProofs: true,
-      },
+      include: publishedTutorDetailInclude,
     });
 
     if (!tutor) throw new NotFoundException('Tutor not found');

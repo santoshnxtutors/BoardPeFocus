@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 
 export const siteConfig = {
   name: 'BoardPeFocus',
-  url: 'https://boardpefocus.com',
+  url: 'https://www.boardpefocus.in',
   description: 'Specialized home tutoring for CBSE, ICSE, IGCSE, and IB boards in Gurugram. We aim to help students target 95%+.',
-  ogImage: 'https://boardpefocus.com/og.jpg',
+  ogImage: 'https://www.boardpefocus.in/og.jpg',
   links: {
     twitter: 'https://twitter.com/boardpefocus',
     github: 'https://github.com/boardpefocus',
