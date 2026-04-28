@@ -1,0 +1,19 @@
+
+> frontend@0.1.0 predev E:\BoardPeFocus\BoardPeFocus\apps\frontend
+> node ../../scripts/clean-next-middleware-cache.cjs .
+
+
+> frontend@0.1.0 dev E:\BoardPeFocus\BoardPeFocus\apps\frontend
+> next dev --webpack -p 3000
+
+▲ Next.js 16.2.4 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.18.3:3000
+- Environments: .env.local
+✓ Ready in 10.0s
+
+○ Compiling / ...
+ GET / 200 in 2.3s (next.js: 28ms, proxy.ts: 1375ms, application-code: 892ms)
+ GET / 200 in 2.4s (next.js: 71ms, proxy.ts: 1373ms, application-code: 986ms)
+○ Compiling /_error ...
+ GET / 500 in 4.9s (next.js: 4.5s, proxy.ts: 14ms, application-code: 414ms)
