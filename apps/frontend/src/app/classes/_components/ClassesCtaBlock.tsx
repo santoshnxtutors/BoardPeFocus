@@ -19,7 +19,7 @@ export function ClassesCtaBlock({
         </div>
         <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
           <Link
-            href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20Class%2010%20or%20Class%2012%20board%20tutoring%20in%20Gurgaon."
+            href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20Class%2010%20or%20Class%2012%20board%20tutoring%20in%20Gurgaon."
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full"

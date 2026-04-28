@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, CheckCircle2, Send } from "lucide-react";
@@ -173,9 +173,9 @@ export function TutorApplicationForm() {
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const {
+    control,
     register,
     handleSubmit,
-    watch,
     setValue,
     reset,
     formState: { errors },
@@ -191,9 +191,10 @@ export function TutorApplicationForm() {
     },
   });
 
-  const selectedBoards = watch("boardsHandled");
-  const selectedClasses = watch("classesHandled");
-  const selectedTeachingMode = watch("preferredTeachingMode");
+  const selectedBoards = useWatch({ control, name: "boardsHandled" }) ?? [];
+  const selectedClasses = useWatch({ control, name: "classesHandled" }) ?? [];
+  const selectedTeachingMode =
+    useWatch({ control, name: "preferredTeachingMode" }) ?? "";
   const totalErrors = useMemo(() => Object.keys(errors).length, [errors]);
 
   const toggleMultiSelect = (
@@ -735,7 +736,7 @@ export function TutorApplicationForm() {
               <Input
                 id="resumeUrl"
                 {...register("resumeUrl")}
-                placeholder="https://..."
+                placeholder="Google Drive or any http/https link"
                 aria-invalid={!!errors.resumeUrl}
               />
               {errors.resumeUrl ? (
@@ -751,7 +752,7 @@ export function TutorApplicationForm() {
               <Input
                 id="profilePhotoUrl"
                 {...register("profilePhotoUrl")}
-                placeholder="https://..."
+                placeholder="Google Drive or any http/https link"
                 aria-invalid={!!errors.profilePhotoUrl}
               />
               {errors.profilePhotoUrl ? (

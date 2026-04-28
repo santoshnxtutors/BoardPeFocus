@@ -18,7 +18,7 @@ export function WhatsAppFloat() {
     message: ""
   });
 
-  const phoneNumber = "919582706764";
+  const phoneNumber = "918796367754";
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();

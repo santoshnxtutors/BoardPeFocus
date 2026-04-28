@@ -121,7 +121,7 @@ export default async function BoardsHubPage() {
                   Use the Boards hub to move cleanly from board to class, subject, school, area, and the right premium one-to-one tutoring path for your child.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20choosing%20the%20right%20board-specific%20tutor%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
+                  <Link href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20choosing%20the%20right%20board-specific%20tutor%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                     <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
                       Talk on WhatsApp
                     </Button>

@@ -88,8 +88,8 @@ export default async function ContactPage() {
                   </div>
                   <div>
                     <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Call or WhatsApp</p>
-                    <Link href="tel:+919582706764" className="text-xl font-bold text-primary transition-colors hover:text-accent">
-                      +91 95827 06764
+                    <Link href="tel:+918796367754" className="text-xl font-bold text-primary transition-colors hover:text-accent">
+                      +91 87963 67754
                     </Link>
                   </div>
                 </div>
@@ -100,8 +100,8 @@ export default async function ContactPage() {
                   </div>
                   <div>
                     <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Email us</p>
-                    <Link href="mailto:hello@boardpefocus.com" className="text-xl font-bold text-primary transition-colors hover:text-accent">
-                      hello@boardpefocus.com
+                    <Link href="mailto:boardpefocus@gmail.com" className="text-xl font-bold text-primary transition-colors hover:text-accent">
+                      boardpefocus@gmail.com
                     </Link>
                   </div>
                 </div>
@@ -112,7 +112,7 @@ export default async function ContactPage() {
                   </div>
                   <div>
                     <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Service base</p>
-                    <p className="text-xl font-bold text-primary">Sector 44, Gurugram, Haryana</p>
+                    <p className="text-xl font-bold text-primary">1st Floor, 497 Housing Board Colony, Sector 51, Gurgaon, Haryana</p>
                   </div>
                 </div>
               </div>
@@ -126,7 +126,7 @@ export default async function ContactPage() {
                 Our team is available Monday through Saturday, 9:00 AM to 8:00 PM, for consultations, callback requests, and tutor-matching support.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Link href="https://wa.me/919582706764" target="_blank" rel="noopener noreferrer">
+                <Link href="https://wa.me/918796367754" target="_blank" rel="noopener noreferrer">
                   <Button className="h-14 w-full rounded-xl bg-accent text-lg font-bold text-white shadow-lg hover:bg-accent/90">
                     Chat with an Advisor
                   </Button>

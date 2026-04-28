@@ -7,6 +7,16 @@ export const siteConfig = {
   url: 'https://boardpefocus.com',
   description: 'Specialized home tutoring for CBSE, ICSE, IGCSE, and IB boards in Gurugram. We aim to help students target 95%+.',
   ogImage: 'https://boardpefocus.com/og.jpg',
+  contact: {
+    phone: '+91 87963 67754',
+    email: 'boardpefocus@gmail.com',
+    address: {
+      streetAddress: '1st Floor, 497 Housing Board Colony, Sector 51',
+      addressLocality: 'Gurgaon',
+      addressRegion: 'Haryana',
+      addressCountry: 'IN',
+    },
+  },
   links: {
     twitter: 'https://twitter.com/boardpefocus',
     github: 'https://github.com/boardpefocus',
@@ -126,6 +136,22 @@ export function generateOrganizationJsonLd() {
     name: siteConfig.name,
     url: getSiteUrl(),
     description: siteConfig.description,
+    telephone: siteConfig.contact.phone,
+    email: siteConfig.contact.email,
+    address: {
+      '@type': 'PostalAddress',
+      ...siteConfig.contact.address,
+    },
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        telephone: siteConfig.contact.phone,
+        email: siteConfig.contact.email,
+        areaServed: 'IN',
+        availableLanguage: ['en', 'hi'],
+      },
+    ],
     areaServed: 'Gurugram, Haryana, India',
     knowsAbout: [
       'CBSE home tutoring',

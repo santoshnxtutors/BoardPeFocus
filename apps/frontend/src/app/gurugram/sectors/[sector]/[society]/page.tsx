@@ -294,7 +294,7 @@ export default async function SocietyPage({ params }: PageProps) {
                     <p>High-demand subjects: {sector.subjectDemand.join(" • ")}</p>
                     <p>Nearby sectors: {sector.adjacentSectors.join(" • ")}</p>
                   </div>
-                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20a%20home%20tutor%20in%20my%20society." target="_blank" rel="noopener noreferrer" className="mt-6 inline-block">
+                  <Link href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20need%20a%20home%20tutor%20in%20my%20society." target="_blank" rel="noopener noreferrer" className="mt-6 inline-block">
                     <Button variant="outline" className="rounded-xl">
                       WhatsApp Us
                     </Button>

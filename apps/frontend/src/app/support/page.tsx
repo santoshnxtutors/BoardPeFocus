@@ -24,7 +24,7 @@ interface LiveSupportContent {
 const supportChannels = [
   {
     title: "Call or WhatsApp",
-    href: "tel:+919582706764",
+    href: "tel:+918796367754",
     description: "Reach the Gurgaon academic advisory team directly when the family wants immediate clarity.",
   },
   {
@@ -146,7 +146,7 @@ export default async function SupportPage() {
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link
-                    href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20support%20to%20choose%20the%20right%20tutoring%20path."
+                    href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20need%20support%20to%20choose%20the%20right%20tutoring%20path."
                     target="_blank"
                     rel="noopener noreferrer"
                   >

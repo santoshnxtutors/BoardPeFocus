@@ -120,7 +120,7 @@ export default async function BoardSubjectPage({ params }: PageProps) {
               <h1 className="mt-6 text-4xl font-extrabold tracking-tight md:text-6xl">{subject.heroTitle}</h1>
               <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">{subject.heroDescription}</p>
               <div className="mt-8 flex flex-wrap gap-4">
-                <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20this%20board%20subject%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
+                <Link href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20this%20board%20subject%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                   <Button className="rounded-xl bg-white px-6 text-primary hover:bg-white/90">Talk on WhatsApp</Button>
                 </Link>
                 <Link href="/contact">

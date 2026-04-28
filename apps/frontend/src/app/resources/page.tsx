@@ -88,7 +88,7 @@ export default async function ResourcesHubPage() {
                       Explore Board Guides
                     </Button>
                   </Link>
-                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20after%20reading%20your%20resources." target="_blank" rel="noopener noreferrer">
+                  <Link href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20after%20reading%20your%20resources." target="_blank" rel="noopener noreferrer">
                     <Button
                       variant="outline"
                       size="lg"

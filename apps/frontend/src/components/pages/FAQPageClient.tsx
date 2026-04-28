@@ -239,12 +239,12 @@ export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCa
           <FadeIn>
             <h2 className="text-4xl md:text-5xl font-heading font-bold mb-8">Can&apos;t find what you&apos;re looking for?</h2>
             <div className="flex flex-wrap justify-center gap-6">
-              <Link href="mailto:hello@boardpefocus.com">
+              <Link href="mailto:boardpefocus@gmail.com">
                 <Button size="lg" className="h-16 px-10 text-lg rounded-2xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-xl">
                   <Mail className="w-5 h-5 mr-2" /> Email Support
                 </Button>
               </Link>
-              <Link href="tel:+919582706764">
+              <Link href="tel:+918796367754">
                 <Button
                   size="lg"
                   className="h-16 px-10 text-lg rounded-2xl !bg-white !text-primary hover:!bg-white/90 shadow-xl [&_svg]:!text-primary"

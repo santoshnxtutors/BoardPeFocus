@@ -145,7 +145,7 @@ export async function renderBoardPage(boardSlug: string) {
                 <h1 className="mt-6 text-4xl font-extrabold text-primary md:text-6xl">{`${board.name} Home Tutors in Gurgaon`}</h1>
                 <p className="mt-6 text-lg leading-8 text-muted-foreground md:text-xl">{heroDescription}</p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20board-specific%20tutoring%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
+                  <Link href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20need%20help%20with%20board-specific%20tutoring%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
                     <Button className="rounded-xl px-6">Talk on WhatsApp</Button>
                   </Link>
                   <Link href="/contact">

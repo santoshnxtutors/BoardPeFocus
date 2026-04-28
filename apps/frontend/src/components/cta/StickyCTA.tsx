@@ -59,7 +59,7 @@ export function StickyCTA() {
           </Link>
           
           <Link
-            href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20to%20talk%20about%20board-exam%20tutoring%20support."
+            href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20want%20to%20talk%20about%20board-exam%20tutoring%20support."
             target="_blank"
             rel="noopener noreferrer"
             className={cn(

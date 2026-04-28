@@ -12,18 +12,24 @@ import { trackEvent } from "@/lib/tracking";
 import { Loader2, CheckCircle2, Send, Phone, User, GraduationCap, BookOpen, School as SchoolIcon, MapPin } from "lucide-react";
 import { FadeIn } from "@/lib/animations";
 
+const LEAD_WHATSAPP_NUMBER = "918796367754";
+
 const leadSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  phone: z.string().min(10, "Please enter a valid 10-digit number"),
-  email: z.string().email("Please enter a valid email").optional().or(z.literal("")),
-  board: z.string().optional(),
-  class: z.string().optional(),
-  subject: z.string().optional(),
-  school: z.string().optional(),
-  location: z.string().optional(),
-  preferredMode: z.string().optional(),
-  preferredTimeSlot: z.string().optional(),
-  message: z.string().optional(),
+  name: z.string().trim().min(2, "Name is required"),
+  phone: z
+    .string()
+    .trim()
+    .transform((value) => value.replace(/\D/g, ""))
+    .refine((value) => value.length >= 10, "Please enter a valid 10-digit number"),
+  email: z.string().trim().email("Please enter a valid email").optional().or(z.literal("")),
+  board: z.string().trim().optional(),
+  class: z.string().trim().optional(),
+  subject: z.string().trim().optional(),
+  school: z.string().trim().optional(),
+  location: z.string().trim().optional(),
+  preferredMode: z.string().trim().optional(),
+  preferredTimeSlot: z.string().trim().optional(),
+  message: z.string().trim().optional(),
 });
 
 type LeadFormData = z.infer<typeof leadSchema>;
@@ -33,6 +39,31 @@ interface LeadFormProps {
   defaultValues?: Partial<LeadFormData>;
   title?: string;
   subtitle?: string;
+}
+
+function optionalField(value?: string) {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
+}
+
+function buildWhatsAppUrl(data: LeadFormData) {
+  const lines = [
+    "Hi BoardPeFocus, I want to request a free demo class.",
+    "",
+    `Name: ${data.name}`,
+    `Phone: ${data.phone}`,
+    `Email: ${optionalField(data.email) ?? "Not provided"}`,
+    `Board: ${optionalField(data.board) ?? "Not provided"}`,
+    `Class: ${optionalField(data.class) ?? "Not provided"}`,
+    `Preferred Mode: ${optionalField(data.preferredMode) ?? "Not provided"}`,
+    `Preferred Time Slot: ${optionalField(data.preferredTimeSlot) ?? "Not provided"}`,
+    `Subject(s): ${optionalField(data.subject) ?? "Not provided"}`,
+    `School: ${optionalField(data.school) ?? "Not provided"}`,
+    `Location: ${optionalField(data.location) ?? "Not provided"}`,
+    `Notes: ${optionalField(data.message) ?? "Not provided"}`,
+  ];
+
+  return `https://wa.me/${LEAD_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
 
 export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadFormProps) {
@@ -75,20 +106,57 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
     setError(null);
+
+    const payload = {
+      ...data,
+      email: optionalField(data.email),
+      board: optionalField(data.board),
+      class: optionalField(data.class),
+      subject: optionalField(data.subject),
+      school: optionalField(data.school),
+      location: optionalField(data.location),
+      preferredMode: optionalField(data.preferredMode),
+      preferredTimeSlot: optionalField(data.preferredTimeSlot),
+      message: optionalField(data.message),
+      source: "whatsapp_lead_form",
+      pageUrl: typeof window !== "undefined" ? window.location.href : undefined,
+    };
+
     try {
-      await api.leads.submit(data);
-      trackEvent("lead_submit", {
-        board: data.board,
-        class: data.class,
-        subject: data.subject,
-        school: data.school,
-        location: data.location,
-        preferred_mode: data.preferredMode,
+      const whatsappUrl = buildWhatsAppUrl(data);
+
+      const whatsappWindow = window.open(
+        whatsappUrl,
+        "_blank",
+        "noopener,noreferrer",
+      );
+
+      if (!whatsappWindow) {
+        window.open(whatsappUrl, "_self");
+      }
+
+      void api.leads.submit(payload).catch((submissionError) => {
+        console.error("Lead save failed after WhatsApp redirect", submissionError);
       });
+
+      trackEvent("lead_submit", {
+        board: payload.board,
+        class: payload.class,
+        subject: payload.subject,
+        school: payload.school,
+        location: payload.location,
+        preferred_mode: payload.preferredMode,
+        delivery: "whatsapp",
+      });
+
       setIsSuccess(true);
       if (onSuccess) onSuccess();
-    } catch {
-      setError("Something went wrong. Please try again or contact us on WhatsApp.");
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Something went wrong. Please try again or contact us on WhatsApp.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -100,9 +168,9 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10 text-green-600" />
         </div>
-        <h3 className="text-3xl font-heading font-bold text-primary mb-4">Request Received!</h3>
+        <h3 className="text-3xl font-heading font-bold text-primary mb-4">WhatsApp Opened!</h3>
         <p className="text-muted-foreground text-lg mb-8">
-          One of our academic advisors will contact you within 24 hours to match you with the perfect tutor.
+          Your details are ready in WhatsApp. Send the message there and our academic advisors will take it forward.
         </p>
         <Button onClick={() => setIsSuccess(false)} variant="outline" className="rounded-xl">
           Submit Another Request

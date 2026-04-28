@@ -309,7 +309,7 @@ export default function BecomeOurTutorPage() {
                 </Button>
               </Link>
               <Link
-                href="https://wa.me/919582706764"
+                href="https://wa.me/918796367754"
                 target="_blank"
                 rel="noopener noreferrer"
               >

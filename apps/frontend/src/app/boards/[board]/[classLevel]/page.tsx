@@ -93,7 +93,7 @@ export async function renderBoardClassPage(boardSlug: string, classLevel: string
                 <Link href="/contact">
                   <Button className="rounded-xl px-6">Get Matched</Button>
                 </Link>
-                <Link href={`https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20need%20${encodeURIComponent(`${board.name} ${classConfig.label}`)}%20support%20in%20Gurgaon.`} target="_blank" rel="noopener noreferrer">
+                <Link href={`https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20need%20${encodeURIComponent(`${board.name} ${classConfig.label}`)}%20support%20in%20Gurgaon.`} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="rounded-xl px-6">
                     Talk on WhatsApp
                   </Button>

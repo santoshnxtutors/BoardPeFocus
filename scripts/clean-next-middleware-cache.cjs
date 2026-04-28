@@ -9,6 +9,8 @@ if (!appDir) {
 }
 
 const targets = [
+  ".next/cache",
+  ".next/dev",
   ".next/dev/server/middleware",
   ".next/dev/server/middleware-build-manifest.js",
   ".next/dev/server/middleware-manifest.json",

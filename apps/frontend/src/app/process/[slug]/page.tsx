@@ -123,7 +123,7 @@ export default async function ProcessDetailPage({ params }: PageProps) {
                 <p className="mt-6 text-lg leading-8 text-white/80 md:text-xl">{page.heroDescription}</p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link
-                    href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20with%20this%20process%20step%20for%20my%20child."
+                    href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20with%20this%20process%20step%20for%20my%20child."
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -299,7 +299,7 @@ function LiveProcessDetailPage({
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link
-                    href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20with%20this%20process%20step%20for%20my%20child."
+                    href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20with%20this%20process%20step%20for%20my%20child."
                     target="_blank"
                     rel="noopener noreferrer"
                   >

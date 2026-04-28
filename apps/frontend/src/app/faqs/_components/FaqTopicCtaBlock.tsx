@@ -19,7 +19,7 @@ export function FaqTopicCtaBlock({
         </div>
         <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
           <Link
-            href="https://wa.me/919582706764?text=Hi%20BoardPeFocus%2C%20I%20still%20need%20help%20after%20reading%20your%20FAQs."
+            href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20still%20need%20help%20after%20reading%20your%20FAQs."
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full"

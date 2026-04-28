@@ -13,6 +13,7 @@ import { FadeIn } from "@/lib/animations";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJsonLd, generateTutorJsonLd } from "@/lib/seo";
 import { TutorProfileViewModel } from "@/types/tutor-profile";
+import { BackendTutorLocationRelation, BackendTutorPayload } from "@/types/backend-tutor";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { fetchBackend } from "@/lib/backend-api";
 import { getTutorPath } from "@/lib/tutor-paths";
@@ -27,6 +28,24 @@ import { TutorStickyCTA } from "@/components/sections/tutor/TutorStickyCTA";
 interface PageProps {
   params: Promise<{ tutorSlug: string }>;
 }
+
+type TutorPageModel = TutorProfileViewModel & {
+  boards: string[];
+  subjects: string[];
+  schools: string[];
+  reviews: {
+    id: string;
+    parentName: string;
+    studentName?: string;
+    rating: number;
+    comment: string;
+  }[];
+  faqs: { id: string; question: string; answer: string }[];
+  teachingPhilosophy: string;
+  results: { label: string; value: string }[];
+  locations: string[];
+  coverage: { sectors: string[]; societies: string[] };
+};
 
 export function generateStaticParams() {
   return mockTutors.map((tutor) => ({ tutorSlug: tutor.slug }));
@@ -60,23 +79,7 @@ export async function renderTutorProfilePage(tutorSlug: string) {
     notFound();
   }
 
-  const tutor: TutorProfileViewModel & {
-    boards: string[];
-    subjects: string[];
-    schools: string[];
-    reviews: {
-      id: string;
-      parentName: string;
-      studentName?: string;
-      rating: number;
-      comment: string;
-    }[];
-    faqs: { id: string; question: string; answer: string }[];
-    teachingPhilosophy: string;
-    results: { label: string; value: string }[];
-    locations: string[];
-    coverage: { sectors: string[]; societies: string[] };
-  } = tutorData;
+  const tutor: TutorPageModel = tutorData;
 
   const jsonLd = generateTutorJsonLd(tutor);
   const faqJsonLd = generateFaqJsonLd(tutor.faqs);
@@ -270,11 +273,11 @@ export async function renderTutorProfilePage(tutorSlug: string) {
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-accent">Quick Inquiry</p>
-                      <p className="font-black text-primary uppercase">+91 95827 06764</p>
+                      <p className="font-black text-primary uppercase">+91 87963 67754</p>
                     </div>
                   </div>
                   
-                  <Link href={`https://wa.me/919582706764?text=Hi, I'm interested in booking a demo with ${tutor.name}`} target="_blank" rel="noopener noreferrer" className="block">
+                  <Link href={`https://wa.me/918796367754?text=Hi, I'm interested in booking a demo with ${tutor.name}`} target="_blank" rel="noopener noreferrer" className="block">
                     <Button variant="outline" className="w-full h-14 rounded-2xl border-accent/20 text-accent font-black uppercase tracking-widest text-xs hover:bg-accent hover:text-white transition-all shadow-xl shadow-accent/5">
                       <MessageSquare className="w-4 h-4 mr-2" /> Chat on WhatsApp
                     </Button>
@@ -345,11 +348,11 @@ export default async function TutorProfilePage({ params }: PageProps) {
   permanentRedirect(getTutorPath(tutorSlug));
 }
 
-async function getPublishedTutor(slug: string) {
+async function getPublishedTutor(slug: string): Promise<TutorPageModel | null> {
   try {
     const response = await fetchBackend(`/public/tutors/${encodeURIComponent(slug)}`);
     if (response.ok) {
-      const rawTutor = await response.json();
+      const rawTutor = (await response.json()) as BackendTutorPayload;
       return normalizeBackendTutor(rawTutor);
     }
   } catch {
@@ -368,32 +371,45 @@ async function getPublishedTutor(slug: string) {
   return null;
 }
 
-function normalizeBackendTutor(rawTutor: any) {
+function extractLocationNames(
+  items: BackendTutorPayload["locations"],
+  relationKey: "sector" | "society",
+) {
+  return (items ?? [])
+    .map((item) => {
+      if (typeof item === "string") return null;
+
+      const location = item as BackendTutorLocationRelation;
+      return location[relationKey]?.name ?? null;
+    })
+    .filter((item): item is string => Boolean(item));
+}
+
+function normalizeBackendTutor(rawTutor: BackendTutorPayload): TutorPageModel {
   const boards = normalizeNameList(rawTutor.boards, "board");
   const subjects = normalizeNameList(rawTutor.subjects, "subject");
   const schools = normalizeNameList(rawTutor.schools, "school");
-  const sectorNames = (rawTutor.locations ?? [])
-    .map((item: any) => item?.sector?.name)
-    .filter(Boolean);
-  const societyNames = (rawTutor.locations ?? [])
-    .map((item: any) => item?.society?.name)
-    .filter(Boolean);
+  const sectorNames = extractLocationNames(rawTutor.locations, "sector");
+  const societyNames = extractLocationNames(rawTutor.locations, "society");
   const locationNames = (rawTutor.locations ?? [])
-    .map((item: any) => (typeof item === "string" ? item : null))
-    .filter(Boolean);
+    .map((item) => (typeof item === "string" ? item : null))
+    .filter((item): item is string => Boolean(item));
   const locations = locationNames.length > 0 ? locationNames : [...sectorNames, ...societyNames];
   const about =
     rawTutor.about ||
     rawTutor.bio ||
     rawTutor.tagline ||
-    `${rawTutor.name} is a verified BoardPeFocus tutor in Gurugram.`;
+    `${rawTutor.name ?? rawTutor.displayName ?? "This tutor"} is a verified BoardPeFocus tutor in Gurugram.`;
+  const experienceYears = rawTutor.experienceYrs ?? rawTutor.experienceYears ?? 0;
+  const studentsTaught = rawTutor.studentsTaught ?? 0;
 
   const normalized = {
     ...rawTutor,
+    name: rawTutor.displayName || rawTutor.name || "BoardPeFocus Tutor",
     rating: rawTutor.rating ?? 0,
     reviewsCount: rawTutor.reviewsCount ?? rawTutor.reviews?.length ?? 0,
-    experienceYrs: rawTutor.experienceYrs ?? 0,
-    studentsTaught: rawTutor.studentsTaught ?? 0,
+    experienceYrs: experienceYears,
+    studentsTaught,
     about,
     teachingPhilosophy:
       rawTutor.teachingMethod ||
@@ -411,21 +427,25 @@ function normalizeBackendTutor(rawTutor: any) {
     results:
       rawTutor.results && rawTutor.results.length > 0
         ? rawTutor.results
+            .filter(
+              (result): result is { label: string; value: string } =>
+                Boolean(result.label && result.value),
+            )
         : [
-            { label: "Experience", value: `${rawTutor.experienceYrs ?? 0} years` },
-            { label: "Students Taught", value: `${rawTutor.studentsTaught ?? 0}+` },
+            { label: "Experience", value: `${experienceYears} years` },
+            { label: "Students Taught", value: `${studentsTaught}+` },
           ],
-    reviews: (rawTutor.reviews ?? []).map((review: any) => ({
-      id: review.id,
-      parentName: review.parentName,
+    reviews: (rawTutor.reviews ?? []).map((review, index) => ({
+      id: String(review.id ?? `review-${index}`),
+      parentName: review.parentName ?? "BoardPeFocus family",
       studentName: review.studentName,
-      rating: review.rating,
-      comment: review.comment,
+      rating: Number(review.rating ?? 5),
+      comment: review.comment ?? "",
     })),
-    faqs: (rawTutor.faqs ?? []).map((faq: any) => ({
-      id: faq.id,
-      question: faq.question,
-      answer: faq.answer,
+    faqs: (rawTutor.faqs ?? []).map((faq, index) => ({
+      id: String(faq.id ?? `faq-${index}`),
+      question: faq.question ?? "",
+      answer: faq.answer ?? "",
     })),
   };
 
@@ -441,11 +461,20 @@ function normalizeBackendTutor(rawTutor: any) {
 
 function normalizeNameList(items: unknown, relationKey: "board" | "subject" | "school") {
   return (Array.isArray(items) ? items : [])
-    .map((item: any) => {
+    .map((item) => {
       if (typeof item === "string") return item;
-      return item?.[relationKey]?.name ?? item?.name ?? null;
+      if (!item || typeof item !== "object") return null;
+
+      const record = item as Record<string, unknown>;
+      const relation = record[relationKey];
+      const relationName =
+        relation && typeof relation === "object"
+          ? (relation as { name?: string }).name
+          : undefined;
+
+      return relationName ?? (record.name as string | undefined) ?? null;
     })
-    .filter(Boolean);
+    .filter((item): item is string => Boolean(item));
 }
 
 function formatList(items: string[]) {
@@ -455,7 +484,7 @@ function formatList(items: string[]) {
   return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
 }
 
-function buildGenericTutorFaqs(tutor: any) {
+function buildGenericTutorFaqs(tutor: TutorPageModel) {
   return [
     {
       id: "backend-faq-1",
@@ -470,7 +499,7 @@ function buildGenericTutorFaqs(tutor: any) {
   ];
 }
 
-function buildGenericTutorNotes(tutor: any) {
+function buildGenericTutorNotes(tutor: TutorPageModel) {
   return [
     {
       id: "backend-review-1",

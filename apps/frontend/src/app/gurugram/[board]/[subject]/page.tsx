@@ -190,7 +190,7 @@ export default function BoardSubjectPage({ params }: { params: { board: string, 
                     Book Free Consultation
                   </Button>
                 </Link>
-                <Link href="tel:+919582706764" className="block">
+                <Link href="tel:+918796367754" className="block">
                   <Button variant="outline" className="w-full h-12 border-primary/20 text-primary hover:bg-primary/5 rounded-xl font-bold">
                     Call Us
                   </Button>

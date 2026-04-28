@@ -1,5 +1,9 @@
 import { mockTutors } from "@/data/mock";
 import { fetchBackend } from "@/lib/backend-api";
+import {
+  BackendTutorLocationRelation,
+  BackendTutorPayload,
+} from "@/types/backend-tutor";
 import { Tutor } from "@/types";
 
 function slugify(value: string) {
@@ -12,23 +16,35 @@ function slugify(value: string) {
 
 function normalizeNameList(items: unknown, relationKey: "board" | "subject" | "school") {
   return (Array.isArray(items) ? items : [])
-    .map((item: any) => {
+    .map((item) => {
       if (typeof item === "string") return item;
-      return item?.[relationKey]?.name ?? item?.name ?? null;
+      if (!item || typeof item !== "object") return null;
+
+      const record = item as Record<string, unknown>;
+      const relation = record[relationKey];
+      const relationName =
+        relation && typeof relation === "object"
+          ? (relation as { name?: string }).name
+          : undefined;
+
+      return relationName ?? (record.name as string | undefined) ?? null;
     })
-    .filter(Boolean) as string[];
+    .filter((item): item is string => Boolean(item));
 }
 
 function normalizeLocationList(items: unknown) {
   return (Array.isArray(items) ? items : [])
-    .map((item: any) => {
+    .map((item) => {
       if (typeof item === "string") return item;
-      return item?.sector?.name ?? item?.society?.name ?? item?.name ?? null;
+      if (!item || typeof item !== "object") return null;
+
+      const location = item as BackendTutorLocationRelation;
+      return location.sector?.name ?? location.society?.name ?? location.name ?? null;
     })
-    .filter(Boolean) as string[];
+    .filter((item): item is string => Boolean(item));
 }
 
-export function normalizeTutorCard(rawTutor: any): Tutor {
+export function normalizeTutorCard(rawTutor: BackendTutorPayload): Tutor {
   const boards = normalizeNameList(rawTutor.boards, "board");
   const subjects = normalizeNameList(rawTutor.subjects, "subject");
   const schools = normalizeNameList(rawTutor.schools, "school");
@@ -40,7 +56,7 @@ export function normalizeTutorCard(rawTutor: any): Tutor {
   return {
     id: rawTutor.id,
     slug: rawTutor.slug,
-    name: rawTutor.displayName || rawTutor.name,
+    name: rawTutor.displayName || rawTutor.name || "BoardPeFocus Tutor",
     photoUrl: rawTutor.photoUrl || undefined,
     rating: Number(rawTutor.rating ?? 0),
     experienceYears: Number(rawTutor.experienceYears ?? rawTutor.experienceYrs ?? 0),
@@ -51,13 +67,23 @@ export function normalizeTutorCard(rawTutor: any): Tutor {
       rawTutor.about ||
       rawTutor.bio ||
       rawTutor.tagline ||
-      `${rawTutor.displayName || rawTutor.name} is a BoardPeFocus tutor in Gurugram.`,
+      `${rawTutor.displayName || rawTutor.name || "This tutor"} is a BoardPeFocus tutor in Gurugram.`,
     teachingPhilosophy: rawTutor.teachingPhilosophy || rawTutor.teachingMethod,
     methodology: rawTutor.methodology || rawTutor.teachingMethod,
     schools,
     areas: Array.isArray(areas) ? normalizeLocationList(areas) : [],
-    results: rawTutor.results,
-    reviews: rawTutor.reviews,
+    results: (rawTutor.results ?? []).filter(
+      (result): result is { label: string; value: string } =>
+        Boolean(result.label && result.value),
+    ),
+    reviews: (rawTutor.reviews ?? []).map((review, index) => ({
+      id: String(review.id ?? `review-${index}`),
+      author: review.parentName ?? review.studentName ?? "BoardPeFocus family",
+      rating: Number(review.rating ?? 5),
+      comment: review.comment ?? "",
+      date: "",
+      location: "",
+    })),
   };
 }
 
@@ -92,8 +118,10 @@ export async function getLiveTutorCards() {
     const response = await fetchBackend("/public/tutors");
     if (!response.ok) return [];
 
-    const rawTutors = await response.json();
-    return (Array.isArray(rawTutors) ? rawTutors : []).map(normalizeTutorCard);
+    const rawTutors = (await response.json()) as unknown;
+    return (Array.isArray(rawTutors) ? (rawTutors as BackendTutorPayload[]) : []).map(
+      normalizeTutorCard,
+    );
   } catch {
     return [];
   }

@@ -11,7 +11,7 @@ import {
 
 function resolveApiBaseUrl() {
   if (typeof window !== "undefined") {
-    return "/api";
+    return "/api/v1";
   }
 
   const rawApiBaseUrl =
