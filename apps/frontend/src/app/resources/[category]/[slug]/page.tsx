@@ -16,6 +16,8 @@ import {
   getResourceCategoryFromArticle,
 } from "@/app/resources/_data/articles";
 
+export const dynamic = "force-dynamic";
+
 interface LiveResourceArticle {
   id: string;
   slug: string;
@@ -43,19 +45,20 @@ export async function generateMetadata({
   params: Promise<{ category: string; slug: string }>;
 }) {
   const { category, slug } = await params;
-  const article = getResourceArticle(category, slug);
+  const liveArticle = await getLiveResource(slug);
 
-  if (!article) {
-    const liveArticle = await getLiveResource(slug);
-    if (!liveArticle) {
-      return constructMetadata({ title: "Resource Not Found | BoardPeFocus", noIndex: true });
-    }
-
+  if (liveArticle) {
     return constructMetadata({
       title: liveArticle.seoTitle ?? `${liveArticle.title} | BoardPeFocus Resources`,
       description: liveArticle.metaDescription ?? liveArticle.summary ?? undefined,
       pathname: `/resources/${category}/${slug}`,
     });
+  }
+
+  const article = getResourceArticle(category, slug);
+
+  if (!article) {
+    return constructMetadata({ title: "Resource Not Found | BoardPeFocus", noIndex: true });
   }
 
   return constructMetadata({
@@ -71,15 +74,16 @@ export default async function ResourceArticlePage({
   params: Promise<{ category: string; slug: string }>;
 }) {
   const { category: categorySlug, slug } = await params;
+  const liveArticle = await getLiveResource(slug);
+
+  if (liveArticle) {
+    return <LiveResourceView article={liveArticle} categorySlug={categorySlug} />;
+  }
+
   const article = getResourceArticle(categorySlug, slug);
 
   if (!article) {
-    const liveArticle = await getLiveResource(slug);
-    if (!liveArticle) {
-      notFound();
-    }
-
-    return <LiveResourceView article={liveArticle} categorySlug={categorySlug} />;
+    notFound();
   }
 
   const category = getResourceCategoryFromArticle(article);

@@ -18,6 +18,25 @@ import {
   resourcesHubRelatedLinks,
 } from "@/app/resources/_data/catalog";
 import { getResourceArticlesByCategory, getResourceCategoryFromArticle } from "@/app/resources/_data/articles";
+import { getLiveContent } from "@/lib/live-content";
+
+export const dynamic = "force-dynamic";
+
+interface LiveResource {
+  id: string;
+  slug: string;
+  title: string;
+  category?: string | null;
+  summary?: string | null;
+}
+
+function toRouteSlug(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export function generateStaticParams() {
   return getAllResourceCategoryParams();
@@ -37,7 +56,7 @@ export function generateMetadata({ params }: { params: { category: string } }) {
   });
 }
 
-export default function ResourceCategoryPage({ params }: { params: { category: string } }) {
+export default async function ResourceCategoryPage({ params }: { params: { category: string } }) {
   const category = getResourceCategory(params.category);
 
   if (!category) {
@@ -45,6 +64,10 @@ export default function ResourceCategoryPage({ params }: { params: { category: s
   }
 
   const articles = getResourceArticlesByCategory(category.slug);
+  const staticArticleSlugs = new Set(articles.map((article) => article.slug));
+  const liveResources = (await getLiveContent<LiveResource>("/content/resources"))
+    .filter((resource) => toRouteSlug(resource.category ?? "guides") === category.slug)
+    .filter((resource) => !staticArticleSlugs.has(resource.slug));
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Resources", url: absoluteUrl("/resources") },
@@ -114,6 +137,21 @@ export default function ResourceCategoryPage({ params }: { params: { category: s
               description="Each guide in this category is written to answer the search intent quickly and then route the user into the most relevant next commercial or support page."
             >
               <div className="grid gap-6 xl:grid-cols-3">
+                {liveResources.map((resource) => (
+                  <Link
+                    key={resource.id}
+                    href={`/resources/${category.slug}/${resource.slug}`}
+                    className="rounded-[1.75rem] border border-primary/10 bg-primary/5 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/60">
+                      {resource.category ?? category.title}
+                    </p>
+                    <h3 className="mt-3 text-xl font-bold text-primary">{resource.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                      {resource.summary ?? "Read this BoardPeFocus resource guide."}
+                    </p>
+                  </Link>
+                ))}
                 {articles.map((article) => (
                   <ResourceArticleCard key={article.slug} article={article} category={getResourceCategoryFromArticle(article)} />
                 ))}
@@ -169,4 +207,3 @@ export default function ResourceCategoryPage({ params }: { params: { category: s
     </div>
   );
 }
-

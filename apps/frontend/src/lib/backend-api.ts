@@ -1,4 +1,3 @@
-const DEFAULT_REVALIDATE_SECONDS = 300;
 const BACKEND_UNAVAILABLE_HEADER = "x-boardpe-backend-unavailable";
 
 function backendUnavailableResponse(path: string) {
@@ -61,7 +60,7 @@ export async function fetchBackend(path: string, init?: RequestInit) {
         ? init?.cache
           ? { cache: init.cache }
           : {
-              next: init?.next ?? { revalidate: DEFAULT_REVALIDATE_SECONDS },
+              cache: "no-store",
             }
         : {
             cache: init?.cache ?? "no-store",

@@ -513,6 +513,9 @@ export class TutorsService {
 
   async create(dto: CreateTutorDto) {
     const data = this.buildTutorCreateData(dto);
+    if (data.status === TutorStatus.PUBLISHED) {
+      await this.assertPublishable(null, data, dto);
+    }
 
     try {
       return await this.prisma.$transaction(async (tx) => {
@@ -532,7 +535,7 @@ export class TutorsService {
   async update(id: string, dto: UpdateTutorDto) {
     const existingTutor = await this.prisma.tutor.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true },
+      select: { id: true, status: true },
     });
 
     if (!existingTutor) {
@@ -540,6 +543,11 @@ export class TutorsService {
     }
 
     const data = this.buildTutorUpdateData(dto);
+    const nextStatus = data.status ?? existingTutor.status;
+    if (nextStatus === TutorStatus.PUBLISHED) {
+      await this.assertPublishable(id, data, dto);
+    }
+
     try {
       return await this.prisma.$transaction(async (tx) => {
         await tx.tutor.update({

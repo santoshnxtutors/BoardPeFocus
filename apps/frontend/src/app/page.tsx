@@ -228,12 +228,12 @@ export default async function HomePage() {
                   <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover/button:translate-x-1" />
                 </ButtonLink>
                 <ButtonLink
-                  href="/boards"
+                  href="/search"
                   size="lg"
                   variant="outline"
                   className="h-12 w-full rounded-xl border-primary/20 px-6 text-base font-bold text-primary hover:bg-primary/5 sm:w-auto"
                 >
-                  Explore Boards
+                  Explore Tutors
                 </ButtonLink>
               </div>
 

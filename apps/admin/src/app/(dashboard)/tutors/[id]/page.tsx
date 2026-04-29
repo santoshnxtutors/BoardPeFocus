@@ -47,7 +47,7 @@ const emptyTutor = {
   priority: 0,
   isFeatured: false,
   isVerified: true,
-  status: "PUBLISHED",
+  status: "DRAFT",
   seoTitle: "",
   metaDescription: "",
   canonical: "",

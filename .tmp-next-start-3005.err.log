@@ -14,3 +14,47 @@ TypeError: fetch failed
     [errors]: [ [Error], [Error] ]
   }
 }
+Failed to proxy http://localhost:3001/api/v1/public/boards AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:3001
+        at <unknown> (Error: connect ECONNREFUSED ::1:3001) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 3001
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:3001
+        at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:3001) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 3001
+    }
+  ]
+}
+AggregateError: 
+    at ignore-listed frames {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:3001
+        at <unknown> (Error: connect ECONNREFUSED ::1:3001) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 3001
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:3001
+        at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:3001) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 3001
+    }
+  ]
+}
