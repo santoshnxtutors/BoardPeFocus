@@ -173,15 +173,26 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
       pageUrl: typeof window !== "undefined" ? window.location.href : undefined,
     };
 
+    const whatsappUrl = buildWhatsAppUrl(normalizedData);
+    const whatsappWindow = window.open("about:blank", "_blank");
+
+    if (whatsappWindow) {
+      whatsappWindow.opener = null;
+    }
+
+    const openWhatsApp = () => {
+      if (whatsappWindow && !whatsappWindow.closed) {
+        whatsappWindow.location.href = whatsappUrl;
+        return;
+      }
+
+      window.location.href = whatsappUrl;
+    };
+
     try {
       await api.leads.submit(payload);
 
-      const whatsappUrl = buildWhatsAppUrl(normalizedData);
-      const whatsappWindow = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-
-      if (!whatsappWindow) {
-        window.open(whatsappUrl, "_self");
-      }
+      openWhatsApp();
 
       trackEvent("lead_submit", {
         board: payload.board,
@@ -196,10 +207,23 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
       setIsSuccess(true);
       onSuccess?.();
     } catch (submissionError) {
+      openWhatsApp();
+
+      trackEvent("lead_submit", {
+        board: payload.board,
+        class: payload.class,
+        subject: payload.subject,
+        school: payload.school,
+        location: payload.location,
+        preferred_mode: payload.preferredMode,
+        delivery: "whatsapp",
+        lead_saved: false,
+      });
+
       setError(
         submissionError instanceof Error
-          ? submissionError.message
-          : "Something went wrong. Please try again or contact us on WhatsApp.",
+          ? `WhatsApp opened, but we could not save the request: ${submissionError.message}`
+          : "WhatsApp opened, but we could not save the request.",
       );
     } finally {
       setIsSubmitting(false);

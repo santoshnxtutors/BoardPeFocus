@@ -28,13 +28,12 @@ function resolveApiBaseUrl() {
   return withApiVersion(rawApiBaseUrl);
 }
 
-function resolveTutorApplicationApiBaseUrl() {
+function resolvePublicWriteApiBaseUrl(envOverride?: string) {
   if (typeof window === "undefined") {
     return resolveApiBaseUrl();
   }
 
-  const configuredApiBaseUrl =
-    process.env.NEXT_PUBLIC_TUTOR_APPLICATION_API_URL?.trim();
+  const configuredApiBaseUrl = envOverride?.trim();
 
   if (configuredApiBaseUrl) {
     return withApiVersion(configuredApiBaseUrl);
@@ -101,10 +100,14 @@ export const api = {
   },
   leads: {
     submit: (data: Lead) =>
-      fetcher<{ success: boolean; id: string }>("/public/leads", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      fetcher<{ success: boolean; id: string }>(
+        "/public/leads",
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+        },
+        resolvePublicWriteApiBaseUrl(process.env.NEXT_PUBLIC_LEADS_API_URL),
+      ),
   },
   tutorApplications: {
     submit: (data: TutorApplicationPayload) =>
@@ -114,7 +117,9 @@ export const api = {
           method: "POST",
           body: JSON.stringify(data),
         },
-        resolveTutorApplicationApiBaseUrl(),
+        resolvePublicWriteApiBaseUrl(
+          process.env.NEXT_PUBLIC_TUTOR_APPLICATION_API_URL,
+        ),
       ),
   },
 };
