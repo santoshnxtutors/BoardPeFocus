@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+  import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
@@ -17,7 +17,16 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = constructMetadata();
+const baseMetadata = constructMetadata();
+
+export const metadata: Metadata = {
+  ...baseMetadata,
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
+};
 
 export default function RootLayout({
   children,

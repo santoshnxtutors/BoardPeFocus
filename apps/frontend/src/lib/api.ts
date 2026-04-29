@@ -9,6 +9,12 @@ import {
   TutorApplicationSubmissionResponse,
 } from "@/types";
 
+function withApiVersion(rawApiBaseUrl: string) {
+  const apiBaseUrl = rawApiBaseUrl.trim().replace(/\/$/, "");
+
+  return apiBaseUrl.endsWith("/v1") ? apiBaseUrl : `${apiBaseUrl}/v1`;
+}
+
 function resolveApiBaseUrl() {
   if (typeof window !== "undefined") {
     return "/api/v1";
@@ -19,13 +25,33 @@ function resolveApiBaseUrl() {
     process.env.NEXT_PUBLIC_API_URL ||
     "http://127.0.0.1:3001/api";
 
-  return rawApiBaseUrl.endsWith("/v1")
-    ? rawApiBaseUrl
-    : `${rawApiBaseUrl.replace(/\/$/, "")}/v1`;
+  return withApiVersion(rawApiBaseUrl);
 }
 
-async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const apiBaseUrl = resolveApiBaseUrl();
+function resolveTutorApplicationApiBaseUrl() {
+  if (typeof window === "undefined") {
+    return resolveApiBaseUrl();
+  }
+
+  const configuredApiBaseUrl =
+    process.env.NEXT_PUBLIC_TUTOR_APPLICATION_API_URL?.trim();
+
+  if (configuredApiBaseUrl) {
+    return withApiVersion(configuredApiBaseUrl);
+  }
+
+  if (window.location.hostname === "www.boardpefocus.in") {
+    return "https://admin.boardpefocus.in/api/v1";
+  }
+
+  return resolveApiBaseUrl();
+}
+
+async function fetcher<T>(
+  endpoint: string,
+  options?: RequestInit,
+  apiBaseUrl = resolveApiBaseUrl(),
+): Promise<T> {
   let response: Response;
 
   try {
@@ -88,6 +114,7 @@ export const api = {
           method: "POST",
           body: JSON.stringify(data),
         },
+        resolveTutorApplicationApiBaseUrl(),
       ),
   },
 };
