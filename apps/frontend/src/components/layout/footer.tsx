@@ -23,94 +23,127 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-primary text-primary-foreground py-6 sm:py-8 border-t border-border/10">
-      <div className="container mx-auto px-4 max-w-[1400px]">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8 mb-4">
-          
-          {/* Brand & Contact */}
-          <div className="col-span-2 lg:col-span-1 space-y-4">
+    <footer className="border-t border-border/10 bg-primary py-6 text-primary-foreground sm:py-8">
+      <div className="container mx-auto max-w-[1400px] px-4">
+        <div className="mb-4 grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-4">
+          <h2 className="sr-only">Footer links</h2>
+
+          <div className="col-span-2 space-y-4 lg:col-span-1">
             <Link href="/" className="inline-block">
-              <span className="font-heading font-bold text-2xl tracking-tight">
+              <span className="font-heading text-2xl font-bold tracking-tight">
                 BoardPe<span className="text-accent">Focus</span>
               </span>
             </Link>
-            <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-xs">
-              Gurugram's most trusted academic advisory firm for Class 10 & 12 board-specific home tutors.
+            <p className="max-w-xs text-sm leading-relaxed text-primary-foreground/70">
+              Gurugram&apos;s most trusted academic advisory firm for Class 10 &
+              12 board-specific home tutors.
             </p>
             <div className="space-y-2 text-sm text-primary-foreground/80">
               <div className="flex items-center gap-3">
-                <MapPin className="w-4 h-4 text-accent shrink-0" />
-                <span>1st Floor, 497 Housing Board Colony, Sector 51, Gurgaon, Haryana</span>
+                <MapPin className="h-4 w-4 shrink-0 text-accent" />
+                <span>
+                  1st Floor, 497 Housing Board Colony, Sector 51, Gurgaon,
+                  Haryana
+                </span>
               </div>
               <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-accent shrink-0" />
-                <span>+91 87963 67754</span>
+                <Phone className="h-4 w-4 shrink-0 text-accent" />
+                <Link
+                  href="tel:+918796367754"
+                  className="transition-colors hover:text-accent"
+                >
+                  +91 87963 67754
+                </Link>
               </div>
               <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-accent shrink-0" />
-                <span>boardpefocus@gmail.com</span>
+                <Mail className="h-4 w-4 shrink-0 text-accent" />
+                <Link
+                  href="mailto:boardpefocus@gmail.com"
+                  className="transition-colors hover:text-accent"
+                >
+                  boardpefocus@gmail.com
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* Boards */}
           <div>
-            <h4 className="font-heading font-bold text-base mb-4 text-white">Board Curricula</h4>
+            <h3 className="mb-4 text-base font-bold text-white">
+              Board Curricula
+            </h3>
             <ul className="grid grid-cols-1 gap-2 text-sm text-primary-foreground/70">
               {boardLinks.map((board) => (
                 <li key={board.slug}>
-                  <Link href={getBoardPath(board.slug)} className="hover:text-accent transition-colors">
+                  <Link
+                    href={getBoardPath(board.slug)}
+                    className="transition-colors hover:text-accent"
+                  >
                     {board.name} Tutors
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href={getClassHubPath("class-10")} className="hover:text-accent transition-colors">
+                <Link
+                  href={getClassHubPath("class-10")}
+                  className="transition-colors hover:text-accent"
+                >
                   Class 10 Hub
                 </Link>
               </li>
               <li>
-                <Link href={getClassHubPath("class-12")} className="hover:text-accent transition-colors">
+                <Link
+                  href={getClassHubPath("class-12")}
+                  className="transition-colors hover:text-accent"
+                >
                   Class 12 Hub
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Top Localities */}
           <div>
-            <h4 className="font-heading font-bold text-base mb-4 text-white">Top Localities</h4>
+            <h3 className="mb-4 text-base font-bold text-white">
+              Top Localities
+            </h3>
             <ul className="grid grid-cols-1 gap-2 text-sm text-primary-foreground/70">
               {topLocalityLinks.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="hover:text-accent transition-colors">
+                  <Link
+                    href={item.href}
+                    className="transition-colors hover:text-accent"
+                  >
                     {item.label}
                   </Link>
                 </li>
               ))}
-              <li><Link href="/gurgaon-area" className="hover:text-accent transition-colors text-white font-medium">View All &rarr;</Link></li>
+              <li>
+                <Link
+                  href="/gurgaon-area"
+                  className="font-medium text-white transition-colors hover:text-accent"
+                >
+                  View All &rarr;
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h4 className="font-heading font-bold text-base mb-4 text-white">Company</h4>
+            <h3 className="mb-4 text-base font-bold text-white">Company</h3>
             <ul className="grid grid-cols-1 gap-2 text-sm text-primary-foreground/70">
-              <li><Link href="/about" className="hover:text-accent transition-colors">About Us</Link></li>
-              <li><Link href="/blog" className="hover:text-accent transition-colors">Blog</Link></li>
-              <li><Link href="/resources" className="hover:text-accent transition-colors">Resources</Link></li>
-              <li><Link href="/result" className="hover:text-accent transition-colors">Results</Link></li>
-              <li><Link href="/process" className="hover:text-accent transition-colors">How It Works</Link></li>
-              <li><Link href="/faqs" className="hover:text-accent transition-colors">FAQs</Link></li>
-              <li><Link href="/support" className="hover:text-accent transition-colors">Support</Link></li>
-              <li><Link href="/privacy-policy" className="hover:text-accent transition-colors">Privacy</Link></li>
-              <li><Link href="/terms" className="hover:text-accent transition-colors">Terms</Link></li>
+              <li><Link href="/about" className="transition-colors hover:text-accent">About Us</Link></li>
+              <li><Link href="/blog" className="transition-colors hover:text-accent">Blog</Link></li>
+              <li><Link href="/resources" className="transition-colors hover:text-accent">Resources</Link></li>
+              <li><Link href="/result" className="transition-colors hover:text-accent">Results</Link></li>
+              <li><Link href="/process" className="transition-colors hover:text-accent">How It Works</Link></li>
+              <li><Link href="/faqs" className="transition-colors hover:text-accent">FAQs</Link></li>
+              <li><Link href="/support" className="transition-colors hover:text-accent">Support</Link></li>
+              <li><Link href="/privacy-policy" className="transition-colors hover:text-accent">Privacy</Link></li>
+              <li><Link href="/terms" className="transition-colors hover:text-accent">Terms</Link></li>
             </ul>
           </div>
-
         </div>
 
-        <div className="pt-4 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-widest text-primary-foreground/40 font-bold">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-4 text-[10px] font-bold uppercase tracking-widest text-primary-foreground/60 md:flex-row">
           <p>© {currentYear} BoardPeFocus. Gurugram only.</p>
           <p>Designed for academic excellence.</p>
         </div>

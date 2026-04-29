@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { MessageCircle, PhoneCall } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 
 export function ProcessCtaBlock({
   title,
@@ -18,34 +17,30 @@ export function ProcessCtaBlock({
           <p className="mt-4 max-w-2xl text-lg leading-8 text-white/75">{description}</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-          <Link
+          <ButtonLink
             href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20want%20help%20with%20the%20tutoring%20process%20for%20my%20child."
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full"
+            className="h-12 w-full justify-center rounded-xl bg-white px-4 text-primary hover:bg-white/90"
           >
-            <Button className="h-12 w-full justify-center rounded-xl bg-white px-4 text-primary hover:bg-white/90">
-              <MessageCircle className="mr-2 h-4 w-4" />
-              WhatsApp
-            </Button>
-          </Link>
-          <Link href="/contact" className="block w-full">
-            <Button
-              variant="outline"
-              className="h-12 w-full justify-center rounded-xl border-white/20 bg-white/10 px-4 text-white hover:bg-white/15 hover:text-white"
-            >
-              <PhoneCall className="mr-2 h-4 w-4" />
-              Callback
-            </Button>
-          </Link>
-          <Link href="/search" className="block w-full sm:col-span-2 2xl:col-span-1">
-            <Button
-              variant="outline"
-              className="h-12 w-full justify-center rounded-xl border-white/20 bg-white/10 px-4 text-white hover:bg-white/15 hover:text-white"
-            >
-              Browse Tutors
-            </Button>
-          </Link>
+            <MessageCircle className="mr-2 h-4 w-4" />
+            WhatsApp
+          </ButtonLink>
+          <ButtonLink
+            href="/contact"
+            variant="outline"
+            className="h-12 w-full justify-center rounded-xl border-white/20 bg-white/10 px-4 text-white hover:bg-white/15 hover:text-white"
+          >
+            <PhoneCall className="mr-2 h-4 w-4" />
+            Callback
+          </ButtonLink>
+          <ButtonLink
+            href="/search"
+            variant="outline"
+            className="h-12 w-full justify-center rounded-xl border-white/20 bg-white/10 px-4 text-white hover:bg-white/15 hover:text-white sm:col-span-2 2xl:col-span-1"
+          >
+            Browse Tutors
+          </ButtonLink>
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
 import {
   constructMetadata,
@@ -201,77 +201,70 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
             <div className="text-center lg:text-left">
-              <FadeIn delay={0.1}>
-                <Badge variant="outline" className="mb-3 border-primary/20 bg-primary/5 text-primary text-xs px-3 py-1 rounded-full shadow-sm font-bold">
-                  Gurugram's Premium Home Tutors
-                </Badge>
-              </FadeIn>
+              <Badge variant="outline" className="mb-3 border-primary/20 bg-primary/5 text-primary text-xs px-3 py-1 rounded-full shadow-sm font-bold">
+                Gurugram's Premium Home Tutors
+              </Badge>
 
-              <FadeIn delay={0.2}>
-                <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-heading font-extrabold tracking-tight mb-6 text-primary leading-[1.15]">
-                  Board-exam home tutors in Gurgaon for <span className="text-accent relative inline-block">
-                    CBSE, ICSE, ISC, IGCSE, and IB students.
-                    <svg className="absolute w-full h-2 -bottom-1 left-0 text-accent/30" viewBox="0 0 100 10" preserveAspectRatio="none">
-                      <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent" />
-                    </svg>
-                  </span>
-                </h1>
-              </FadeIn>
+              <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-heading font-extrabold tracking-tight mb-6 text-primary leading-[1.15]">
+                Board-exam home tutors in Gurgaon for <span className="relative inline-block text-[#b56a00]">
+                  CBSE, ICSE, ISC, IGCSE, and IB students.
+                  <svg className="absolute w-full h-2 -bottom-1 left-0 text-accent/30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent" />
+                  </svg>
+                </span>
+              </h1>
 
-              <FadeIn delay={0.3}>
-                <p className="text-base md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto lg:mx-0 leading-relaxed">
-                  BoardPeFocus offers specialized, premium one-to-one home tutoring for CBSE, ICSE, IGCSE, and IB students in Gurugram, matching families with top 2% educators for a focused, local, school-aware learning experience designed to achieve 95%.
-                </p>
-              </FadeIn>
+              <p className="mb-8 max-w-3xl text-base leading-relaxed text-slate-700 md:text-xl lg:mx-0 mx-auto">
+                BoardPeFocus offers specialized, premium one-to-one home tutoring for CBSE, ICSE, IGCSE, and IB students in Gurugram, matching families with top 2% educators for a focused, local, school-aware learning experience designed to achieve 95%.
+              </p>
 
-              <FadeIn delay={0.4}>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center mb-12">
-                  <Link href="/contact" className="w-full sm:w-auto">
-                    <Button size="lg" className="h-12 px-6 text-base w-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl group transition-all duration-300 font-bold">
-                      Get Matched with a Tutor
-                      <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                  <Link href="/boards" className="w-full sm:w-auto">
-                    <Button size="lg" variant="outline" className="h-12 px-6 text-base w-full rounded-xl border-primary/20 hover:bg-primary/5 text-primary font-bold">
-                      Explore Boards
-                    </Button>
-                  </Link>
-                </div>
-              </FadeIn>
+              <div className="mb-12 flex items-center justify-center gap-3 sm:flex-row flex-col lg:justify-start">
+                <ButtonLink
+                  href="/contact"
+                  size="lg"
+                  className="h-12 w-full rounded-xl bg-primary px-6 text-base font-bold shadow-xl transition-all duration-300 hover:bg-primary/90 sm:w-auto"
+                >
+                  Get Matched with a Tutor
+                  <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover/button:translate-x-1" />
+                </ButtonLink>
+                <ButtonLink
+                  href="/boards"
+                  size="lg"
+                  variant="outline"
+                  className="h-12 w-full rounded-xl border-primary/20 px-6 text-base font-bold text-primary hover:bg-primary/5 sm:w-auto"
+                >
+                  Explore Boards
+                </ButtonLink>
+              </div>
 
-              <FadeIn delay={0.5}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:max-w-3xl items-stretch">
-                  {[
-                    {
-                      title: "BOARD-FOCUSED",
-                      desc: "Built around board prep, syllabus control, revision structure, and paper confidence."
-                    },
-                    {
-                      title: "SCHOOL-AWARE",
-                      desc: "Navigate by school, corridor, sector, and society instead of starting with a directory dump."
-                    },
-                    {
-                      title: "ONE-TO-ONE",
-                      desc: "Positioning stays premium and one-to-one so families can brief us around the exact academic context."
-                    }
-                  ].map((item) => (
-                    <div key={item.title} className="p-5 rounded-[1.25rem] bg-white border border-border/40 shadow-sm hover:shadow-md transition-all h-full flex flex-col">
-                      <p className="text-[10px] font-extrabold tracking-[0.12em] text-emerald-800 uppercase mb-3">{item.title}</p>
-                      <p className="text-[13px] text-slate-600 leading-relaxed font-medium">{item.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </FadeIn>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:max-w-3xl items-stretch">
+                {[
+                  {
+                    title: "BOARD-FOCUSED",
+                    desc: "Built around board prep, syllabus control, revision structure, and paper confidence."
+                  },
+                  {
+                    title: "SCHOOL-AWARE",
+                    desc: "Navigate by school, corridor, sector, and society instead of starting with a directory dump."
+                  },
+                  {
+                    title: "ONE-TO-ONE",
+                    desc: "Positioning stays premium and one-to-one so families can brief us around the exact academic context."
+                  }
+                ].map((item) => (
+                  <div key={item.title} className="p-5 rounded-[1.25rem] bg-white border border-border/40 shadow-sm hover:shadow-md transition-all h-full flex flex-col">
+                    <p className="text-[10px] font-extrabold tracking-[0.12em] text-emerald-800 uppercase mb-3">{item.title}</p>
+                    <p className="text-[13px] text-slate-600 leading-relaxed font-medium">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="lg:pl-8 lg:mt-0 mt-12">
-              <FadeIn delay={0.6}>
-                <LeadForm
-                  title="Request for Matching"
-                  subtitle="Find the perfect board-specialized tutor for your child."
-                />
-              </FadeIn>
+              <LeadForm
+                title="Request for Matching"
+                subtitle="Find the perfect board-specialized tutor for your child."
+              />
             </div>
           </div>
         </div>
@@ -485,12 +478,14 @@ export default async function HomePage() {
                   Rigorous selection process. Only the most experienced board-specialized educators make it to BoardPeFocus.
                 </p>
               </div>
-              <Link href="/search">
-                <Button variant="link" className="text-primary hover:text-primary/80 px-0 mt-4 md:mt-0 text-lg group font-bold">
-                  View all tutors
-                  <ChevronRight className="ml-1 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              <ButtonLink
+                href="/search"
+                variant="link"
+                className="mt-4 px-0 text-lg font-bold text-primary hover:text-primary/80 md:mt-0"
+              >
+                View all tutors
+                <ChevronRight className="ml-1 h-5 w-5 transition-transform group-hover/button:translate-x-1" />
+              </ButtonLink>
             </div>
           </FadeIn>
 
@@ -653,11 +648,13 @@ export default async function HomePage() {
             <p className="text-muted-foreground text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
               Join hundreds of parents in Gurugram who trust BoardPeFocus for targeted, premium home tutoring.
             </p>
-            <Link href="/contact">
-              <Button size="lg" className="h-16 px-12 text-lg font-bold shadow-2xl rounded-2xl hover:-translate-y-1 transition-all duration-300">
-                Request a Callback
-              </Button>
-            </Link>
+            <ButtonLink
+              href="/contact"
+              size="lg"
+              className="h-16 rounded-2xl px-12 text-lg font-bold shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            >
+              Request a Callback
+            </ButtonLink>
           </FadeIn>
         </div>
       </section>

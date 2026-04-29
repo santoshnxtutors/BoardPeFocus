@@ -1,38 +1,40 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useState } from "react";
+import {
+  Loader2,
+  CheckCircle2,
+  Send,
+  Phone,
+  User,
+  GraduationCap,
+  BookOpen,
+  School as SchoolIcon,
+  MapPin,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { trackEvent } from "@/lib/tracking";
-import { Loader2, CheckCircle2, Send, Phone, User, GraduationCap, BookOpen, School as SchoolIcon, MapPin } from "lucide-react";
-import { FadeIn } from "@/lib/animations";
 
 const LEAD_WHATSAPP_NUMBER = "918796367754";
 
-const leadSchema = z.object({
-  name: z.string().trim().min(2, "Name is required"),
-  phone: z
-    .string()
-    .trim()
-    .transform((value) => value.replace(/\D/g, ""))
-    .refine((value) => value.length >= 10, "Please enter a valid 10-digit number"),
-  email: z.string().trim().email("Please enter a valid email").optional().or(z.literal("")),
-  board: z.string().trim().optional(),
-  class: z.string().trim().optional(),
-  subject: z.string().trim().optional(),
-  school: z.string().trim().optional(),
-  location: z.string().trim().optional(),
-  preferredMode: z.string().trim().optional(),
-  preferredTimeSlot: z.string().trim().optional(),
-  message: z.string().trim().optional(),
-});
+type LeadFormData = {
+  name: string;
+  phone: string;
+  email: string;
+  board: string;
+  class: string;
+  subject: string;
+  school: string;
+  location: string;
+  preferredMode: string;
+  preferredTimeSlot: string;
+  message: string;
+};
 
-type LeadFormData = z.infer<typeof leadSchema>;
+type LeadFormErrors = Partial<Record<keyof LeadFormData, string>>;
 
 interface LeadFormProps {
   onSuccess?: () => void;
@@ -41,9 +43,59 @@ interface LeadFormProps {
   subtitle?: string;
 }
 
+function createInitialValues(defaultValues?: Partial<LeadFormData>): LeadFormData {
+  return {
+    name: defaultValues?.name ?? "",
+    phone: defaultValues?.phone ?? "",
+    email: defaultValues?.email ?? "",
+    board: defaultValues?.board ?? "",
+    class: defaultValues?.class ?? "",
+    subject: defaultValues?.subject ?? "",
+    school: defaultValues?.school ?? "",
+    location: defaultValues?.location ?? "",
+    preferredMode: defaultValues?.preferredMode ?? "",
+    preferredTimeSlot: defaultValues?.preferredTimeSlot ?? "",
+    message: defaultValues?.message ?? "",
+  };
+}
+
 function optionalField(value?: string) {
   const normalized = value?.trim();
   return normalized ? normalized : undefined;
+}
+
+function normalizeLeadFormData(data: LeadFormData): LeadFormData {
+  return {
+    name: data.name.trim(),
+    phone: data.phone.replace(/\D/g, ""),
+    email: data.email.trim(),
+    board: data.board.trim(),
+    class: data.class.trim(),
+    subject: data.subject.trim(),
+    school: data.school.trim(),
+    location: data.location.trim(),
+    preferredMode: data.preferredMode.trim(),
+    preferredTimeSlot: data.preferredTimeSlot.trim(),
+    message: data.message.trim(),
+  };
+}
+
+function validateLeadForm(data: LeadFormData): LeadFormErrors {
+  const errors: LeadFormErrors = {};
+
+  if (data.name.trim().length < 2) {
+    errors.name = "Name is required";
+  }
+
+  if (data.phone.replace(/\D/g, "").length < 10) {
+    errors.phone = "Please enter a valid 10-digit number";
+  }
+
+  if (data.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) {
+    errors.email = "Please enter a valid email";
+  }
+
+  return errors;
 }
 
 function buildWhatsAppUrl(data: LeadFormData) {
@@ -67,57 +119,56 @@ function buildWhatsAppUrl(data: LeadFormData) {
 }
 
 export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadFormProps) {
+  const [formData, setFormData] = useState<LeadFormData>(() => createInitialValues(defaultValues));
+  const [fieldErrors, setFieldErrors] = useState<LeadFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const nameInputRef = useRef<HTMLInputElement | null>(null);
-  const phoneInputRef = useRef<HTMLInputElement | null>(null);
-  const boardSelectRef = useRef<HTMLSelectElement | null>(null);
-  const classSelectRef = useRef<HTMLSelectElement | null>(null);
-  const emailInputRef = useRef<HTMLInputElement | null>(null);
-  const subjectInputRef = useRef<HTMLInputElement | null>(null);
-  const schoolInputRef = useRef<HTMLInputElement | null>(null);
-  const locationInputRef = useRef<HTMLInputElement | null>(null);
-  const preferredModeSelectRef = useRef<HTMLSelectElement | null>(null);
-  const preferredTimeSlotSelectRef = useRef<HTMLSelectElement | null>(null);
-  const messageInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LeadFormData>({
-    resolver: zodResolver(leadSchema),
-    defaultValues,
-  });
+  const updateField =
+    (field: keyof LeadFormData) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const value = event.target.value;
 
-  const { ref: nameRef, ...nameField } = register("name");
-  const { ref: phoneRef, ...phoneField } = register("phone");
-  const { ref: emailRef, ...emailField } = register("email");
-  const { ref: boardRef, ...boardField } = register("board");
-  const { ref: classRef, ...classField } = register("class");
-  const { ref: subjectRef, ...subjectField } = register("subject");
-  const { ref: schoolRef, ...schoolField } = register("school");
-  const { ref: locationRef, ...locationField } = register("location");
-  const { ref: preferredModeRef, ...preferredModeField } = register("preferredMode");
-  const { ref: preferredTimeSlotRef, ...preferredTimeSlotField } = register("preferredTimeSlot");
-  const { ref: messageRef, ...messageField } = register("message");
+      setFormData((current) => ({
+        ...current,
+        [field]: value,
+      }));
 
-  const focusInput = (ref: React.RefObject<HTMLInputElement | null>) => {
-    ref.current?.focus();
-  };
+      setFieldErrors((current) =>
+        current[field] ? { ...current, [field]: undefined } : current,
+      );
 
-  const onSubmit = async (data: LeadFormData) => {
+      if (error) {
+        setError(null);
+      }
+    };
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const normalizedData = normalizeLeadFormData(formData);
+    const nextErrors = validateLeadForm(normalizedData);
+    setFieldErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
     const payload = {
-      ...data,
-      email: optionalField(data.email),
-      board: optionalField(data.board),
-      class: optionalField(data.class),
-      subject: optionalField(data.subject),
-      school: optionalField(data.school),
-      location: optionalField(data.location),
-      preferredMode: optionalField(data.preferredMode),
-      preferredTimeSlot: optionalField(data.preferredTimeSlot),
-      message: optionalField(data.message),
+      ...normalizedData,
+      email: optionalField(normalizedData.email),
+      board: optionalField(normalizedData.board),
+      class: optionalField(normalizedData.class),
+      subject: optionalField(normalizedData.subject),
+      school: optionalField(normalizedData.school),
+      location: optionalField(normalizedData.location),
+      preferredMode: optionalField(normalizedData.preferredMode),
+      preferredTimeSlot: optionalField(normalizedData.preferredTimeSlot),
+      message: optionalField(normalizedData.message),
       source: "whatsapp_lead_form",
       pageUrl: typeof window !== "undefined" ? window.location.href : undefined,
     };
@@ -125,13 +176,8 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
     try {
       await api.leads.submit(payload);
 
-      const whatsappUrl = buildWhatsAppUrl(data);
-
-      const whatsappWindow = window.open(
-        whatsappUrl,
-        "_blank",
-        "noopener,noreferrer",
-      );
+      const whatsappUrl = buildWhatsAppUrl(normalizedData);
+      const whatsappWindow = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 
       if (!whatsappWindow) {
         window.open(whatsappUrl, "_self");
@@ -148,7 +194,7 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
       });
 
       setIsSuccess(true);
-      if (onSuccess) onSuccess();
+      onSuccess?.();
     } catch (submissionError) {
       setError(
         submissionError instanceof Error
@@ -162,111 +208,129 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
 
   if (isSuccess) {
     return (
-      <FadeIn className="text-center py-12 px-6">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 className="w-10 h-10 text-green-600" />
+      <div className="px-6 py-12 text-center">
+        <div aria-live="polite">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle2 className="h-10 w-10 text-green-600" />
+          </div>
+          <h2 className="mb-4 text-3xl font-heading font-bold text-primary">WhatsApp Opened!</h2>
+          <p className="mb-8 text-lg text-muted-foreground">
+            Your details are ready in WhatsApp. Send the message there and our academic advisors will take it forward.
+          </p>
+          <Button
+            type="button"
+            onClick={() => {
+              setIsSuccess(false);
+              setFormData(createInitialValues(defaultValues));
+              setFieldErrors({});
+              setError(null);
+            }}
+            variant="outline"
+            className="rounded-xl"
+          >
+            Submit Another Request
+          </Button>
         </div>
-        <h3 className="text-3xl font-heading font-bold text-primary mb-4">WhatsApp Opened!</h3>
-        <p className="text-muted-foreground text-lg mb-8">
-          Your details are ready in WhatsApp. Send the message there and our academic advisors will take it forward.
-        </p>
-        <Button onClick={() => setIsSuccess(false)} variant="outline" className="rounded-xl">
-          Submit Another Request
-        </Button>
-      </FadeIn>
+      </div>
     );
   }
 
   return (
-    <div className="relative isolate bg-white rounded-3xl p-5 md:p-6 shadow-xl border border-border/50 max-w-md mx-auto">
-      {title && <h3 className="text-xl font-heading font-bold text-primary mb-1 text-center">{title}</h3>}
-      {subtitle && <p className="text-muted-foreground text-[12px] mb-5 text-center">{subtitle}</p>}
+    <div className="relative isolate mx-auto max-w-md rounded-3xl border border-border/50 bg-white p-5 shadow-xl md:p-6">
+      {title ? <h2 className="mb-1 text-center text-xl font-heading font-bold text-primary">{title}</h2> : null}
+      {subtitle ? (
+        <p className="mb-5 text-center text-[12px] text-muted-foreground">{subtitle}</p>
+      ) : null}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+      <form noValidate onSubmit={onSubmit} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div className="relative z-10 space-y-1">
-            <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Full Name</Label>
-            <label
-              htmlFor="name"
-              className="relative block cursor-text"
-              onClick={() => focusInput(nameInputRef)}
-            >
-              <User className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <Input 
-                id="name" 
-                {...nameField}
-                ref={(node) => {
-                  nameRef(node);
-                  nameInputRef.current = node;
-                }}
-                placeholder="Name" 
-                className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
+            <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Full Name
+            </Label>
+            <div className="relative">
+              <User className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={updateField("name")}
+                aria-describedby={fieldErrors.name ? "lead-name-error" : undefined}
+                aria-invalid={!!fieldErrors.name}
+                autoComplete="name"
+                placeholder="Name"
+                required
+                className="h-10 rounded-lg border-border/60 pl-8 text-xs transition-all focus:border-primary focus:ring-primary/5"
               />
-            </label>
-            {errors.name && <p className="text-destructive text-[10px] mt-1 font-medium">{errors.name.message}</p>}
+            </div>
+            {fieldErrors.name ? (
+              <p id="lead-name-error" role="alert" className="mt-1 text-[10px] font-medium text-destructive">
+                {fieldErrors.name}
+              </p>
+            ) : null}
           </div>
 
           <div className="relative z-10 space-y-1">
-            <Label htmlFor="phone" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Phone Number</Label>
-            <label
-              htmlFor="phone"
-              className="relative block cursor-text"
-              onClick={() => focusInput(phoneInputRef)}
-            >
-              <Phone className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <Input 
-                id="phone" 
-                {...phoneField}
-                ref={(node) => {
-                  phoneRef(node);
-                  phoneInputRef.current = node;
-                }}
-                placeholder="Phone" 
-                className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
+            <Label htmlFor="phone" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Phone Number
+            </Label>
+            <div className="relative">
+              <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={updateField("phone")}
+                aria-describedby={fieldErrors.phone ? "lead-phone-error" : undefined}
+                aria-invalid={!!fieldErrors.phone}
+                autoComplete="tel"
+                inputMode="numeric"
+                type="tel"
+                placeholder="Phone"
+                required
+                className="h-10 rounded-lg border-border/60 pl-8 text-xs transition-all focus:border-primary focus:ring-primary/5"
               />
-            </label>
-            {errors.phone && <p className="text-destructive text-[10px] mt-1 font-medium">{errors.phone.message}</p>}
+            </div>
+            {fieldErrors.phone ? (
+              <p id="lead-phone-error" role="alert" className="mt-1 text-[10px] font-medium text-destructive">
+                {fieldErrors.phone}
+              </p>
+            ) : null}
           </div>
         </div>
 
         <div className="relative z-10 space-y-1">
-          <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Email (optional)</Label>
-          <label
-            htmlFor="email"
-            className="relative block cursor-text"
-            onClick={() => focusInput(emailInputRef)}
-          >
-            <Input
-              id="email"
-              type="email"
-              {...emailField}
-              ref={(node) => {
-                emailRef(node);
-                emailInputRef.current = node;
-              }}
-              placeholder="Parent email"
-              className="h-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
-            />
-          </label>
-          {errors.email && <p className="text-destructive text-[10px] mt-1 font-medium">{errors.email.message}</p>}
+          <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            Email (optional)
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={updateField("email")}
+            aria-describedby={fieldErrors.email ? "lead-email-error" : undefined}
+            aria-invalid={!!fieldErrors.email}
+            autoComplete="email"
+            placeholder="Parent email"
+            className="h-10 rounded-lg border-border/60 text-xs transition-all focus:border-primary focus:ring-primary/5"
+          />
+          {fieldErrors.email ? (
+            <p id="lead-email-error" role="alert" className="mt-1 text-[10px] font-medium text-destructive">
+              {fieldErrors.email}
+            </p>
+          ) : null}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="relative z-10 space-y-1">
-            <Label htmlFor="board" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Board</Label>
-            <label
-              htmlFor="board"
-              className="relative block cursor-pointer"
-            >
-              <GraduationCap className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <select 
-                id="board" 
-                {...boardField}
-                ref={(node) => {
-                  boardRef(node);
-                  boardSelectRef.current = node;
-                }}
-                className="flex h-10 w-full rounded-lg border border-border/60 bg-transparent pl-8 pr-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+            <Label htmlFor="board" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Board
+            </Label>
+            <div className="relative">
+              <GraduationCap className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <select
+                id="board"
+                value={formData.board}
+                onChange={updateField("board")}
+                className="flex h-10 w-full appearance-none rounded-lg border border-border/60 bg-transparent py-1 pl-8 pr-4 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="">Board</option>
                 <option value="CBSE">CBSE</option>
@@ -274,24 +338,20 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                 <option value="IGCSE">IGCSE</option>
                 <option value="IB">IB DP / MYP</option>
               </select>
-            </label>
+            </div>
           </div>
 
           <div className="relative z-10 space-y-1">
-            <Label htmlFor="class" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Class</Label>
-            <label
-              htmlFor="class"
-              className="relative block cursor-pointer"
-            >
-              <GraduationCap className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <select 
-                id="class" 
-                {...classField}
-                ref={(node) => {
-                  classRef(node);
-                  classSelectRef.current = node;
-                }}
-                className="flex h-10 w-full rounded-lg border border-border/60 bg-transparent pl-8 pr-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+            <Label htmlFor="class" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Class
+            </Label>
+            <div className="relative">
+              <GraduationCap className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <select
+                id="class"
+                value={formData.class}
+                onChange={updateField("class")}
+                className="flex h-10 w-full appearance-none rounded-lg border border-border/60 bg-transparent py-1 pl-8 pr-4 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="">Class</option>
                 <option value="Class 10">Class 10</option>
@@ -300,144 +360,120 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
                 <option value="Class 11">Class 11</option>
                 <option value="Other">Other</option>
               </select>
-            </label>
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="relative z-10 space-y-1">
-            <Label htmlFor="preferredMode" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Preferred mode</Label>
-            <label htmlFor="preferredMode" className="relative block cursor-pointer">
-              <select
-                id="preferredMode"
-                {...preferredModeField}
-                ref={(node) => {
-                  preferredModeRef(node);
-                  preferredModeSelectRef.current = node;
-                }}
-                className="flex h-10 w-full rounded-lg border border-border/60 bg-transparent px-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
-              >
-                <option value="">Preferred mode</option>
-                <option value="Home tutoring">Home tutoring</option>
-                <option value="Online">Online</option>
-                <option value="Hybrid">Hybrid</option>
-              </select>
-            </label>
+            <Label htmlFor="preferredMode" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Preferred mode
+            </Label>
+            <select
+              id="preferredMode"
+              value={formData.preferredMode}
+              onChange={updateField("preferredMode")}
+              className="flex h-10 w-full appearance-none rounded-lg border border-border/60 bg-transparent px-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Preferred mode</option>
+              <option value="Home tutoring">Home tutoring</option>
+              <option value="Online">Online</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
           </div>
 
           <div className="relative z-10 space-y-1">
-            <Label htmlFor="preferredTimeSlot" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Preferred time slot</Label>
-            <label htmlFor="preferredTimeSlot" className="relative block cursor-pointer">
-              <select
-                id="preferredTimeSlot"
-                {...preferredTimeSlotField}
-                ref={(node) => {
-                  preferredTimeSlotRef(node);
-                  preferredTimeSlotSelectRef.current = node;
-                }}
-                className="flex h-10 w-full rounded-lg border border-border/60 bg-transparent px-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
-              >
-                <option value="">Preferred time slot</option>
-                <option value="Weekday mornings">Weekday mornings</option>
-                <option value="Weekday afternoons">Weekday afternoons</option>
-                <option value="Weekday evenings">Weekday evenings</option>
-                <option value="Weekend mornings">Weekend mornings</option>
-                <option value="Weekend afternoons">Weekend afternoons</option>
-              </select>
-            </label>
+            <Label htmlFor="preferredTimeSlot" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Preferred time slot
+            </Label>
+            <select
+              id="preferredTimeSlot"
+              value={formData.preferredTimeSlot}
+              onChange={updateField("preferredTimeSlot")}
+              className="flex h-10 w-full appearance-none rounded-lg border border-border/60 bg-transparent px-4 py-1 text-xs shadow-sm transition-colors focus:border-primary focus:ring-primary/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Preferred time slot</option>
+              <option value="Weekday mornings">Weekday mornings</option>
+              <option value="Weekday afternoons">Weekday afternoons</option>
+              <option value="Weekday evenings">Weekday evenings</option>
+              <option value="Weekend mornings">Weekend mornings</option>
+              <option value="Weekend afternoons">Weekend afternoons</option>
+            </select>
           </div>
         </div>
 
         <div className="relative z-10 space-y-1">
-          <Label htmlFor="subject" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Subject(s)</Label>
-          <label
-            htmlFor="subject"
-            className="relative block cursor-text"
-            onClick={() => focusInput(subjectInputRef)}
-          >
-            <BookOpen className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <Input 
-              id="subject" 
-              {...subjectField}
-              ref={(node) => {
-                subjectRef(node);
-                subjectInputRef.current = node;
-              }}
-              placeholder="e.g. Maths, Physics" 
-              className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
-            />
-          </label>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="relative z-10 space-y-1">
-            <Label htmlFor="school" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">School</Label>
-            <label
-              htmlFor="school"
-              className="relative block cursor-text"
-              onClick={() => focusInput(schoolInputRef)}
-            >
-              <SchoolIcon className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <Input 
-                id="school" 
-                {...schoolField}
-                ref={(node) => {
-                  schoolRef(node);
-                  schoolInputRef.current = node;
-                }}
-                placeholder="School" 
-                className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
-              />
-            </label>
-          </div>
-
-          <div className="relative z-10 space-y-1">
-            <Label htmlFor="location" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Location</Label>
-            <label
-              htmlFor="location"
-              className="relative block cursor-text"
-              onClick={() => focusInput(locationInputRef)}
-            >
-              <MapPin className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <Input 
-                id="location" 
-                {...locationField}
-                ref={(node) => {
-                  locationRef(node);
-                  locationInputRef.current = node;
-                }}
-              placeholder="Area" 
-              className="h-10 pl-8 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
-            />
-          </label>
-        </div>
-      </div>
-
-        <div className="relative z-10 space-y-1">
-          <Label htmlFor="message" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Notes</Label>
-          <label
-            htmlFor="message"
-            className="relative block cursor-text"
-            onClick={() => focusInput(messageInputRef)}
-          >
+          <Label htmlFor="subject" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            Subject(s)
+          </Label>
+          <div className="relative">
+            <BookOpen className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="message"
-              {...messageField}
-              ref={(node) => {
-                messageRef(node);
-                messageInputRef.current = node;
-              }}
-              placeholder="Any school, sector, society, or timing details"
-              className="h-10 rounded-lg border-border/60 focus:border-primary focus:ring-primary/5 transition-all text-xs"
+              id="subject"
+              value={formData.subject}
+              onChange={updateField("subject")}
+              placeholder="e.g. Maths, Physics"
+              className="h-10 rounded-lg border-border/60 pl-8 text-xs transition-all focus:border-primary focus:ring-primary/5"
             />
-          </label>
+          </div>
         </div>
 
-        {error && <p className="text-destructive text-[11px] font-medium bg-destructive/5 p-2 rounded border border-destructive/10">{error}</p>}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="relative z-10 space-y-1">
+            <Label htmlFor="school" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              School
+            </Label>
+            <div className="relative">
+              <SchoolIcon className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="school"
+                value={formData.school}
+                onChange={updateField("school")}
+                placeholder="School"
+                className="h-10 rounded-lg border-border/60 pl-8 text-xs transition-all focus:border-primary focus:ring-primary/5"
+              />
+            </div>
+          </div>
 
-        <Button 
-          type="submit" 
-          className="w-full h-12 text-base font-bold rounded-lg shadow-lg shadow-primary/10 hover:shadow-xl transition-all mt-2" 
+          <div className="relative z-10 space-y-1">
+            <Label htmlFor="location" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Location
+            </Label>
+            <div className="relative">
+              <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={updateField("location")}
+                placeholder="Area"
+                className="h-10 rounded-lg border-border/60 pl-8 text-xs transition-all focus:border-primary focus:ring-primary/5"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 space-y-1">
+          <Label htmlFor="message" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            Notes
+          </Label>
+          <Input
+            id="message"
+            value={formData.message}
+            onChange={updateField("message")}
+            placeholder="Any school, sector, society, or timing details"
+            className="h-10 rounded-lg border-border/60 text-xs transition-all focus:border-primary focus:ring-primary/5"
+          />
+        </div>
+
+        {error ? (
+          <p role="alert" className="rounded border border-destructive/10 bg-destructive/5 p-2 text-[11px] font-medium text-destructive">
+            {error}
+          </p>
+        ) : null}
+
+        <Button
+          type="submit"
+          className="mt-2 h-12 w-full rounded-lg text-base font-bold shadow-lg shadow-primary/10 transition-all hover:shadow-xl"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
@@ -455,5 +491,4 @@ export function LeadForm({ onSuccess, defaultValues, title, subtitle }: LeadForm
       </form>
     </div>
   );
-
 }

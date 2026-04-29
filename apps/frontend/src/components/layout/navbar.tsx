@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -59,7 +59,7 @@ export function Navbar() {
         <Logo className="scale-[0.85] md:scale-100 origin-left" />
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex gap-8 items-center">
+        <nav aria-label="Primary" className="hidden md:flex gap-8 items-center">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -79,15 +79,17 @@ export function Navbar() {
           >
             Join as Tutor
           </Link>
-          <Link href="/become-our-tutor" className="hidden sm:block group">
-            <Button className="bg-primary text-white hover:bg-primary/95 shadow-md hover:shadow-xl hover:shadow-primary/20 rounded-full h-10 px-6 font-bold transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2 border border-transparent hover:border-primary/10">
-              <span>Join as Tutor</span>
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Button>
-          </Link>
+          <ButtonLink
+            href="/become-our-tutor"
+            className="hidden h-10 rounded-full border border-transparent bg-primary px-6 font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/10 hover:bg-primary/95 hover:shadow-xl hover:shadow-primary/20 sm:inline-flex"
+          >
+            <span>Join as Tutor</span>
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/button:translate-x-1" />
+          </ButtonLink>
 
           {/* Mobile Toggle */}
           <button
+            type="button"
             className="md:hidden p-2 rounded-lg text-primary hover:bg-black/5 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
             aria-label={
@@ -108,7 +110,7 @@ export function Navbar() {
           isOpen ? "max-h-96 opacity-100 border-t" : "max-h-0 opacity-0",
         )}
       >
-        <nav id="mobile-navigation" className="flex flex-col p-6 gap-4">
+        <nav aria-label="Mobile" id="mobile-navigation" className="flex flex-col p-6 gap-4">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -120,11 +122,13 @@ export function Navbar() {
             </Link>
           ))}
           <div className="pt-4">
-            <Link href="/become-our-tutor" onClick={() => setIsOpen(false)}>
-              <Button className="w-full bg-primary h-14 text-lg rounded-xl">
-                Join as Tutor
-              </Button>
-            </Link>
+            <ButtonLink
+              href="/become-our-tutor"
+              className="h-14 w-full rounded-xl bg-primary text-lg"
+              onClick={() => setIsOpen(false)}
+            >
+              Join as Tutor
+            </ButtonLink>
           </div>
         </nav>
       </div>

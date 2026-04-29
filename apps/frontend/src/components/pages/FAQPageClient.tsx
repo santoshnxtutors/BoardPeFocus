@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { categorizedFaqs } from "@/data/faqs";
 import { FAQ } from "@/components/faq/FAQ";
 import { FadeIn } from "@/lib/animations";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import {
   BookOpen,
   ChevronRight,
@@ -25,10 +23,13 @@ import { cn } from "@/lib/utils";
 
 const getCategoryId = (category: string) => category.toLowerCase().replace(/\s+/g, "-");
 
-type FaqCategory = typeof categorizedFaqs[number];
+type FaqCategory = {
+  category: string;
+  items: Array<{ question: string; answer: string }>;
+};
 
-export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCategory[] }) {
-  const categories = initialCategories?.length ? initialCategories : categorizedFaqs;
+export function FAQPageClient({ initialCategories }: { initialCategories: FaqCategory[] }) {
+  const categories = initialCategories;
   const [activeCategory, setActiveCategory] = useState(categories[0]?.category ?? "General Information");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -133,7 +134,7 @@ export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCa
                 <Search className="w-6 h-6 text-primary/40 group-focus-within:text-primary transition-colors" />
               </div>
               <Input
-                type="text"
+                type="search"
                 placeholder="Search for questions (e.g. 'fees', 'boards', 'tutors')..."
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
@@ -151,7 +152,7 @@ export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCa
             <aside className="lg:w-80 flex-shrink-0">
               <div className="sticky top-28 space-y-4">
                 <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6 ml-4">Categories</h2>
-                <nav className="space-y-2">
+                <nav aria-label="FAQ categories" className="space-y-2">
                   {visibleCategories.map((cat) => {
                     const Icon = categoryIcons[cat.category] || HelpCircle;
                     const isActive = displayedActiveCategory === cat.category;
@@ -159,11 +160,13 @@ export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCa
                     return (
                       <button
                         key={cat.category}
+                        type="button"
                         onClick={() => {
                           setActiveCategory(cat.category);
                           const el = document.getElementById(getCategoryId(cat.category));
                           el?.scrollIntoView({ behavior: "smooth", block: "start" });
                         }}
+                        aria-pressed={isActive}
                         className={cn(
                           "w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 text-left group",
                           isActive
@@ -174,7 +177,7 @@ export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCa
                         <Icon className={cn("w-5 h-5", isActive ? "text-accent" : "text-primary/40 group-hover:text-primary")} />
                         <span className="font-bold flex-1">{cat.category}</span>
                         <ChevronRight className={cn("w-4 h-4 transition-transform", isActive ? "rotate-90 text-accent" : "opacity-0 group-hover:opacity-100")} />
-                      </button>
+                  </button>
                     );
                   })}
                 </nav>
@@ -185,9 +188,9 @@ export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCa
                   </div>
                   <h3 className="font-bold text-lg mb-2">Need direct help?</h3>
                   <p className="text-sm text-accent-foreground/80 mb-6 leading-relaxed">Our academic advisors are online to assist you.</p>
-                  <Link href="/contact">
-                    <Button className="w-full bg-primary text-white hover:bg-primary/90 rounded-xl">Contact Now</Button>
-                  </Link>
+                  <ButtonLink href="/contact" className="w-full rounded-xl bg-primary text-white hover:bg-primary/90">
+                    Contact Now
+                  </ButtonLink>
                 </div>
               </div>
             </aside>
@@ -239,19 +242,20 @@ export function FAQPageClient({ initialCategories }: { initialCategories?: FaqCa
           <FadeIn>
             <h2 className="text-4xl md:text-5xl font-heading font-bold mb-8">Can&apos;t find what you&apos;re looking for?</h2>
             <div className="flex flex-wrap justify-center gap-6">
-              <Link href="mailto:boardpefocus@gmail.com">
-                <Button size="lg" className="h-16 px-10 text-lg rounded-2xl bg-accent text-accent-foreground hover:bg-accent/90 shadow-xl">
-                  <Mail className="w-5 h-5 mr-2" /> Email Support
-                </Button>
-              </Link>
-              <Link href="tel:+918796367754">
-                <Button
-                  size="lg"
-                  className="h-16 px-10 text-lg rounded-2xl !bg-white !text-primary hover:!bg-white/90 shadow-xl [&_svg]:!text-primary"
-                >
-                  <Phone className="w-5 h-5 mr-2" /> Call Academic Office
-                </Button>
-              </Link>
+              <ButtonLink
+                href="mailto:boardpefocus@gmail.com"
+                size="lg"
+                className="h-16 rounded-2xl bg-accent px-10 text-lg text-accent-foreground shadow-xl hover:bg-accent/90"
+              >
+                <Mail className="mr-2 h-5 w-5" /> Email Support
+              </ButtonLink>
+              <ButtonLink
+                href="tel:+918796367754"
+                size="lg"
+                className="h-16 rounded-2xl !bg-white px-10 text-lg !text-primary shadow-xl hover:!bg-white/90 [&_svg]:!text-primary"
+              >
+                <Phone className="mr-2 h-5 w-5" /> Call Academic Office
+              </ButtonLink>
             </div>
           </FadeIn>
         </div>

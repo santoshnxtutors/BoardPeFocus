@@ -5,20 +5,14 @@ export function Logo({ className }: { className?: string }) {
   return (
     <Link href="/" className={cn("inline-flex flex-col group", className)}>
       <div className="flex items-baseline leading-none tracking-tight">
-        {/* "Board" in Navy Blue with Serif font */}
-        <span className="text-[#1e3a5f] text-2xl font-serif font-bold">
-          Board
+        <span className="text-2xl font-serif font-bold text-[#1e3a5f]">Board</span>
+        <span
+          className="mx-0.5 text-2xl font-bold text-[#1e3a5f]"
+          style={{ fontFamily: "serif" }}
+        >
+          {"\u092a\u0947"}
         </span>
-        
-        {/* "पे" in Navy Blue Hindi Script */}
-        <span className="text-[#1e3a5f] text-2xl font-bold mx-0.5" style={{ fontFamily: 'serif' }}>
-          पे
-        </span>
-
-        {/* "Focus" in Gold/Orange with Serif font */}
-        <span className="text-[#f5a623] text-2xl font-serif font-bold">
-          Focus
-        </span>
+        <span className="text-2xl font-serif font-bold text-[#b56a00]">Focus</span>
       </div>
     </Link>
   );

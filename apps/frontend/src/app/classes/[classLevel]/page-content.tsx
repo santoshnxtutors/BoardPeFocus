@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { BookOpen, MapPin, School, ShieldCheck } from "lucide-react";
 import { FAQ } from "@/components/faq/FAQ";
 import { Badge } from "@/components/ui/badge";

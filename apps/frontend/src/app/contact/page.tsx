@@ -4,7 +4,7 @@ import { FadeIn } from "@/lib/animations";
 import { FAQ } from "@/components/faq/FAQ";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import {
   absoluteUrl,
   constructMetadata,
@@ -126,16 +126,21 @@ export default async function ContactPage() {
                 Our team is available Monday through Saturday, 9:00 AM to 8:00 PM, for consultations, callback requests, and tutor-matching support.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Link href="https://wa.me/918796367754" target="_blank" rel="noopener noreferrer">
-                  <Button className="h-14 w-full rounded-xl bg-accent text-lg font-bold text-white shadow-lg hover:bg-accent/90">
-                    Chat with an Advisor
-                  </Button>
-                </Link>
-                <Link href="/support">
-                  <Button variant="outline" className="h-14 w-full rounded-xl text-lg font-bold">
-                    Open Support Hub
-                  </Button>
-                </Link>
+                <ButtonLink
+                  href="https://wa.me/918796367754"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-14 w-full rounded-xl bg-accent text-lg font-bold text-white shadow-lg hover:bg-accent/90"
+                >
+                  Chat with an Advisor
+                </ButtonLink>
+                <ButtonLink
+                  href="/support"
+                  variant="outline"
+                  className="h-14 w-full rounded-xl text-lg font-bold"
+                >
+                  Open Support Hub
+                </ButtonLink>
               </div>
             </div>
 
@@ -147,21 +152,15 @@ export default async function ContactPage() {
                 If you already know the board, class, subject, school, and Gurgaon locality, share those details in the form so we can guide you more quickly into the right consultation, tutor match, or demo path.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/process">
-                  <Button variant="outline" className="rounded-xl">
-                    How it works
-                  </Button>
-                </Link>
-                <Link href="/faqs/service">
-                  <Button variant="outline" className="rounded-xl">
-                    Service FAQs
-                  </Button>
-                </Link>
-                <Link href="/result">
-                  <Button variant="outline" className="rounded-xl">
-                    Results
-                  </Button>
-                </Link>
+                <ButtonLink href="/process" variant="outline" className="rounded-xl">
+                  How it works
+                </ButtonLink>
+                <ButtonLink href="/faqs/service" variant="outline" className="rounded-xl">
+                  Service FAQs
+                </ButtonLink>
+                <ButtonLink href="/result" variant="outline" className="rounded-xl">
+                  Results
+                </ButtonLink>
               </div>
             </div>
           </FadeIn>

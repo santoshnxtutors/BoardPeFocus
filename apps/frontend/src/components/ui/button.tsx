@@ -1,5 +1,7 @@
+import Link from "next/link"
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
+import type * as React from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -55,4 +57,40 @@ function Button({
   )
 }
 
-export { Button, buttonVariants }
+type ButtonLinkProps = Omit<ButtonPrimitive.Props, "render" | "nativeButton"> &
+  VariantProps<typeof buttonVariants> & {
+    href: React.ComponentProps<typeof Link>["href"]
+    prefetch?: React.ComponentProps<typeof Link>["prefetch"]
+    replace?: React.ComponentProps<typeof Link>["replace"]
+    scroll?: React.ComponentProps<typeof Link>["scroll"]
+    target?: React.ComponentProps<"a">["target"]
+    rel?: React.ComponentProps<"a">["rel"]
+    download?: React.ComponentProps<"a">["download"]
+  }
+
+function isExternalHref(href: ButtonLinkProps["href"]) {
+  return (
+    typeof href === "string" &&
+    (/^(https?:|mailto:|tel:)/.test(href) || href.startsWith("#"))
+  )
+}
+
+function ButtonLink({
+  href,
+  prefetch,
+  replace,
+  scroll,
+  target,
+  rel,
+  ...props
+}: ButtonLinkProps) {
+  const render = isExternalHref(href) ? (
+    <a href={typeof href === "string" ? href : undefined} target={target} rel={rel} />
+  ) : (
+    <Link href={href} prefetch={prefetch} replace={replace} scroll={scroll} target={target} rel={rel} />
+  )
+
+  return <Button nativeButton={false} render={render} {...props} />
+}
+
+export { Button, ButtonLink, buttonVariants }

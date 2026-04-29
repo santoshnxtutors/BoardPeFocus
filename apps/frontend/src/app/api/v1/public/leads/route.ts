@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { fetchBackend } from "@/lib/backend-api";
+import { fetchBackend, relayBackendResponse } from "@/lib/backend-api";
 
 const leadSchema = z.object({
   name: z.string().min(2),
@@ -32,5 +32,5 @@ export async function POST(request: Request) {
     body: JSON.stringify(parsed.data),
   });
 
-  return NextResponse.json(await response.json(), { status: response.status });
+  return relayBackendResponse(response, JSON.stringify({ message: "Lead submission failed" }));
 }

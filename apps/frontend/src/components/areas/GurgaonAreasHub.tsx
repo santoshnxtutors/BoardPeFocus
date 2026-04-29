@@ -25,7 +25,7 @@ import { AreaCard } from "@/components/areas/AreaCard";
 import { AreaSection } from "@/components/areas/AreaSection";
 import { FAQ } from "@/components/faq/FAQ";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { mockSchools } from "@/data/mock";
@@ -110,20 +110,21 @@ export function GurgaonAreasHub() {
               Explore Gurugram by corridor, sector, and society to find locality-aware Class 10 and Class 12 home tutoring that fits school routes, evening timing preferences, and premium family schedules.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/contact">
-                <Button size="lg" className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90">
-                  Get Matched
-                </Button>
-              </Link>
-              <a href="#area-search">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-12 rounded-xl border-white/20 bg-white/10 px-6 text-white hover:bg-white/15 hover:text-white"
-                >
-                  Explore Corridors
-                </Button>
-              </a>
+              <ButtonLink
+                href="/contact"
+                size="lg"
+                className="h-12 rounded-xl bg-white px-6 text-primary hover:bg-white/90"
+              >
+                Get Matched
+              </ButtonLink>
+              <ButtonLink
+                href="#area-search"
+                size="lg"
+                variant="outline"
+                className="h-12 rounded-xl border-white/20 bg-white/10 px-6 text-white hover:bg-white/15 hover:text-white"
+              >
+                Explore Corridors
+              </ButtonLink>
             </div>
           </div>
 
@@ -368,21 +369,28 @@ export function GurgaonAreasHub() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <Link href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20want%20a%20home%20tutor%20in%20Gurgaon." target="_blank" rel="noopener noreferrer">
-              <Button className="h-12 w-full rounded-xl bg-white text-primary hover:bg-white/90">
-                WhatsApp
-              </Button>
-            </Link>
-            <Link href="/contact">
-              <Button variant="outline" className="h-12 w-full rounded-xl border-white/20 bg-white/10 text-white hover:bg-white/15 hover:text-white">
-                Request Callback
-              </Button>
-            </Link>
-            <Link href="/search">
-              <Button variant="outline" className="h-12 w-full rounded-xl border-white/20 bg-white/10 text-white hover:bg-white/15 hover:text-white">
-                Get Matched
-              </Button>
-            </Link>
+            <ButtonLink
+              href="https://wa.me/918796367754?text=Hi%20BoardPeFocus%2C%20I%20want%20a%20home%20tutor%20in%20Gurgaon."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-12 w-full rounded-xl bg-white text-primary hover:bg-white/90"
+            >
+              WhatsApp
+            </ButtonLink>
+            <ButtonLink
+              href="/contact"
+              variant="outline"
+              className="h-12 w-full rounded-xl border-white/20 bg-white/10 text-white hover:bg-white/15 hover:text-white"
+            >
+              Request Callback
+            </ButtonLink>
+            <ButtonLink
+              href="/search"
+              variant="outline"
+              className="h-12 w-full rounded-xl border-white/20 bg-white/10 text-white hover:bg-white/15 hover:text-white"
+            >
+              Get Matched
+            </ButtonLink>
           </div>
         </div>
       </section>

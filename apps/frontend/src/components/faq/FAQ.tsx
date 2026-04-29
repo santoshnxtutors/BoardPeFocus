@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import {
   Accordion,
   AccordionContent,
@@ -51,12 +50,14 @@ export function FAQ({
           </div>
           
           {showViewMore && (
-            <Link href={viewMoreHref}>
-              <Button variant="link" className="text-primary hover:text-primary/80 px-0 mt-4 md:mt-0 text-lg group font-bold">
-                View more FAQs
-                <ChevronRight className="ml-1 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
+            <ButtonLink
+              href={viewMoreHref}
+              variant="link"
+              className="mt-4 px-0 text-lg font-bold text-primary hover:text-primary/80 md:mt-0"
+            >
+              View more FAQs
+              <ChevronRight className="ml-1 h-5 w-5 transition-transform group-hover/button:translate-x-1" />
+            </ButtonLink>
           )}
         </div>
       )}

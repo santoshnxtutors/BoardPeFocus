@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchBackend } from "@/lib/backend-api";
+import { fetchBackend, relayBackendResponse } from "@/lib/backend-api";
 
 export async function GET(
   _request: Request,
@@ -9,12 +9,8 @@ export async function GET(
 
   try {
     const response = await fetchBackend(`/public/tutors/${encodeURIComponent(slug)}`);
-    if (response.ok) {
-      return NextResponse.json(await response.json(), { status: response.status });
-    }
+    return relayBackendResponse(response, JSON.stringify({ message: "Tutor not found" }));
   } catch {
     return NextResponse.json({ message: "Tutor not found" }, { status: 404 });
   }
-
-  return NextResponse.json({ message: "Tutor not found" }, { status: 404 });
 }

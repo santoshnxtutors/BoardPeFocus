@@ -1,5 +1,5 @@
 import { mockSchools, mockTutors } from "@/data/mock";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +15,7 @@ import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJs
 import { TutorProfileViewModel } from "@/types/tutor-profile";
 import { BackendTutorLocationRelation, BackendTutorPayload } from "@/types/backend-tutor";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { fetchBackend } from "@/lib/backend-api";
+import { fetchBackend, isBackendUnavailableResponse } from "@/lib/backend-api";
 import { getTutorPath } from "@/lib/tutor-paths";
 
 // New high-fidelity components
@@ -349,6 +349,19 @@ async function getPublishedTutor(slug: string): Promise<TutorPageModel | null> {
     if (response.ok) {
       const rawTutor = (await response.json()) as BackendTutorPayload;
       return normalizeBackendTutor(rawTutor);
+    }
+
+    if (isBackendUnavailableResponse(response)) {
+      const mockTutor = mockTutors.find((item) => item.slug === slug);
+      if (mockTutor) {
+        return {
+          ...mockTutor,
+          faqs: buildTutorFaqs(mockTutor),
+          reviews: buildTutorNotes(mockTutor),
+        };
+      }
+
+      return null;
     }
 
     // The backend responded and did not find a published tutor for this slug.

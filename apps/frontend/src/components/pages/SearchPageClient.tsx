@@ -70,6 +70,8 @@ function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
             <div className="relative flex-grow">
               <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
+                aria-label="Search tutors"
+                type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by name, subject, or school..."
@@ -79,7 +81,10 @@ function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
             <Button
               variant="outline"
               className="h-14 px-6 rounded-2xl md:hidden border-border/60"
+              type="button"
               onClick={() => setShowFilters(!showFilters)}
+              aria-controls="search-filters"
+              aria-expanded={showFilters}
             >
               <SlidersHorizontal className="w-5 h-5 mr-2" />
               Filters
@@ -88,7 +93,10 @@ function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
         </FadeIn>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-          <aside className={`lg:block ${showFilters ? 'block' : 'hidden'} lg:col-span-1 space-y-8`}>
+          <aside
+            id="search-filters"
+            className={`lg:block ${showFilters ? 'block' : 'hidden'} lg:col-span-1 space-y-8`}
+          >
             <div className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm sticky top-24">
               <div className="flex justify-between items-center mb-8">
                 <h2 className="text-xl font-heading font-bold text-primary flex items-center gap-2">
@@ -98,6 +106,7 @@ function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
                   <Button
                     variant="ghost"
                     size="sm"
+                    type="button"
                     onClick={clearFilters}
                     className="text-accent hover:text-accent/80 p-0 h-auto"
                   >
@@ -110,7 +119,8 @@ function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
                 <AccordionItem value="boards" className="border-border/50">
                   <AccordionTrigger className="text-primary font-bold hover:no-underline">Boards</AccordionTrigger>
                   <AccordionContent>
-                    <div className="flex flex-col gap-2 pt-2">
+                    <fieldset className="flex flex-col gap-2 pt-2">
+                      <legend className="sr-only">Filter tutors by board</legend>
                       {mockBoards.map((board) => (
                         <label key={board.slug} className="flex items-center gap-3 cursor-pointer group">
                           <input
@@ -125,14 +135,15 @@ function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
                           </span>
                         </label>
                       ))}
-                    </div>
+                    </fieldset>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="subjects" className="border-border/50">
                   <AccordionTrigger className="text-primary font-bold hover:no-underline">Subjects</AccordionTrigger>
                   <AccordionContent>
-                    <div className="flex flex-col gap-2 pt-2">
+                    <fieldset className="flex flex-col gap-2 pt-2">
+                      <legend className="sr-only">Filter tutors by subject</legend>
                       {mockSubjects.map((subject) => (
                         <label key={subject.slug} className="flex items-center gap-3 cursor-pointer group">
                           <input
@@ -147,13 +158,17 @@ function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
                           </span>
                         </label>
                       ))}
-                    </div>
+                    </fieldset>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
 
               <div className="mt-8 pt-8 border-t border-border/50">
-                <Button className="w-full rounded-xl shadow-lg" onClick={() => setShowFilters(false)}>
+                <Button
+                  className="w-full rounded-xl shadow-lg"
+                  type="button"
+                  onClick={() => setShowFilters(false)}
+                >
                   Apply Filters
                 </Button>
               </div>
@@ -182,7 +197,7 @@ function SearchPageContent({ tutors }: { tutors: Tutor[] }) {
                 </div>
                 <h3 className="text-2xl font-heading font-bold text-primary mb-2">No tutors found</h3>
                 <p className="text-muted-foreground mb-8">Try adjusting your filters or search terms.</p>
-                <Button onClick={clearFilters} variant="outline" className="rounded-xl">
+                <Button type="button" onClick={clearFilters} variant="outline" className="rounded-xl">
                   Clear All Filters
                 </Button>
               </FadeIn>

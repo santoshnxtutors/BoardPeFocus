@@ -4,7 +4,7 @@ import { FAQ } from "@/components/faq/FAQ";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import {
   buildManifestJsonLd,
   getManifestAudienceCards,
@@ -83,20 +83,21 @@ export function GeneratedManifestPage({ record }: { record: ManifestPageRecord }
                   ))}
                 </div>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="/contact">
-                    <Button size="lg" className="rounded-xl bg-white px-6 text-primary hover:bg-white/90">
-                      Request Callback
-                    </Button>
-                  </Link>
-                  <Link href="/search">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="rounded-xl border-white/20 bg-white/10 px-6 text-white hover:bg-white/15 hover:text-white"
-                    >
-                      Browse Tutors
-                    </Button>
-                  </Link>
+                  <ButtonLink
+                    href="/contact"
+                    size="lg"
+                    className="rounded-xl bg-white px-6 text-primary hover:bg-white/90"
+                  >
+                    Request Callback
+                  </ButtonLink>
+                  <ButtonLink
+                    href="/search"
+                    size="lg"
+                    variant="outline"
+                    className="rounded-xl border-white/20 bg-white/10 px-6 text-white hover:bg-white/15 hover:text-white"
+                  >
+                    Browse Tutors
+                  </ButtonLink>
                 </div>
               </div>
 

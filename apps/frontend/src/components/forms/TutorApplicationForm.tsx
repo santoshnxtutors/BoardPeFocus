@@ -484,8 +484,10 @@ export function TutorApplicationForm() {
             </div>
           </div>
 
-          <div className="space-y-3">
-            <Label>Boards handled</Label>
+          <fieldset className="space-y-3">
+            <legend className="text-sm font-medium text-foreground">
+              Boards handled
+            </legend>
             <div className="grid gap-3 md:grid-cols-3">
               {boardOptions.map((option) => (
                 <label
@@ -503,14 +505,16 @@ export function TutorApplicationForm() {
               ))}
             </div>
             {errors.boardsHandled ? (
-              <p className="text-sm text-destructive">
+              <p id="boards-handled-error" className="text-sm text-destructive">
                 {errors.boardsHandled.message}
               </p>
             ) : null}
-          </div>
+          </fieldset>
 
-          <div className="space-y-3">
-            <Label>Classes handled</Label>
+          <fieldset className="space-y-3">
+            <legend className="text-sm font-medium text-foreground">
+              Classes handled
+            </legend>
             <div className="grid gap-3 md:grid-cols-3">
               {classOptions.map((option) => (
                 <label
@@ -528,17 +532,19 @@ export function TutorApplicationForm() {
               ))}
             </div>
             {errors.classesHandled ? (
-              <p className="text-sm text-destructive">
+              <p id="classes-handled-error" className="text-sm text-destructive">
                 {errors.classesHandled.message}
               </p>
             ) : null}
-          </div>
+          </fieldset>
         </section>
 
         <section className="space-y-4">
           <h3 className="text-lg font-bold text-primary">Service fit</h3>
-          <div className="space-y-3">
-            <Label>Preferred teaching mode</Label>
+          <fieldset className="space-y-3">
+            <legend className="text-sm font-medium text-foreground">
+              Preferred teaching mode
+            </legend>
             <div className="grid gap-3 md:grid-cols-3">
               {teachingModeOptions.map((option) => (
                 <label
@@ -562,11 +568,14 @@ export function TutorApplicationForm() {
               ))}
             </div>
             {errors.preferredTeachingMode ? (
-              <p className="text-sm text-destructive">
+              <p
+                id="preferred-teaching-mode-error"
+                className="text-sm text-destructive"
+              >
                 {errors.preferredTeachingMode.message}
               </p>
             ) : null}
-          </div>
+          </fieldset>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">

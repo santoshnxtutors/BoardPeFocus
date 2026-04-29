@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/lib/animations";
 import { blogPosts } from "@/data/blogs";
 import { BlogCard } from "@/components/cards/BlogCard";
@@ -31,12 +30,14 @@ export function BlogSection({
               <p className="text-muted-foreground text-lg max-w-3xl">{subtitle}</p>
             </div>
             {showViewMore && (
-              <Link href="/blog">
-                <Button variant="link" className="text-primary hover:text-primary/80 px-0 mt-4 md:mt-0 text-lg group font-bold">
-                  View all blogs
-                  <ChevronRight className="ml-1 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              <ButtonLink
+                href="/blog"
+                variant="link"
+                className="mt-4 px-0 text-lg font-bold text-primary hover:text-primary/80 md:mt-0"
+              >
+                View all blogs
+                <ChevronRight className="ml-1 h-5 w-5 transition-transform group-hover/button:translate-x-1" />
+              </ButtonLink>
             )}
           </div>
         </FadeIn>
