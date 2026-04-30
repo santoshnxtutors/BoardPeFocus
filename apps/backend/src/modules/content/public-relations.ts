@@ -143,6 +143,14 @@ export const publishedTutorDetailInclude = {
     where: { status: 'APPROVED' },
     orderBy: { createdAt: 'desc' },
   },
+  resultStories: {
+    where: {
+      deletedAt: null,
+      status: 'APPROVED',
+      visibility: true,
+    },
+    orderBy: { updatedAt: 'desc' },
+  },
   faqs: { orderBy: { order: 'asc' } },
   qualifications: true,
   achievements: true,

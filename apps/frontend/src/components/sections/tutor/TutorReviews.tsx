@@ -37,7 +37,7 @@ export const TutorReviews = ({ reviews }: TutorReviewsProps) => {
                 </div>
                 <div className="bg-slate-50 px-3 py-1 rounded-full border border-slate-100 flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Common Use Case</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Trusted Parents</span>
                 </div>
               </div>
               

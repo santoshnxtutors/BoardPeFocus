@@ -507,6 +507,14 @@ export default function TutorDetailPage() {
                         <label className="text-xs font-black uppercase tracking-widest text-slate-400">Students Taught</label>
                         <Input type="number" value={tutor.studentsTaught || 0} onChange={(e) => updateTutor({ studentsTaught: Number(e.target.value) || 0 })} />
                       </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black uppercase tracking-widest text-slate-400">Rating</label>
+                        <Input type="number" min="0" max="5" step="0.1" value={tutor.rating ?? 0} onChange={(e) => updateTutor({ rating: e.target.value })} />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black uppercase tracking-widest text-slate-400">Review Count</label>
+                        <Input type="number" min="0" step="1" value={tutor.reviewsCount ?? 0} onChange={(e) => updateTutor({ reviewsCount: e.target.value })} />
+                      </div>
                    </div>
                 </CardContent>
               </Card>
@@ -760,12 +768,12 @@ export default function TutorDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {(tutor.reviews ?? []).length === 0 ? (
+                    {((tutor.resultStories ?? []).length === 0 && (tutor.reviews ?? []).length === 0) ? (
                       <p className="text-sm text-slate-400">No tutor reviews found.</p>
                     ) : (
-                      (tutor.reviews ?? []).map((review: any) => (
+                      [...(tutor.resultStories ?? []), ...(tutor.reviews ?? [])].map((review: any) => (
                         <Badge key={review.id} variant="outline" className="px-3 py-1.5 rounded-xl border-slate-200 bg-white text-slate-600">
-                          {review.parentName} - {review.status}
+                          {review.parentName ?? review.title ?? "Review"} - {review.status}
                         </Badge>
                       ))
                     )}

@@ -33,6 +33,18 @@ export interface BackendTutorReview {
   comment?: string;
 }
 
+export interface BackendTutorResultStory {
+  id?: string | number;
+  parentName?: string | null;
+  studentName?: string | null;
+  rating?: number | null;
+  story?: string | null;
+  title?: string | null;
+  context?: string | null;
+  status?: string | null;
+  visibility?: boolean | null;
+}
+
 export interface BackendTutorFaq {
   id?: string | number;
   question?: string;
@@ -72,5 +84,6 @@ export interface BackendTutorPayload {
   };
   results?: BackendTutorResult[];
   reviews?: BackendTutorReview[];
+  resultStories?: BackendTutorResultStory[];
   faqs?: BackendTutorFaq[];
 }

@@ -33,7 +33,9 @@ export class TutorsService {
     return normalized;
   }
 
-  private normalizeOptionalString(value?: string | null): string | null | undefined {
+  private normalizeOptionalString(
+    value?: string | null,
+  ): string | null | undefined {
     if (value === undefined) {
       return undefined;
     }
@@ -53,6 +55,36 @@ export class TutorsService {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
       .replace(/-{2,}/g, '-');
+  }
+
+  private toRating(value: number | undefined, fallback = 0): number {
+    if (value === undefined) {
+      return fallback;
+    }
+
+    if (!Number.isFinite(value) || value < 0 || value > 5) {
+      throw new BadRequestException('Rating must be between 0 and 5.');
+    }
+
+    return value;
+  }
+
+  private toCount(
+    value: number | undefined,
+    fieldName: string,
+    fallback = 0,
+  ): number {
+    if (value === undefined) {
+      return fallback;
+    }
+
+    if (!Number.isInteger(value) || value < 0) {
+      throw new BadRequestException(
+        `${fieldName} must be a non-negative integer.`,
+      );
+    }
+
+    return value;
   }
 
   private buildTutorCreateData(dto: CreateTutorDto): any {
@@ -99,8 +131,8 @@ export class TutorsService {
       studentsTaught: dto.studentsTaught ?? 0,
       hourlyRateMin: dto.hourlyRateMin ?? null,
       hourlyRateMax: dto.hourlyRateMax ?? null,
-      rating: dto.rating ?? 0,
-      reviewsCount: dto.reviewsCount ?? 0,
+      rating: this.toRating(dto.rating),
+      reviewsCount: this.toCount(dto.reviewsCount, 'reviewsCount'),
       priority: dto.priority ?? 0,
       isFeatured: dto.isFeatured ?? false,
       isVerified: dto.isVerified ?? false,
@@ -195,10 +227,10 @@ export class TutorsService {
       data.hourlyRateMax = dto.hourlyRateMax;
     }
     if (dto.rating !== undefined) {
-      data.rating = dto.rating;
+      data.rating = this.toRating(dto.rating);
     }
     if (dto.reviewsCount !== undefined) {
-      data.reviewsCount = dto.reviewsCount;
+      data.reviewsCount = this.toCount(dto.reviewsCount, 'reviewsCount');
     }
     if (dto.priority !== undefined) {
       data.priority = dto.priority;
@@ -426,6 +458,10 @@ export class TutorsService {
         schools: { include: { school: true } },
         locations: { include: { sector: true, society: true } },
         reviews: true,
+        resultStories: {
+          where: { deletedAt: null },
+          orderBy: { updatedAt: 'desc' },
+        },
         faqs: true,
         qualifications: true,
         achievements: true,
@@ -585,6 +621,10 @@ export class TutorsService {
       schools: { include: { school: true } },
       locations: { include: { sector: true, society: true } },
       reviews: true,
+      resultStories: {
+        where: { deletedAt: null },
+        orderBy: { updatedAt: 'desc' },
+      },
       faqs: true,
       qualifications: true,
       achievements: true,

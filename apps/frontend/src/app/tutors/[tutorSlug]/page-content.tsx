@@ -13,7 +13,7 @@ import { FadeIn } from "@/lib/animations";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { absoluteUrl, constructMetadata, generateBreadcrumbJsonLd, generateFaqJsonLd, generateTutorJsonLd } from "@/lib/seo";
 import { TutorProfileViewModel } from "@/types/tutor-profile";
-import { BackendTutorLocationRelation, BackendTutorPayload } from "@/types/backend-tutor";
+import { BackendTutorLocationRelation, BackendTutorPayload, BackendTutorResultStory } from "@/types/backend-tutor";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { fetchBackend, isBackendUnavailableResponse } from "@/lib/backend-api";
 import { getTutorPath } from "@/lib/tutor-paths";
@@ -414,12 +414,17 @@ function normalizeBackendTutor(rawTutor: BackendTutorPayload): TutorPageModel {
     `${rawTutor.name ?? rawTutor.displayName ?? "This tutor"} is a verified BoardPeFocus tutor in Gurugram.`;
   const experienceYears = rawTutor.experienceYrs ?? rawTutor.experienceYears ?? 0;
   const studentsTaught = rawTutor.studentsTaught ?? 0;
+  const tutorReviews = normalizeTutorReviews(rawTutor);
+  const reviewsCount =
+    rawTutor.reviewsCount && rawTutor.reviewsCount > 0
+      ? rawTutor.reviewsCount
+      : tutorReviews.length;
 
   const normalized = {
     ...rawTutor,
     name: rawTutor.displayName || rawTutor.name || "BoardPeFocus Tutor",
     rating: rawTutor.rating ?? 0,
-    reviewsCount: rawTutor.reviewsCount ?? rawTutor.reviews?.length ?? 0,
+    reviewsCount,
     experienceYrs: experienceYears,
     studentsTaught,
     about,
@@ -447,13 +452,7 @@ function normalizeBackendTutor(rawTutor: BackendTutorPayload): TutorPageModel {
             { label: "Experience", value: `${experienceYears} years` },
             { label: "Students Taught", value: `${studentsTaught}+` },
           ],
-    reviews: (rawTutor.reviews ?? []).map((review, index) => ({
-      id: String(review.id ?? `review-${index}`),
-      parentName: review.parentName ?? "BoardPeFocus family",
-      studentName: review.studentName,
-      rating: Number(review.rating ?? 5),
-      comment: review.comment ?? "",
-    })),
+    reviews: tutorReviews,
     faqs: (rawTutor.faqs ?? []).map((faq, index) => ({
       id: String(faq.id ?? `faq-${index}`),
       question: faq.question ?? "",
@@ -464,11 +463,39 @@ function normalizeBackendTutor(rawTutor: BackendTutorPayload): TutorPageModel {
   return {
     ...normalized,
     faqs: normalized.faqs.length > 0 ? normalized.faqs : buildGenericTutorFaqs(normalized),
-    reviews:
-      normalized.reviews.length > 0
-        ? normalized.reviews
-        : buildGenericTutorNotes(normalized),
+    reviews: normalized.reviews,
   };
+}
+
+function normalizeTutorReviews(rawTutor: BackendTutorPayload) {
+  const resultStoryReviews = (rawTutor.resultStories ?? []).map((story, index) =>
+    resultStoryToTutorReview(story, index),
+  );
+  const directTutorReviews = (rawTutor.reviews ?? []).map((review, index) => ({
+    id: String(review.id ?? `review-${index}`),
+    parentName: review.parentName ?? "BoardPeFocus family",
+    studentName: review.studentName,
+    rating: normalizeReviewRating(review.rating),
+    comment: review.comment ?? "",
+  }));
+
+  return [...resultStoryReviews, ...directTutorReviews].filter((review) => review.comment.trim().length > 0);
+}
+
+function resultStoryToTutorReview(story: BackendTutorResultStory, index: number) {
+  return {
+    id: String(story.id ?? `result-story-${index}`),
+    parentName: story.parentName ?? "BoardPeFocus family",
+    studentName: story.studentName ?? story.context ?? undefined,
+    rating: normalizeReviewRating(story.rating),
+    comment: story.story ?? "",
+  };
+}
+
+function normalizeReviewRating(value: number | null | undefined) {
+  const rating = Number(value ?? 0);
+  if (!Number.isFinite(rating)) return 0;
+  return Math.max(0, Math.min(5, rating));
 }
 
 function normalizeNameList(items: unknown, relationKey: "board" | "subject" | "school") {
@@ -507,18 +534,6 @@ function buildGenericTutorFaqs(tutor: TutorPageModel) {
       id: "backend-faq-2",
       question: `Where is ${tutor.name} available in Gurugram?`,
       answer: `This profile is relevant for ${formatList(tutor.locations.slice(0, 5)) || "Gurugram"} families, subject to schedule fit.`,
-    },
-  ];
-}
-
-function buildGenericTutorNotes(tutor: TutorPageModel) {
-  return [
-    {
-      id: "backend-review-1",
-      parentName: "BoardPeFocus family",
-      studentName: tutor.subjects[0] ?? "Board preparation",
-      rating: Math.round(tutor.rating || 5),
-      comment: `A structured one-to-one option for families seeking ${formatList(tutor.subjects)} support with board-aware planning.`,
     },
   ];
 }

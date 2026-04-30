@@ -4,7 +4,10 @@ import {
   IsBoolean,
   IsEmail,
   IsEnum,
+  IsInt,
   IsArray,
+  Max,
+  Min,
   IsNumber,
   IsOptional,
   IsString,
@@ -128,11 +131,14 @@ export class UpdateTutorDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
+  @Min(0)
+  @Max(5)
   rating?: number;
 
   @IsOptional()
   @Type(() => Number)
-  @IsNumber()
+  @IsInt()
+  @Min(0)
   reviewsCount?: number;
 
   @IsOptional()
