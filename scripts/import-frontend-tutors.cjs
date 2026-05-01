@@ -264,43 +264,50 @@ async function main() {
     const importedTutorIds = [];
 
     for (const [index, tutorInput] of tutors.entries()) {
-      const tutor = await prisma.tutor.upsert({
-        where: { id: tutorInput.id },
-        update: {
-          name: tutorInput.name,
-          slug: tutorInput.slug,
-          photoUrl: tutorInput.photoUrl,
-          tagline: tutorInput.tagline,
-          bio: tutorInput.about,
-          about: tutorInput.about,
-          methodology: tutorInput.methodology,
-          experienceYrs: tutorInput.experienceYrs,
-          studentsTaught: tutorInput.studentsTaught,
-          rating: tutorInput.rating,
-          reviewsCount: tutorInput.reviewsCount,
-          isFeatured: index < 3,
-          isVerified: true,
-          priority: tutors.length - index,
-        },
-        create: {
-          id: tutorInput.id,
-          slug: tutorInput.slug,
-          name: tutorInput.name,
-          photoUrl: tutorInput.photoUrl,
-          tagline: tutorInput.tagline,
-          bio: tutorInput.about,
-          about: tutorInput.about,
-          methodology: tutorInput.methodology,
-          experienceYrs: tutorInput.experienceYrs,
-          studentsTaught: tutorInput.studentsTaught,
-          rating: tutorInput.rating,
-          reviewsCount: tutorInput.reviewsCount,
-          isFeatured: index < 3,
-          isVerified: true,
-          status: TutorStatus.PUBLISHED,
-          priority: tutors.length - index,
-        },
+      const tutorData = {
+        name: tutorInput.name,
+        slug: tutorInput.slug,
+        photoUrl: tutorInput.photoUrl,
+        tagline: tutorInput.tagline,
+        bio: tutorInput.about,
+        about: tutorInput.about,
+        methodology: tutorInput.methodology,
+        experienceYrs: tutorInput.experienceYrs,
+        studentsTaught: tutorInput.studentsTaught,
+        rating: tutorInput.rating,
+        reviewsCount: tutorInput.reviewsCount,
+        isFeatured: index < 3,
+        isVerified: true,
+        priority: tutors.length - index,
+        deletedAt: null,
+      };
+      const existingBySlug = await prisma.tutor.findUnique({
+        where: { slug: tutorInput.slug },
       });
+      const existingById =
+        existingBySlug?.id === tutorInput.id
+          ? existingBySlug
+          : await prisma.tutor.findUnique({ where: { id: tutorInput.id } });
+      const existingTutor = existingBySlug ?? existingById;
+
+      if (existingBySlug && existingById && existingBySlug.id !== existingById.id) {
+        console.warn(
+          `Tutor slug "${tutorInput.slug}" already belongs to ${existingBySlug.id}; importing into that record instead of ${tutorInput.id}.`,
+        );
+      }
+
+      const tutor = existingTutor
+        ? await prisma.tutor.update({
+            where: { id: existingTutor.id },
+            data: tutorData,
+          })
+        : await prisma.tutor.create({
+            data: {
+              ...tutorData,
+              id: tutorInput.id,
+              status: TutorStatus.PUBLISHED,
+            },
+          });
 
       const boardIds = tutorInput.boards.map((boardName) => {
         const boardId = boardMap.get(boardName);
