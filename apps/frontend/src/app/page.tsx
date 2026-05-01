@@ -237,7 +237,7 @@ export default async function HomePage() {
               </Badge>
 
               <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-heading font-extrabold tracking-tight mb-6 text-primary leading-[1.15]">
-                Board-exam home tutions in Gurgaon for{" "}
+                Board-exam home tuitions in Gurgaon for{" "}
                 <span className="relative inline-block text-[#b56a00]">
                   CBSE, ICSE, ISC, IGCSE, and IB students.
                   <svg
