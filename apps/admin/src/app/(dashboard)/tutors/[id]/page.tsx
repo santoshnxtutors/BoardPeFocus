@@ -108,6 +108,31 @@ function cleanSlug(value: any) {
   return normalized ?? undefined;
 }
 
+function calculateProfileEligibilityScore(tutor: any) {
+  const bio = cleanOptionalString(tutor.bio);
+  const about = cleanOptionalString(tutor.about);
+  const metaDescription = cleanOptionalString(tutor.metaDescription);
+  const qualifications = Array.isArray(tutor.qualifications) ? tutor.qualifications : [];
+  let profileScore = 0;
+  let indexingScore = 0;
+
+  if (cleanOptionalString(tutor.photoUrl)) profileScore += 15;
+  if (bio && bio.length > 200) profileScore += 20;
+  if (cleanOptionalString(tutor.tagline)) profileScore += 5;
+  if (about && about.length > 500) profileScore += 20;
+  if (cleanOptionalString(tutor.methodology)) profileScore += 10;
+  if (qualifications.some((item: any) => cleanOptionalString(item.degree) && cleanOptionalString(item.institution))) profileScore += 10;
+  if ((Array.isArray(tutor.boardIds) ? tutor.boardIds : []).length > 0) profileScore += 10;
+  if ((Array.isArray(tutor.subjectIds) ? tutor.subjectIds : []).length > 0) profileScore += 10;
+
+  if (cleanOptionalString(tutor.seoTitle)) indexingScore += 25;
+  if (metaDescription && metaDescription.length > 80) indexingScore += 35;
+  if (cleanOptionalString(tutor.canonical) || cleanOptionalString(tutor.slug)) indexingScore += 25;
+  if (tutor.status && tutor.status !== "DRAFT") indexingScore += 15;
+
+  return Math.min(Math.max(profileScore, indexingScore), 100);
+}
+
 function buildTutorPayload(tutor: any) {
   return {
     name: tutor.name,
@@ -272,6 +297,8 @@ export default function TutorDetailPage() {
     { id: "interactions", label: "Reviews & FAQs", icon: MessageSquare },
     { id: "seo", label: "SEO & Publish", icon: Globe },
   ];
+  const profileEligibilityScore = calculateProfileEligibilityScore(tutor);
+  const isProfileEligible = profileEligibilityScore >= 80;
 
   const renderRelationPicker = (
     name: string,
@@ -718,12 +745,14 @@ export default function TutorDetailPage() {
                      <p className="text-xs text-muted-foreground font-medium">Profile must score &gt; 80 for public indexing.</p>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="text-4xl font-black text-primary">92%</span>
-                    <Badge className="bg-green-500 mt-2">READY TO PUBLISH</Badge>
+                    <span className="text-4xl font-black text-primary">{profileEligibilityScore}%</span>
+                    <Badge className={`${isProfileEligible ? "bg-green-500" : "bg-amber-500"} mt-2`}>
+                      {isProfileEligible ? "READY TO PUBLISH" : "NEEDS WORK"}
+                    </Badge>
                   </div>
                 </CardContent>
                 <div className="h-1.5 w-full bg-slate-100">
-                  <div className="h-full bg-primary w-[92%]"></div>
+                  <div className="h-full bg-primary" style={{ width: `${profileEligibilityScore}%` }}></div>
                 </div>
               </Card>
             </div>
