@@ -22,9 +22,9 @@ const baseMetadata = constructMetadata();
 export const metadata: Metadata = {
   ...baseMetadata,
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo/logo.png",
+    shortcut: "/logo/logo.png",
+    apple: "/logo/logo.png",
   },
 };
 
