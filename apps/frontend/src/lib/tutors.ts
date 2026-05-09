@@ -44,6 +44,29 @@ function normalizeLocationList(items: unknown) {
     .filter((item): item is string => Boolean(item));
 }
 
+function normalizeReviewRating(value: unknown) {
+  const rating = Number(value ?? 0);
+  if (!Number.isFinite(rating)) return 0;
+  return Math.max(0, Math.min(5, rating));
+}
+
+function deriveTutorRatingFromReviews(reviews: BackendTutorPayload["reviews"]) {
+  const visibleRatings = (reviews ?? [])
+    .map((review) => normalizeReviewRating(review.rating))
+    .filter((rating) => rating > 0);
+
+  if (visibleRatings.length === 0) {
+    return null;
+  }
+
+  return Number(
+    (
+      visibleRatings.reduce((sum, rating) => sum + rating, 0) /
+      visibleRatings.length
+    ).toFixed(1),
+  );
+}
+
 export function normalizeTutorCard(rawTutor: BackendTutorPayload): Tutor {
   const boards = normalizeNameList(rawTutor.boards, "board");
   const subjects = normalizeNameList(rawTutor.subjects, "subject");
@@ -52,13 +75,14 @@ export function normalizeTutorCard(rawTutor: BackendTutorPayload): Tutor {
     rawTutor.areas ??
     rawTutor.locations ??
     normalizeLocationList(rawTutor.locations);
+  const derivedRating = deriveTutorRatingFromReviews(rawTutor.reviews);
 
   return {
     id: rawTutor.id,
     slug: rawTutor.slug,
     name: rawTutor.displayName || rawTutor.name || "BoardPeFocus Tutor",
     photoUrl: rawTutor.photoUrl || undefined,
-    rating: Number(rawTutor.rating ?? 0),
+    rating: derivedRating ?? Number(rawTutor.rating ?? 0),
     experienceYears: Number(rawTutor.experienceYears ?? rawTutor.experienceYrs ?? 0),
     studentsTaught: Number(rawTutor.studentsTaught ?? 0),
     subjects,
@@ -79,7 +103,7 @@ export function normalizeTutorCard(rawTutor: BackendTutorPayload): Tutor {
     reviews: (rawTutor.reviews ?? []).map((review, index) => ({
       id: String(review.id ?? `review-${index}`),
       author: review.parentName ?? review.studentName ?? "BoardPeFocus family",
-      rating: Number(review.rating ?? 5),
+      rating: normalizeReviewRating(review.rating),
       comment: review.comment ?? "",
       date: "",
       location: "",

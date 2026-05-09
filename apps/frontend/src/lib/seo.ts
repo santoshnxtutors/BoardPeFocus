@@ -1,22 +1,13 @@
 import { Metadata } from 'next';
 import { TutorProfileViewModel } from '@/types/tutor-profile';
 import { getTutorPath } from '@/lib/tutor-paths';
+import { BusinessProfile, DEFAULT_BUSINESS_PROFILE } from '@/lib/business-profile';
 
 export const siteConfig = {
-  name: 'BoardPeFocus',
-  url: 'https://www.boardpefocus.in',
-  description: 'Specialized home tutoring for CBSE, ICSE, IGCSE, and IB boards in Gurugram. We aim to help students target 95%+.',
+  name: DEFAULT_BUSINESS_PROFILE.name,
+  url: DEFAULT_BUSINESS_PROFILE.websiteUrl,
+  description: DEFAULT_BUSINESS_PROFILE.description,
   ogImage: 'https://www.boardpefocus.in/og.jpg',
-  contact: {
-    phone: '+91 87963 67754',
-    email: 'boardpefocus@gmail.com',
-    address: {
-      streetAddress: '1st Floor, 497 Housing Board Colony, Sector 51',
-      addressLocality: 'Gurgaon',
-      addressRegion: 'Haryana',
-      addressCountry: 'IN',
-    },
-  },
   links: {
     twitter: 'https://twitter.com/boardpefocus',
     github: 'https://github.com/boardpefocus',
@@ -129,40 +120,89 @@ export function generateFaqJsonLd(items: { question: string; answer: string }[])
   };
 }
 
-export function generateOrganizationJsonLd() {
-  return {
+function toAbsoluteAssetUrl(path?: string | null) {
+  if (!path) return undefined;
+  if (/^https?:\/\//i.test(path)) return path;
+  return absoluteUrl(path);
+}
+
+export function generateProfessionalServiceJsonLd(profile: BusinessProfile) {
+  const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'EducationalOrganization',
-    name: siteConfig.name,
+    '@type': 'ProfessionalService',
+    '@id': absoluteUrl('/#business'),
+    name: profile.name,
     url: getSiteUrl(),
-    description: siteConfig.description,
-    telephone: siteConfig.contact.phone,
-    email: siteConfig.contact.email,
+    logo: toAbsoluteAssetUrl(profile.logoPath),
+    image: toAbsoluteAssetUrl(profile.imagePath),
+    description: profile.description,
+    telephone: profile.phone,
+    email: profile.email,
     address: {
       '@type': 'PostalAddress',
-      ...siteConfig.contact.address,
+      streetAddress: profile.streetAddress,
+      addressLocality: profile.addressLocality,
+      addressRegion: profile.addressRegion,
+      postalCode: profile.postalCode ?? undefined,
+      addressCountry: profile.addressCountryCode,
     },
     contactPoint: [
       {
         '@type': 'ContactPoint',
         contactType: 'customer support',
-        telephone: siteConfig.contact.phone,
-        email: siteConfig.contact.email,
-        areaServed: 'IN',
+        telephone: profile.phone,
+        email: profile.email,
+        areaServed: profile.addressCountryCode,
         availableLanguage: ['en', 'hi'],
       },
     ],
-    areaServed: 'Gurugram, Haryana, India',
+    areaServed: profile.areaServed,
     knowsAbout: [
       'CBSE home tutoring',
       'ICSE home tutoring',
+      'ISC home tutoring',
       'IGCSE home tutoring',
       'IB tutoring',
       'Class 10 tutoring',
       'Class 12 tutoring',
     ],
-    sameAs: [siteConfig.links.twitter],
   };
+
+  if (profile.hasMapUrl) {
+    schema.hasMap = profile.hasMapUrl;
+  }
+
+  if (profile.googleMapsUrl) {
+    schema.sameAs = [profile.googleMapsUrl];
+  }
+
+  if (
+    typeof profile.latitude === 'number' &&
+    Number.isFinite(profile.latitude) &&
+    typeof profile.longitude === 'number' &&
+    Number.isFinite(profile.longitude)
+  ) {
+    schema.geo = {
+      '@type': 'GeoCoordinates',
+      latitude: profile.latitude,
+      longitude: profile.longitude,
+    };
+  }
+
+  if (profile.openingHours && profile.openingHours.length > 0) {
+    schema.openingHoursSpecification = profile.openingHours.map((row) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: row.daysOfWeek,
+      opens: row.opens,
+      closes: row.closes,
+    }));
+  }
+
+  return schema;
+}
+
+export function generateOrganizationJsonLd(profile: BusinessProfile = DEFAULT_BUSINESS_PROFILE) {
+  return generateProfessionalServiceJsonLd(profile);
 }
 
 export function generateWebsiteJsonLd() {
@@ -184,8 +224,21 @@ export function generateTutorJsonLd(tutor: TutorProfileViewModel) {
     .map((board) => (typeof board === 'string' ? board : board.board?.name))
     .filter(Boolean);
   const knowsAbout = [...boardNames, ...(tutor.subjects ?? [])];
+  const visibleReviews = (tutor.reviews ?? []).filter(
+    (review) => review.comment.trim().length > 0,
+  );
+  const ratedReviews = visibleReviews.filter((review) => review.rating > 0);
+  const reviewAverage =
+    ratedReviews.length > 0
+      ? Number(
+          (
+            ratedReviews.reduce((sum, review) => sum + review.rating, 0) /
+            ratedReviews.length
+          ).toFixed(1),
+        )
+      : null;
 
-  return {
+  const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: tutor.name,
@@ -198,10 +251,44 @@ export function generateTutorJsonLd(tutor: TutorProfileViewModel) {
       name: 'Gurugram, Haryana, India',
     },
     worksFor: {
-      '@type': 'EducationalOrganization',
-      name: siteConfig.name,
+      '@type': 'ProfessionalService',
+      name: DEFAULT_BUSINESS_PROFILE.name,
       url: getSiteUrl(),
     },
     knowsAbout,
   };
+
+  if (reviewAverage !== null) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: reviewAverage,
+      reviewCount: ratedReviews.length,
+    };
+  }
+
+  if (visibleReviews.length > 0) {
+    schema.review = visibleReviews.slice(0, 5).map((review) => ({
+      '@type': 'Review',
+      author: {
+        '@type': 'Person',
+        name: review.parentName,
+      },
+      reviewBody: review.comment,
+      itemReviewed: {
+        '@type': 'Person',
+        name: tutor.name,
+      },
+      reviewRating:
+        review.rating > 0
+          ? {
+              '@type': 'Rating',
+              ratingValue: review.rating,
+              bestRating: 5,
+              worstRating: 1,
+            }
+          : undefined,
+    }));
+  }
+
+  return schema;
 }

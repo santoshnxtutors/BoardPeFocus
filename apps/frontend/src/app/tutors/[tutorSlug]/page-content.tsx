@@ -357,7 +357,7 @@ async function getPublishedTutor(slug: string): Promise<TutorPageModel | null> {
         return {
           ...mockTutor,
           faqs: buildTutorFaqs(mockTutor),
-          reviews: buildTutorNotes(mockTutor),
+          reviews: [],
         };
       }
 
@@ -376,7 +376,7 @@ async function getPublishedTutor(slug: string): Promise<TutorPageModel | null> {
     return {
       ...mockTutor,
       faqs: buildTutorFaqs(mockTutor),
-      reviews: buildTutorNotes(mockTutor),
+      reviews: [],
     };
   }
 
@@ -415,15 +415,27 @@ function normalizeBackendTutor(rawTutor: BackendTutorPayload): TutorPageModel {
   const experienceYears = rawTutor.experienceYrs ?? rawTutor.experienceYears ?? 0;
   const studentsTaught = rawTutor.studentsTaught ?? 0;
   const tutorReviews = normalizeTutorReviews(rawTutor);
+  const ratedTutorReviews = tutorReviews.filter((review) => review.rating > 0);
+  const derivedRating =
+    ratedTutorReviews.length > 0
+      ? Number(
+          (
+            ratedTutorReviews.reduce((sum, review) => sum + review.rating, 0) /
+            ratedTutorReviews.length
+          ).toFixed(1),
+        )
+      : null;
   const reviewsCount =
-    rawTutor.reviewsCount && rawTutor.reviewsCount > 0
+    tutorReviews.length > 0
+      ? tutorReviews.length
+      : rawTutor.reviewsCount && rawTutor.reviewsCount > 0
       ? rawTutor.reviewsCount
       : tutorReviews.length;
 
   const normalized = {
     ...rawTutor,
     name: rawTutor.displayName || rawTutor.name || "BoardPeFocus Tutor",
-    rating: rawTutor.rating ?? 0,
+    rating: derivedRating ?? rawTutor.rating ?? 0,
     reviewsCount,
     experienceYrs: experienceYears,
     studentsTaught,
@@ -564,36 +576,6 @@ function buildTutorFaqs(tutor: (typeof mockTutors)[number]) {
       id: "4",
       question: `Is ${tutor.name} familiar with top school expectations in Gurugram?`,
       answer: `Yes. The profile is especially relevant for families connected to ${schools}. The emphasis stays on school-aware pacing, cleaner revision structure, and board-ready one-to-one support without implying any school affiliation.`,
-    },
-  ];
-}
-
-function buildTutorNotes(tutor: (typeof mockTutors)[number]) {
-  const primarySubject = tutor.subjects[0];
-  const firstBoard = tutor.boards[0];
-  const firstSchool = tutor.schools[0];
-
-  return [
-    {
-      id: "1",
-      parentName: `${firstBoard} board parent`,
-      studentName: primarySubject,
-      rating: 5,
-      comment: `Useful for families who want more dependable ${primarySubject.toLowerCase()} structure, cleaner written work, and steadier preparation instead of rushed chapter completion.`,
-    },
-    {
-      id: "2",
-      parentName: "School-aware family",
-      studentName: firstSchool,
-      rating: 5,
-      comment: `A strong fit when parents want the tutoring pace to stay aligned with demanding school schedules while still creating space for disciplined board revision at home.`,
-    },
-    {
-      id: "3",
-      parentName: "Home-tutoring enquiry",
-      studentName: "Gurugram",
-      rating: 5,
-      comment: `Often preferred by families looking for calm one-to-one support across ${formatList(tutor.boards)} with clearer communication, steady follow-through, and practical home scheduling.`,
     },
   ];
 }

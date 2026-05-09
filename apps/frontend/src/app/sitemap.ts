@@ -25,6 +25,58 @@ import { areaClusters } from '@/data/areas';
 import { mockBoards, mockSchools, mockSectors, mockSubjects, mockTutors } from '@/data/mock';
 import { getGeneratedSitemapRoutes } from '@/lib/generated-pages';
 
+function normalizeTutorRelationName(
+  value: unknown,
+  relationKey: 'board' | 'subject' | 'school',
+): string | null {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const relation = record[relationKey];
+
+  if (relation && typeof relation === 'object' && 'name' in relation) {
+    const relationName = (relation as { name?: unknown }).name;
+    return typeof relationName === 'string' ? relationName : null;
+  }
+
+  return typeof record.name === 'string' ? record.name : null;
+}
+
+function normalizeTutorNames(
+  values: unknown,
+  relationKey: 'board' | 'subject' | 'school',
+) {
+  return (Array.isArray(values) ? values : [])
+    .map((value) => normalizeTutorRelationName(value, relationKey))
+    .filter((value): value is string => Boolean(value));
+}
+
+function normalizeSchoolBoardName(value: unknown) {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const board = record.board;
+
+  if (board && typeof board === 'object' && 'name' in board) {
+    const boardName = (board as { name?: unknown }).name;
+    return typeof boardName === 'string' ? boardName : null;
+  }
+
+  return typeof record.name === 'string' ? record.name : null;
+}
+
 async function getJson<T>(url: string): Promise<T | null> {
   try {
     const response = await fetch(url, {
@@ -118,13 +170,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     liveSubjects
       .filter((subject) =>
         tutorSeoInventory.some(
-          (tutor) =>
-            tutor.subjects.some((tutorSubject) => tutorSubject.toLowerCase() === subject.name.toLowerCase()) &&
-            tutor.boards.some(
-              (tutorBoard) =>
-                tutorBoard.toLowerCase() === board.slug.toLowerCase() ||
-                tutorBoard.toLowerCase() === board.name.toLowerCase(),
-            ),
+          (tutor) => {
+            const tutorSubjects = normalizeTutorNames(
+              (tutor as { subjects?: unknown }).subjects,
+              'subject',
+            );
+            const tutorBoards = normalizeTutorNames(
+              (tutor as { boards?: unknown }).boards,
+              'board',
+            );
+
+            return (
+              tutorSubjects.some(
+                (tutorSubject) => tutorSubject.toLowerCase() === subject.name.toLowerCase(),
+              ) &&
+              tutorBoards.some(
+                (tutorBoard) =>
+                  tutorBoard.toLowerCase() === board.slug.toLowerCase() ||
+                  tutorBoard.toLowerCase() === board.name.toLowerCase(),
+              )
+            );
+          },
         ),
       )
       .map((subject) => `/gurugram/${board.slug}/${subject.slug}`),
@@ -132,8 +198,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const schoolRoutes = liveSchools.map((school) => `/gurugram/schools/${school.slug}`);
   const schoolBoardRoutes = liveSchools.flatMap((school) =>
     ('boards' in school && Array.isArray(school.boards) ? school.boards : []).flatMap((schoolBoard) => {
+      const schoolBoardName = normalizeSchoolBoardName(schoolBoard);
       const board = boardSeoInventory.find(
-        (item) => item.name.toLowerCase() === schoolBoard.toLowerCase(),
+        (item) => schoolBoardName ? item.name.toLowerCase() === schoolBoardName.toLowerCase() : false,
       );
 
       return board ? [`/gurugram/schools/${school.slug}/${board.slug}`] : [];
@@ -141,7 +208,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
   const schoolBoardSubjectRoutes = liveSchools.flatMap((school) =>
     ('boards' in school && Array.isArray(school.boards) ? school.boards : []).flatMap((schoolBoard) => {
-      const board = boardSeoInventory.find((item) => item.name.toLowerCase() === schoolBoard.toLowerCase());
+      const schoolBoardName = normalizeSchoolBoardName(schoolBoard);
+      const board = boardSeoInventory.find((item) =>
+        schoolBoardName ? item.name.toLowerCase() === schoolBoardName.toLowerCase() : false,
+      );
 
       if (!board) {
         return [];
@@ -150,13 +220,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       return liveSubjects
         .filter((subject) =>
           tutorSeoInventory.some(
-            (tutor) =>
-              tutor.subjects.some((tutorSubject) => tutorSubject.toLowerCase() === subject.name.toLowerCase()) &&
-              tutor.boards.some(
-                (tutorBoard) =>
-                  tutorBoard.toLowerCase() === board.slug.toLowerCase() ||
-                  tutorBoard.toLowerCase() === board.name.toLowerCase(),
-              ),
+            (tutor) => {
+              const tutorSubjects = normalizeTutorNames(
+                (tutor as { subjects?: unknown }).subjects,
+                'subject',
+              );
+              const tutorBoards = normalizeTutorNames(
+                (tutor as { boards?: unknown }).boards,
+                'board',
+              );
+
+              return (
+                tutorSubjects.some(
+                  (tutorSubject) => tutorSubject.toLowerCase() === subject.name.toLowerCase(),
+                ) &&
+                tutorBoards.some(
+                  (tutorBoard) =>
+                    tutorBoard.toLowerCase() === board.slug.toLowerCase() ||
+                    tutorBoard.toLowerCase() === board.name.toLowerCase(),
+                )
+              );
+            },
           ),
         )
         .map((subject) => `/gurugram/schools/${school.slug}/${board.slug}/${subject.slug}`);

@@ -19,6 +19,7 @@ import {
   generateFaqJsonLd,
   generateOrganizationJsonLd,
 } from "@/lib/seo";
+import { getBusinessProfile } from "@/lib/business-profile";
 import {
   Accordion,
   AccordionContent,
@@ -57,12 +58,13 @@ export const metadata = constructMetadata({
   pathname: "/become-our-tutor",
 });
 
-export default function BecomeOurTutorPage() {
+export default async function BecomeOurTutorPage() {
+  const businessProfile = await getBusinessProfile();
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: absoluteUrl("/") },
     { name: "Become Our Tutor", url: absoluteUrl("/become-our-tutor") },
   ]);
-  const organizationJsonLd = generateOrganizationJsonLd();
+  const organizationJsonLd = generateOrganizationJsonLd(businessProfile);
   const faqJsonLd = generateFaqJsonLd(faqItems);
 
   return (

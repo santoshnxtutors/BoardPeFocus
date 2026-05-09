@@ -17,6 +17,7 @@ import { TutorCard } from "@/components/cards/TutorCard";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { BlogSection } from "@/components/blog/BlogSection";
 import { getPublicTutorCards } from "@/lib/tutors";
+import { getBusinessDisplayAddress, getBusinessProfile } from "@/lib/business-profile";
 
 export const metadata = constructMetadata({
   title: "Best Home Tutors in Gurgaon | BoardPeFocus",
@@ -26,9 +27,11 @@ export const metadata = constructMetadata({
 });
 
 export default async function HomePage() {
-  const organizationJsonLd = generateOrganizationJsonLd();
+  const businessProfile = await getBusinessProfile();
+  const organizationJsonLd = generateOrganizationJsonLd(businessProfile);
   const websiteJsonLd = generateWebsiteJsonLd();
   const featuredTutors = (await getPublicTutorCards()).slice(0, 3);
+  const businessAddress = getBusinessDisplayAddress(businessProfile);
 
   const boardDiscovery = [
     {
@@ -699,14 +702,30 @@ export default async function HomePage() {
                   </div>
                   <div className="space-y-4">
                     <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
-                      <p className="text-sm italic">
-                        &quot;The tutor understood my child&apos;s school
-                        pattern and helped build confidence through regular
-                        practice and clear explanations.&quot;
+                      <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent/80">
+                        Service Base
                       </p>
-                      <p className="mt-2 text-xs font-bold text-accent">
-                        — Parent, Gurgaon
+                      <p className="mt-3 text-sm leading-7 text-white/75">
+                        {businessAddress.join(", ")}
                       </p>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        {businessProfile.googleMapsUrl ? (
+                          <Link
+                            href={businessProfile.googleMapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-bold uppercase tracking-[0.2em] text-accent transition-colors hover:text-white"
+                          >
+                            View on Google Maps
+                          </Link>
+                        ) : null}
+                        <Link
+                          href="/result"
+                          className="text-xs font-bold uppercase tracking-[0.2em] text-white/75 transition-colors hover:text-white"
+                        >
+                          View Parent Result Stories
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>

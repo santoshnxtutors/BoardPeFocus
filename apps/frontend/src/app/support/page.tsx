@@ -12,6 +12,7 @@ import {
   generateFaqJsonLd,
   generateOrganizationJsonLd,
 } from "@/lib/seo";
+import { getBusinessProfile } from "@/lib/business-profile";
 import { getLiveContentItem, getLiveFaqs } from "@/lib/live-content";
 
 interface LiveSupportContent {
@@ -98,7 +99,8 @@ export const metadata = constructMetadata({
 });
 
 export default async function SupportPage() {
-  const [liveSupport, liveFaqs] = await Promise.all([
+  const [businessProfile, liveSupport, liveFaqs] = await Promise.all([
+    getBusinessProfile(),
     getLiveContentItem<LiveSupportContent>("/content/process-content/support"),
     getLiveFaqs({ pageSlug: "support" }),
   ]);
@@ -106,7 +108,7 @@ export default async function SupportPage() {
     { name: "Home", url: absoluteUrl("/") },
     { name: "Support", url: absoluteUrl("/support") },
   ]);
-  const organizationJsonLd = generateOrganizationJsonLd();
+  const organizationJsonLd = generateOrganizationJsonLd(businessProfile);
   const faqJsonLd = liveFaqs.length > 0 ? generateFaqJsonLd(liveFaqs) : null;
 
   return (

@@ -6,6 +6,13 @@ import { LeadForm } from "@/components/forms/LeadForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ButtonLink } from "@/components/ui/button";
 import {
+  getBusinessDisplayAddress,
+  getBusinessMailtoHref,
+  getBusinessPhoneHref,
+  getBusinessProfile,
+  getBusinessWhatsAppHref,
+} from "@/lib/business-profile";
+import {
   absoluteUrl,
   constructMetadata,
   generateBreadcrumbJsonLd,
@@ -29,7 +36,8 @@ export const metadata = constructMetadata({
 });
 
 export default async function ContactPage() {
-  const [liveContact, liveFaqs] = await Promise.all([
+  const [businessProfile, liveContact, liveFaqs] = await Promise.all([
+    getBusinessProfile(),
     getLiveContentItem<LiveContactContent>("/content/process-content/contact"),
     getLiveFaqs({ pageSlug: "contact" }),
   ]);
@@ -37,8 +45,9 @@ export default async function ContactPage() {
     { name: "Home", url: absoluteUrl("/") },
     { name: "Contact", url: absoluteUrl("/contact") },
   ]);
-  const organizationJsonLd = generateOrganizationJsonLd();
+  const organizationJsonLd = generateOrganizationJsonLd(businessProfile);
   const faqJsonLd = liveFaqs.length > 0 ? generateFaqJsonLd(liveFaqs) : null;
+  const businessAddress = getBusinessDisplayAddress(businessProfile);
 
   return (
     <div className="bg-background min-h-screen pt-32 pb-24">
@@ -88,8 +97,8 @@ export default async function ContactPage() {
                   </div>
                   <div>
                     <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Call or WhatsApp</p>
-                    <Link href="tel:+918796367754" className="text-xl font-bold text-primary transition-colors hover:text-accent">
-                      +91 87963 67754
+                    <Link href={getBusinessPhoneHref(businessProfile.phone)} className="text-xl font-bold text-primary transition-colors hover:text-accent">
+                      {businessProfile.phone}
                     </Link>
                   </div>
                 </div>
@@ -100,8 +109,8 @@ export default async function ContactPage() {
                   </div>
                   <div>
                     <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Email us</p>
-                    <Link href="mailto:boardpefocus@gmail.com" className="text-xl font-bold text-primary transition-colors hover:text-accent">
-                      boardpefocus@gmail.com
+                    <Link href={getBusinessMailtoHref(businessProfile.email)} className="text-xl font-bold text-primary transition-colors hover:text-accent">
+                      {businessProfile.email}
                     </Link>
                   </div>
                 </div>
@@ -112,7 +121,17 @@ export default async function ContactPage() {
                   </div>
                   <div>
                     <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">Service base</p>
-                    <p className="text-xl font-bold text-primary">1st Floor, 497 Housing Board Colony, Sector 51, Gurgaon, Haryana</p>
+                    <p className="text-xl font-bold text-primary">{businessAddress.join(", ")}</p>
+                    {businessProfile.googleMapsUrl ? (
+                      <Link
+                        href={businessProfile.googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex text-sm font-bold text-accent transition-colors hover:text-primary"
+                      >
+                        View on Google Maps
+                      </Link>
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -127,7 +146,7 @@ export default async function ContactPage() {
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <ButtonLink
-                  href="https://wa.me/918796367754"
+                  href={getBusinessWhatsAppHref(businessProfile.phone)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="h-14 w-full rounded-xl bg-accent text-lg font-bold text-white shadow-lg hover:bg-accent/90"
@@ -135,11 +154,13 @@ export default async function ContactPage() {
                   Chat with an Advisor
                 </ButtonLink>
                 <ButtonLink
-                  href="/support"
+                  href={businessProfile.googleMapsUrl ?? "/support"}
+                  target={businessProfile.googleMapsUrl ? "_blank" : undefined}
+                  rel={businessProfile.googleMapsUrl ? "noopener noreferrer" : undefined}
                   variant="outline"
                   className="h-14 w-full rounded-xl text-lg font-bold"
                 >
-                  Open Support Hub
+                  {businessProfile.googleMapsUrl ? "View Google Maps" : "Open Support Hub"}
                 </ButtonLink>
               </div>
             </div>

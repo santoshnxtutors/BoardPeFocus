@@ -2,6 +2,12 @@ import Link from "next/link";
 import { MapPin, Mail, Phone } from "lucide-react";
 import { getBoardPath } from "@/app/boards/_data/boards";
 import { getClassHubPath } from "@/app/classes/_data/classes";
+import {
+  getBusinessDisplayAddress,
+  getBusinessMailtoHref,
+  getBusinessPhoneHref,
+  getBusinessProfile,
+} from "@/lib/business-profile";
 
 const boardLinks = [
   { slug: "cbse", name: "CBSE" },
@@ -19,8 +25,10 @@ const topLocalityLinks = [
   { href: "/gurugram/sectors/sector-57", label: "Tutors in Sector 57" },
 ];
 
-export function Footer() {
+export async function Footer() {
   const currentYear = new Date().getFullYear();
+  const businessProfile = await getBusinessProfile();
+  const businessAddress = getBusinessDisplayAddress(businessProfile);
 
   return (
     <footer className="border-t border-border/10 bg-primary py-6 text-primary-foreground sm:py-8">
@@ -42,28 +50,39 @@ export function Footer() {
               <div className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 shrink-0 text-accent" />
                 <span>
-                  1st Floor, 497 Housing Board Colony, Sector 51, Gurgaon,
-                  Haryana
+                  {businessAddress.join(", ")}
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 shrink-0 text-accent" />
                 <Link
-                  href="tel:+918796367754"
+                  href={getBusinessPhoneHref(businessProfile.phone)}
                   className="transition-colors hover:text-accent"
                 >
-                  +91 87963 67754
+                  {businessProfile.phone}
                 </Link>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 shrink-0 text-accent" />
                 <Link
-                  href="mailto:boardpefocus@gmail.com"
+                  href={getBusinessMailtoHref(businessProfile.email)}
                   className="transition-colors hover:text-accent"
                 >
-                  boardpefocus@gmail.com
+                  {businessProfile.email}
                 </Link>
               </div>
+              {businessProfile.googleMapsUrl ? (
+                <div className="pt-1">
+                  <Link
+                    href={businessProfile.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold uppercase tracking-widest text-accent transition-colors hover:text-white"
+                  >
+                    View on Google Maps
+                  </Link>
+                </div>
+              ) : null}
             </div>
           </div>
 
